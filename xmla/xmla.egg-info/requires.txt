@@ -1,4 +1,0 @@
-olap == 0.1
-suds == 0.4
-kerberos == 1.1.1
-s4u2p == 0.2
