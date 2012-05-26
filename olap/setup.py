@@ -4,8 +4,6 @@ from setuptools import setup
 
 setup(name='olap',
     version='0.1',
-    url='',
-    license='GPL3',
     description='Interface to OLAP DBs',
     author='Norman Krämer',
     author_email='kraemer.norman@googlemail.com',
@@ -13,13 +11,10 @@ setup(name='olap',
     namespace_packages=['olap'],
     package_dir={'olap': 'olap'},
     install_requires=[
-      'zope.interface',
-      'zope.schema',
+      'zope.interface == 3.6.7',
+      'zope.schema == 4.1.1',
     ],
-
-    include_package_data=True,
-    zip_safe=False,
-    url="https://github.com/may-day/xmla",
+    url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
     classifiers = [
         "License :: OSI Approved :: Apache Software License",

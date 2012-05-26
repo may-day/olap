@@ -1,0 +1,2 @@
+zope.interface == 3.6.7
+zope.schema == 4.1.1
