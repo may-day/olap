@@ -1,0 +1,13 @@
+.*
+/build
+/dist
+/parts
+/develop-eggs
+/bin
+PKG-INFO
+MANIFEST
+*.egg
+*.keytab
+*.tgz
+*.tar.gz
+*.pyc
