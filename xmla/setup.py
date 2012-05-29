@@ -5,7 +5,7 @@ long_description = open("README.txt").read()
 
 setup(
     name='xmla',
-    version='0.1',
+    version='0.2',
     url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
     classifiers = [
@@ -25,10 +25,10 @@ setup(
     package_dir={'olap':'olap', 'olap.xmla': 'olap/xmla'},
     package_data={'olap.xmla': ['vs.wsdl']},
     install_requires=[
-      'olap == 0.1',
-      'suds == 0.4',
-      'kerberos == 1.1.1',
-      's4u2p == 0.2'
+      'olap',
+      'suds',
+      'kerberos',
+      's4u2p'
     ],
 
     include_package_data=True,

@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='olap',
-    version='0.1',
+    version='0.2',
     description='Interface to OLAP DBs',
     author='Norman Krämer',
     author_email='kraemer.norman@googlemail.com',
@@ -11,8 +11,8 @@ setup(name='olap',
     namespace_packages=['olap'],
     package_dir={'olap': 'olap'},
     install_requires=[
-      'zope.interface == 3.6.7',
-      'zope.schema == 4.1.1',
+      'zope.interface',
+      'zope.schema',
     ],
     url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
