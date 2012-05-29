@@ -28,7 +28,8 @@ setup(
       'olap',
       'suds',
       'kerberos',
-      's4u2p'
+      's4u2p',
+      'requests'
     ],
 
     include_package_data=True,
