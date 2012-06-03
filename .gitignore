@@ -12,3 +12,4 @@ MANIFEST
 *.tgz
 *.tar.gz
 *.pyc
+*.pem
