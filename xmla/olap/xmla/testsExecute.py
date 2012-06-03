@@ -1,6 +1,7 @@
 '''
 Created on 18.04.2012
-Tests are done against the Adventure Works DW 2008R2
+- For SSAS tests are done against the Adventure Works DW 2008R2.
+- For Mondrian tests are done against the FoodMart sample data source.
 
 @author: norman
 
@@ -40,7 +41,7 @@ cube, set1, set2, set3, catalog = be["cube"], be["set1"], be["set2"], be["set3"]
 class TestXMLAExecute(unittest.TestCase):
 	def setUp(self):
 		self.p = xmla.XMLAProvider()
-		self.c = self.p.connect(location=be["location"], doKerberos = (be == ssas), spn=be["spn"])
+		self.c = self.p.connect(location=be["location"], kerberos = (be == ssas), spn=be["spn"])
 
 	def tearDown(self):
 		pass

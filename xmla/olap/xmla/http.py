@@ -41,6 +41,7 @@ class HttpTransport(Transport):
                     - default: 90
         """
         Transport.__init__(self)
+        self.sslverify = kwargs.pop("sslverify")
         Unskin(self.options).update(kwargs)
         self.cookiejar = CookieJar()
         self.proxy = {}
@@ -54,11 +55,10 @@ class HttpTransport(Transport):
         res = self.doOpen(url)
         # TODO: fake a file like object if it isn't already
         if isinstance(res, req.models.Response):
-          res = DummyFile(res.content)
+            res = DummyFile(res.content)
         return res
 
     def send(self, request):
-        result = None
         url = request.url
         msg = request.message
         headers = request.headers
@@ -77,18 +77,19 @@ class HttpTransport(Transport):
     def doOpen(self, url, data=None, headers=None, cookies=None, **moreargs):
         """
         Open a connection.
-        @param u2request: A urllib2 request.
-        @type u2request: urllib2.Requet.
-        @return: The opened file-like urllib2 object.
-        @rtype: fp
+        @param url: an url
+        @type url: string
+        @return: The opened file-like object or requests Response object.
+        @rtype: fp or requests.models.Response
         """
+        # d'oh, requests doesn't know what to do with a file schema... so fall back to good old trusted urllib2
         if url.startswith("file://"):
             return urlopen(url)
         tm = self.options.timeout
         self.modifyargs(moreargs)
         return self.session.request("GET" if data is None else "POST", 
                                     url, data=data, headers=headers, 
-                                    proxies=self.proxy, cookies=cookies, timeout=tm, **moreargs)
+                                    proxies=self.proxy, cookies=cookies, timeout=tm, verify=self.sslverify, **moreargs)
             
     def __deepcopy__(self, memo={}):
         clone = self.__class__()

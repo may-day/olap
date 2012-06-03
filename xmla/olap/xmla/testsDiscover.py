@@ -59,9 +59,9 @@ supported = None
 class TestXMLA(unittest.TestCase):
     
     def setUp(self):
-        self.be = mondrian
+        self.be = ssas
         self.p = xmla.XMLAProvider()
-        self.c = self.p.connect(location=self.be["location"], doKerberos = (self.be == ssas), spn=self.be["spn"])
+        self.c = self.p.connect(location=self.be["location"], kerberos = (self.be == ssas), spn=self.be["spn"])
         self.proprietary, self.conform, self.unsupported, self.supported = self.getSchemaRowsetSupport()
          
     def getSchemaRowsetSupport(self):

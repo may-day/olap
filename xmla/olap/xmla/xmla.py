@@ -50,8 +50,8 @@ class XMLAProvider(object):
     
     implements(IProvider)
     
-    def connect(self, url=defaultwsdl, location=None, username=None, password=None, doKerberos=True, spn=None):
-        return XMLAConnection(url, location, username, password, doKerberos, spn)
+    def connect(self, url=defaultwsdl, location=None, username=None, password=None, kerberos=True, spn=None, sslverify=True):
+        return XMLAConnection(url, location, username, password, kerberos, spn, sslverify)
     
 class XMLADataSource(object):
     
@@ -130,11 +130,11 @@ class XMLAConnection(object):
             mname = schemaNameToMethodName(schemaName)
             cls.addMethod( mname, getFunc(schemaName, keyname) )
 
-    def __init__(self, url, location, username, password, doKerberos, spn):
-        if doKerberos:
-            transport = http.HttpKerberosAuthenticated(as_user=username, spn=spn)
+    def __init__(self, url, location, username, password, kerberos, spn, sslverify):
+        if kerberos:
+            transport = http.HttpKerberosAuthenticated(as_user=username, spn=spn, sslverify=sslverify)
         else:
-            transport = http.HttpAuthenticated(username=username, password=password)
+            transport = http.HttpAuthenticated(username=username, password=password, sslverify=sslverify)
         self.client = Client(url, location=location, transport=transport, cache=None)
         
         # optional, call might fail
