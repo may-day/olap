@@ -1,7 +1,7 @@
 olap.xmla
 =========
 
-This package is meant for accessing xmla datasources - see [Wikipedia entry on XMLA](XMLA http://en.wikipedia.org/wiki/XML_for_Analysis)
+This package is meant for accessing xmla datasources - see [Wikipedia entry on XMLA](http://en.wikipedia.org/wiki/XML_for_Analysis)
 
 BUILD
 =====
