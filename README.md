@@ -8,7 +8,8 @@ BUILD
 
 In this directory, run:
 
-    python setup.py build
+    python bootstrap.py
+    bin/buildout
 
 TESTING
 =======
