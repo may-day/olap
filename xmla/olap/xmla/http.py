@@ -112,7 +112,8 @@ class HttpAuthenticated(HttpTransport):
     
     def modifyargs(self, moreargs):
         HttpTransport.modifyargs(self, moreargs)
-        moreargs["auth"] = self.credentials()
+        if self.credentials()[0] is not None:
+            moreargs["auth"] = self.credentials()
         
     def credentials(self):
         return (self.options.username, self.options.password)
