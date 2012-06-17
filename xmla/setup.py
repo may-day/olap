@@ -5,7 +5,7 @@ long_description = open("README.txt").read()
 
 setup(
     name='xmla',
-    version='0.3',
+    version='0.4',
     url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
     classifiers = [

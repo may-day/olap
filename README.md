@@ -14,7 +14,7 @@ In this directory, run:
 TESTING
 =======
 
-Tests are done against the Mondrian and SSAS XMLA providers.
+Tests are done against the Mondrian, SSAS and icCube XMLA providers.
 The testsDiscover module tests behavior with different XMLA providers with the Discover command while
 testsExecute does the same with the Execute command.
 Note that you likely need to modify the sources if you want to test yourself since they contain specifics (namely the location
@@ -29,14 +29,19 @@ Here is an example how to use it::
 import olap.xmla.xmla as xmla
         
 p = xmla.XMLAProvider()
-c = p.connect(location="http://localhost:8080/mondrian/xmla", kerberos = False)
+c = p.connect(location="http://localhost:8080/mondrian/xmla")
+# to analysis services (if iis proxies requests at /olap/msmdpump.dll)
+# you will need a valid kerberos principal of course
+# c = p.connect(location="https://my-as-server/olap/msmspump.dll", sslverify="/path/to/my/as-servers-ca-cert.pem") # or sslverify=False :)
+# to icCube
+# c = p.connect(location="http://localhost:8282/icCube/xmla", username="demo", password="demo")
 
 # getting info about provided data
 print c.getDatasources()
 print c.getMDSchemaCubes()
 # for ssas a catalog is needed, so the call would be like
 # get a catalogname from a call to c.getDBSchemaCatalogs()
-# c.getMDSchemaCubes(properties={"CATALOG":"a catalogname"})
+# c.getMDSchemaCubes(properties={"Catalog":"a catalogname"})
 
 # execute a MDX (working against the foodmart sample catalog of mondrian)
 cmd= """select {[Measures].ALLMEMBERS} * {[Time].[1997].[Q2].children} on columns, 

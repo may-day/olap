@@ -16,7 +16,7 @@ In this directory, run:
 TESTING
 *******
 
-Tests are done against the Mondrian and SSAS XMLA providers.
+Tests are done against the Mondrian, SSAS, icCube XMLA providers.
 The testsDiscover module tests behavior with different XMLA providers with the Discover command while
 testsExecute does the same with the Execute command.
 Note that you likely need to modify the sources if you want to test yourself since they contain specifics (namely the location
@@ -31,7 +31,13 @@ Here is an example how to use it::
         import olap.xmla.xmla as xmla
         
         p = xmla.XMLAProvider()
-        c = p.connect(location="http://localhost:8080/mondrian/xmla", doKerberos = False)
+        # mondrian
+        c = p.connect(location="http://localhost:8080/mondrian/xmla")
+        # to analysis services (if iis proxies requests at /olap/msmdpump.dll)
+        # you will need a valid kerberos principal of course
+        # c = p.connect(location="https://my-as-server/olap/msmspump.dll", sslverify="/path/to/my/as-servers-ca-cert.pem") # or sslverify=False :)
+        # to icCube
+        # c = p.connect(location="http://localhost:8282/icCube/xmla", username="demo", password="demo")
         
         # getting info about provided data
         print c.getDatasources()
@@ -61,4 +67,4 @@ Note
 ****
 The contained vs.wsdl originates from the following package:
 http://www.microsoft.com/en-us/download/confirmation.aspx?id=9388
-and was subsequently modified (which parameters go in the soap header) to work with the suds package.
+and was subsequently modified (which parameters go in the soap header) to work with the suds package.olap.xmla
