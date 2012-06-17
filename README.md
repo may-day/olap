@@ -29,7 +29,7 @@ Here is an example how to use it::
 import olap.xmla.xmla as xmla
         
 p = xmla.XMLAProvider()
-c = p.connect(location="http://localhost:8080/mondrian/xmla", doKerberos = False)
+c = p.connect(location="http://localhost:8080/mondrian/xmla", kerberos = False)
 
 # getting info about provided data
 print c.getDatasources()
