@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="urn:schemas-microsoft-com:xml-analysis" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="urn:schemas-microsoft-com:xml-analysis" xmlns="http://schemas.xmlsoap.org/wsdl/">
   <types>
-    <s:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="urn:schemas-microsoft-com:xml-analysis">
+    <s:schema attributeFormDefault="qualified" elementFormDefault="unqualified" targetNamespace="urn:schemas-microsoft-com:xml-analysis">
       <s:element name="BeginSession">
-        <s:complexType />
+        <s:complexType>
+          <s:attribute form="unqualified" name="mustUnderstand" type="s:int" />
+        </s:complexType>
       </s:element>
       <s:element name="EndSession">
         <s:complexType>
           <s:attribute form="unqualified" name="SessionId" type="s:string" />
+          <s:attribute form="unqualified" name="mustUnderstand" type="s:int" />
         </s:complexType>
       </s:element>
       <s:element name="Session">
         <s:complexType>
           <s:attribute form="unqualified" name="SessionId" type="s:string" />
+          <s:attribute form="unqualified" name="mustUnderstand" type="s:int" />
         </s:complexType>
       </s:element>
       <s:element name="Discover">
