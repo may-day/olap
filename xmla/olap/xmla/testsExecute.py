@@ -17,6 +17,8 @@ import olap.xmla.xmla as xmla
 
 mondrian={"type":"mondrian",
 "location":"http://localhost:8080/mondrian/xmla",
+"username":None,
+"password":None,
 "spn":"dummy",
 "catalog":"FoodMart",
 "cube":"[Sales]",
@@ -27,6 +29,8 @@ mondrian={"type":"mondrian",
 ssas={
 "type":"ssas",
 "location":"http://dwh-bi/olap/msmdpump.dll",
+"username":None,
+"password":None,
 "spn":"HOST@DWH-BI",
 "catalog":"Adventure Works DW 2008R2",
 "cube":"[Sales Summary]",
@@ -35,13 +39,25 @@ ssas={
 "set3":"[Product].[Product Categories].[Category].ALLMEMBERS",
 }
 
-be = mondrian
+iccube={
+"type":"icCube",
+"spn":"",
+"location":"http://localhost:80/icCube/xmla",
+"username":"demo",
+"password":"demo",
+"catalog":"Sales",
+"cube":"[Sales]",
+"set1":"[Measures].ALLMEMBERS",
+"set2":"[Time].[Month].ALLMEMBERS",
+"set3":"[Product].[Product].[Category].ALLMEMBERS",
+}
+be = ssas
 cube, set1, set2, set3, catalog = be["cube"], be["set1"], be["set2"], be["set3"], be["catalog"]
 
 class TestXMLAExecute(unittest.TestCase):
 	def setUp(self):
 		self.p = xmla.XMLAProvider()
-		self.c = self.p.connect(location=be["location"], kerberos = (be == ssas), spn=be["spn"])
+		self.c = self.p.connect(location=be["location"], username=be["username"], password=be["password"], spn=be["spn"])
 
 	def tearDown(self):
 		pass
