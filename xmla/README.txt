@@ -44,7 +44,7 @@ Here is an example how to use it::
         print c.getMDSchemaCubes()
         # for ssas a catalog is needed, so the call would be like
         # get a catalogname from a call to c.getDBSchemaCatalogs()
-        # c.getMDSchemaCubes(properties={"CATALOG":"a catalogname"})
+        # c.getMDSchemaCubes(properties={"Catalog":"a catalogname"})
         
         # execute a MDX (working against the foodmart sample catalog of mondrian)
         cmd= """select {[Measures].ALLMEMBERS} * {[Time].[1997].[Q2].children} on columns, 

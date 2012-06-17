@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 
 from setuptools import setup
-long_description = open("README.txt").read()
+long_description = open("README.txt").read() + "\n\n" +  open("CHANGES.md").read() 
 
 setup(
     name='xmla',
