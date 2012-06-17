@@ -1,6 +1,12 @@
 HEAD
 -----
 
+0.4
+----
+* keyword ``kerberos`` is gone. kerberos auth need is detected automatically
+* BeginSession and EndSession provide XMLA Sessionsupport
+* changes to work with icCube XMLA provider
+
 0.3
 ----
 * changed keyword ``doKerberos`` in XMLProvider.connect to ``kerberos``
