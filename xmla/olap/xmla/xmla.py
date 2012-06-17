@@ -13,6 +13,16 @@ from pkg_resources import ResourceManager
 rm = ResourceManager()
 defaultwsdl = "file://"+rm.resource_filename(__name__, "vs.wsdl")
 
+from suds.plugin import MessagePlugin
+
+# the following along with changes to the wsdl (elementFormDefault="unqualified") is needed
+# to make it fly with icCube, which expects elements w/o namespace prefix
+class UseDefaultNamespace(MessagePlugin):
+    def marshalled(self, context):
+        for d in context.envelope.getChild('Body').children:
+            d.prefix = None
+            d.set("xmlns", "urn:schemas-microsoft-com:xml-analysis")
+
 #import logging
 #logging.basicConfig(level=logging.INFO)
 #logging.getLogger('suds.client').setLevel(logging.DEBUG)
@@ -50,8 +60,8 @@ class XMLAProvider(object):
     
     implements(IProvider)
     
-    def connect(self, url=defaultwsdl, location=None, username=None, password=None, kerberos=True, spn=None, sslverify=True):
-        return XMLAConnection(url, location, username, password, kerberos, spn, sslverify)
+    def connect(self, url=defaultwsdl, location=None, username=None, password=None, spn=None, sslverify=True):
+        return XMLAConnection(url, location, username, password, spn, sslverify)
     
 class XMLADataSource(object):
     
@@ -130,16 +140,16 @@ class XMLAConnection(object):
             mname = schemaNameToMethodName(schemaName)
             cls.addMethod( mname, getFunc(schemaName, keyname) )
 
-    def __init__(self, url, location, username, password, kerberos, spn, sslverify):
-        if kerberos:
+    def __init__(self, url, location, username, password, spn, sslverify):
+        if password is None:
             transport = http.HttpKerberosAuthenticated(as_user=username, spn=spn, sslverify=sslverify)
         else:
             transport = http.HttpAuthenticated(username=username, password=password, sslverify=sslverify)
-        self.client = Client(url, location=location, transport=transport, cache=None)
+        self.client = Client(url, location=location, transport=transport, cache=None, plugins=[UseDefaultNamespace()])
         
         # optional, call might fail
         self.getMDSchemaLevels = lambda *args, **kw: self.Discover("MDSCHEMA_LEVELS", None, *args, **kw)
-        
+        self.sessionid = None
              
         
     def Discover(self, what, keyname=None, restrictions=None, properties=None):
@@ -158,6 +168,7 @@ class XMLAConnection(object):
                 res = listify(res)
         return res
 
+
     def Execute(self, command, dimformat="Multidimensional", axisFormat="TupleFormat", **kwargs):
         if isinstance(command, types.StringTypes):
             command = {"Statement":command}
@@ -166,6 +177,25 @@ class XMLAConnection(object):
         pl = {"PropertyList":props}
         return TupleFormatReader(self.client.service.Execute(command, pl).ExecuteResponse["return"].root)
         
+    def BeginSession(self):
+        bs= self.client.factory.create("BeginSession")
+        bs._mustUnderstand = 1
+        sess= self.client.factory.create("Session")
+        sess._mustUnderstand = 1
+        self.client.set_options(soapheaders={"BeginSession":bs})
+        self.client.service.Execute({"Statement":None})
+        self.sessionid = sess._SessionId=self.client.last_received().childAtPath("/Envelope/Header/Session").getAttribute("SessionId").getValue()
+        self.client.set_options(soapheaders=sess)
+        
+    def EndSession(self):
+        if self.sessionid is not None:
+            es= self.client.factory.create("EndSession")
+            es._mustUnderstand = 1
+            es._SessionId = self.sessionid
+            self.client.set_options(soapheaders={"EndSession":es})
+            self.client.service.Execute({"Statement":None})
+            self.sessionid = None
+            self.client.set_options(soapheaders=None)
 
 class TupleFormatReader(object):
     
