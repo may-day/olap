@@ -3,6 +3,13 @@
 from setuptools import setup
 long_description = open("README.txt").read() + "\n\n" +  open("CHANGES.md").read() 
 
+# hack, or test wont run on py2.7
+try:
+    import multiprocessing
+    import logging
+except:
+    pass
+
 setup(
     name='xmla',
     version='0.5',
@@ -31,6 +38,11 @@ setup(
       's4u2p',
       'requests'
     ],
+   tests_require = [
+        'nose',
+    ],
+
+    test_suite = 'nose.collector',
 
     include_package_data=True,
     zip_safe=False,
