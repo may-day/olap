@@ -15,6 +15,7 @@ n.b.:
 
 import unittest
 import olap.xmla.xmla as xmla
+from olap.xmla.connection import xmla1_1_rowsets
 
 
 
@@ -88,29 +89,33 @@ supported = None
 
 import logging
 logging.basicConfig(level=logging.INFO)
-logging.getLogger('suds.client').setLevel(logging.DEBUG)
+#logging.getLogger('suds.client').setLevel(logging.DEBUG)
 
 class TestXMLA(unittest.TestCase):
     
     def setUp(self):
         self.be = mondrian
         self.p = xmla.XMLAProvider()
-        self.c = self.p.connect(location=self.be["location"], username=self.be["username"], password=self.be["password"], spn=self.be["spn"])
+        self.c = self.p.connect(location=self.be["location"], 
+                                username=self.be["username"], 
+                                password=self.be["password"], 
+                                spn=self.be["spn"])
         self.c.BeginSession()
-        self.proprietary, self.conform, self.unsupported, self.supported = self.getSchemaRowsetSupport()
+        self.proprietary, self.conform, self.unsupported, self.supported = \
+            self.getSchemaRowsetSupport()
          
     def getSchemaRowsetSupport(self):
         global supported
         if supported is None:
             supported=self.c.getSchemaRowsets().keys()
-        proprietary = filter(lambda x: not(x in xmla.xmla1_1_rowsets), supported)
-        conform = filter(lambda x: (x in xmla.xmla1_1_rowsets), supported)
-        unsupported = filter(lambda x: not (x in supported), xmla.xmla1_1_rowsets)
+        proprietary = filter(lambda x: not(x in xmla1_1_rowsets), supported)
+        conform = filter(lambda x: (x in xmla1_1_rowsets), supported)
+        unsupported = filter(lambda x: not (x in supported), xmla1_1_rowsets)
         return proprietary, conform, unsupported, supported
     
     def tearDown(self):
         self.c.EndSession()
-        pass
+        #pass
     
     def testGetDatasources(self):
         erg=self.c.getDatasources()

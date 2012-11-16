@@ -35,7 +35,7 @@ Here is an example how to use it::
         c = p.connect(location="http://localhost:8080/mondrian/xmla")
         # to analysis services (if iis proxies requests at /olap/msmdpump.dll)
         # you will need a valid kerberos principal of course
-        # c = p.connect(location="https://my-as-server/olap/msmspump.dll", sslverify="/path/to/my/as-servers-ca-cert.pem") # or sslverify=False :)
+        # c = p.connect(location="https://my-as-server/olap/msmdpump.dll", sslverify="/path/to/my/as-servers-ca-cert.pem") # or sslverify=False :)
         # to icCube
         # c = p.connect(location="http://localhost:8282/icCube/xmla", username="demo", password="demo")
         
@@ -53,15 +53,48 @@ Here is an example how to use it::
         """
         
         res = c.Execute(cmd, Catalog="FoodMart")
-        res.getSlice(property="Value") #return only the Value property from the cells
+	#return only the Value property from the cells
+        res.getSlice(properties="Value")
+	# or two props
+        res.getSlice(properties=["Value", "FmtValue"]) 
         
         # to return some subcube from the result you can
-        res.getSlice() # return all
-        res.getSlice(Axis0=3) # carve out the 4th column
-        res.getSlice(Axis0=3, SlicerAxis=0) # same as above, SlicerAxis is ignored
-        res.getSlice(Axis1=[1,2]) # return the data sliced at the 2nd and 3rd row
-        res.getSlice(Axis0=3, Axis1=[1,2]) # return the data sliced at the 2nd and 3rd row in addition to the 4th column 
+	# return all
+        res.getSlice()
+	# carve out the 4th column
+        res.getSlice(Axis0=3) 
+	# same as above, SlicerAxis is ignored
+        res.getSlice(Axis0=3, SlicerAxis=0) 
+	# return the data sliced at the 2nd and 3rd row
+        res.getSlice(Axis1=[1,2]) 
+	# return the data sliced at the 2nd and 3rd row and at the 4th column
+        res.getSlice(Axis0=3, Axis1=[1,2]) 
 
+Using the procedural interface::
+
+        import olap.xmla.xmla as xmla
+        
+        p = xmla.XMLAProvider()
+        c = p.connect(location="http://localhost:8080/mondrian/xmla")
+	s = p.getOLAPSource()
+
+	# import olap.interfaces as oi
+	# oi.IOLAPSource.providedBy(s) == True
+
+	s.getCatalogs()
+	s.getCatalog("FoodMart").getCubes()
+	s.getCatalog("FoodMart").getCube("HR").getDimensions()
+	s.getCatalog("FoodMart").getCube("HR").getDimension("[Department]").\
+	getMembers()
+	s.getCatalog("FoodMart").getCube("HR").getDimension("[Department]").\
+	getMember("[Department].[14]")
+
+        cmd= """select {[Measures].ALLMEMBERS} * {[Time].[1997].[Q2].children} on columns, 
+        [Gender].[Gender].ALLMEMBERS on rows 
+        from [Sales]
+        """
+	res=s.getCatalog("FoodMart").query(cmd)
+	res.getSlice()
 ****
 Note
 ****

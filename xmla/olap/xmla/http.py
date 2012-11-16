@@ -130,7 +130,7 @@ class HttpKerberosAuthenticated(HttpTransport):
         HttpTransport.__init__(self, **kwargs)
         self.as_user = as_user
         self.spn = spn
-        self.auth = HTTPKerberosAuth(as_user=None, spn=None)
+        self.auth = HTTPKerberosAuth(as_user=as_user, spn=spn)
         
     def modifyargs(self, moreargs):
         HttpTransport.modifyargs(self, moreargs)

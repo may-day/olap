@@ -51,7 +51,7 @@ iccube={
 "set2":"[Time].[Month].ALLMEMBERS",
 "set3":"[Product].[Product].[Category].ALLMEMBERS",
 }
-be = ssas
+be = mondrian
 cube, set1, set2, set3, catalog = be["cube"], be["set1"], be["set2"], be["set3"], be["catalog"]
 
 class TestXMLAExecute(unittest.TestCase):

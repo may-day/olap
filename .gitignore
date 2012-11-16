@@ -1,9 +1,12 @@
+*~
 .*
 /build
 /dist
 /parts
 /develop-eggs
 /bin
+cover
+
 PKG-INFO
 MANIFEST
 *.egg-info

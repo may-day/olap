@@ -23,7 +23,7 @@ import olap.xmla.xmla as xmla
 mondrian={
 "type":"mondrian",
 "spn":None,          
-"location":"http://192.168.1.51:8080/mondrian/xmla",
+"location":"http://localhost:8080/mondrian/xmla",
 "username":None,
 "password":None,
 "ds": "Provider=Mondrian;DataSource=MondrianFoodMart;",
@@ -91,13 +91,12 @@ logging.getLogger('suds.client').setLevel(logging.DEBUG)
 class TestXMLA(unittest.TestCase):
     
     def setUp(self):
-        self.be = ssas
+        self.be = mondrian
         self.p = xmla.XMLAProvider()
         self.c = self.p.connect(location=self.be["location"], username=self.be["username"], password=self.be["password"], spn=self.be["spn"])
 
     def testSessionBegin(self):
         self.c.BeginSession()
-        print self.c.getDatasources()
         self.c.EndSession()
         #print self.c.getDatasources()
 

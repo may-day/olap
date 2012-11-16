@@ -3,7 +3,7 @@
 from setuptools import setup
 
 setup(name='olap',
-    version='0.2',
+    version='0.3',
     description='Interface to OLAP DBs',
     author='Norman Krämer',
     author_email='kraemer.norman@googlemail.com',

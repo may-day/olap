@@ -32,7 +32,7 @@ p = xmla.XMLAProvider()
 c = p.connect(location="http://localhost:8080/mondrian/xmla")
 # to analysis services (if iis proxies requests at /olap/msmdpump.dll)
 # you will need a valid kerberos principal of course
-# c = p.connect(location="https://my-as-server/olap/msmspump.dll", sslverify="/path/to/my/as-servers-ca-cert.pem") # or sslverify=False :)
+# c = p.connect(location="https://my-as-server/olap/msmdpump.dll", sslverify="/path/to/my/as-servers-ca-cert.pem") # or sslverify=False :)
 # to icCube
 # c = p.connect(location="http://localhost:8282/icCube/xmla", username="demo", password="demo")
 
@@ -50,7 +50,10 @@ from [Sales]
 """
 
 res = c.Execute(cmd, Catalog="FoodMart")
-res.getSlice(property="Value") #return only the Value property from the cells
+#return only the Value property from the cells
+res.getSlice(properties="Value") 
+#return only the Value property from the cells
+res.getSlice(properties=["Value", "FmtValue"])
 
 # to return some subcube from the result you can
 res.getSlice() # return all
