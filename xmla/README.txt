@@ -95,6 +95,7 @@ Using the procedural interface::
         """
 	res=s.getCatalog("FoodMart").query(cmd)
 	res.getSlice()
+
 ****
 Note
 ****

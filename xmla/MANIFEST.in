@@ -1,1 +1,3 @@
 include olap/xmla/vs.wsdl
+include CHANGES.md
+include README.txt
