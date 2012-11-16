@@ -40,6 +40,7 @@ setup(
     ],
    tests_require = [
         'nose',
+        'docutils'
     ],
 
     test_suite = 'nose.collector',
