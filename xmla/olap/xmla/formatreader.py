@@ -135,11 +135,10 @@ class TupleFormatReader(object):
             for axisrange in axisranges:
                 hyperelemcount=axisrange[axisrange[0]]
                 ordinal = ordinal + hyperelemcount
-            #print ordinal
             
             cell = self.getCellByOrdinal(ordinal)
             if properties is None:
-                axisranges[0][1].append(dictify(cell))
+                axisranges[0][1].append(cell)
             else:
                 if isinstance(properties, basestring):
                     d = cell.get(properties, 
