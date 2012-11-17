@@ -16,3 +16,4 @@ def rst2html(what):
     rst=open(fname, "r").read()
     erg=publish_string(rst, writer_name='html', settings_overrides={"halt_level":2})
     assert(erg != "")
+
