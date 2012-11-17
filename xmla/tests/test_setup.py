@@ -6,7 +6,7 @@ from docutils.core import publish_string
 import os.path
 
 def test_rst_readme():
-    rst2html("README.md")
+    rst2html("README.rst")
 
 def test_rst_changes():
     rst2html("CHANGES.md")
