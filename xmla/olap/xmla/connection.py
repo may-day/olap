@@ -10,6 +10,9 @@ import http
 import types
 from formatreader import TupleFormatReader
 from utils import *
+import logging
+
+logger = logging.getLogger(__name__)
 
 from suds.plugin import MessagePlugin
 
@@ -26,32 +29,28 @@ class UseDefaultNamespace(MessagePlugin):
 #logging.getLogger('suds.client').setLevel(logging.DEBUG)
 #logging.getLogger('suds.transport').setLevel(logging.DEBUG)
 
-# map of rowset: 
-#   key   : XMLA rowset name
-#   value : if empty, a query result for such a resultset will be returned as a list
-#           the result will be returned as a dictionary keyed on a property 
-#           of the resulting row which name this value represents
-xmla1_1_rowsets = {"DISCOVER_DATASOURCES":"",
-                   "DISCOVER_PROPERTIES":"PropertyName", 
-                   "DISCOVER_SCHEMA_ROWSETS":"SchemaName",
-                   "DISCOVER_ENUMERATORS":"",
-                   "DISCOVER_LITERALS":"",
-                   "DISCOVER_KEYWORDS":"",
-                   "DBSCHEMA_CATALOGS":"CATALOG_NAME",
-                   "DBSCHEMA_COLUMNS":"",
-                   "DBSCHEMA_TABLES":"",
-                   "DBSCHEMA_TABLES_INFO":"",
-                   "DBSCHEMA_PROVIDER_TYPES":"TYPE_NAME",
-                   "MDSCHEMA_ACTIONS":"",
-                   "MDSCHEMA_CUBES":"",
-                   "MDSCHEMA_DIMENSIONS":"",
-                   "MDSCHEMA_FUNCTIONS":"",
-                   "MDSCHEMA_HIERARCHIES":"",
-                   "MDSCHEMA_MEASURES":"",
-                   "MDSCHEMA_MEMBERS":"",
-                   "MDSCHEMA_PROPERTIES":"",
-                   "MDSCHEMA_SETS":""
-                   }
+# lsit of XMLA1.1 rowsets: 
+xmla1_1_rowsets = ["DISCOVER_DATASOURCES",
+                   "DISCOVER_PROPERTIES", 
+                   "DISCOVER_SCHEMA_ROWSETS",
+                   "DISCOVER_ENUMERATORS",
+                   "DISCOVER_LITERALS",
+                   "DISCOVER_KEYWORDS",
+                   "DBSCHEMA_CATALOGS",
+                   "DBSCHEMA_COLUMNS",
+                   "DBSCHEMA_TABLES",
+                   "DBSCHEMA_TABLES_INFO",
+                   "DBSCHEMA_PROVIDER_TYPES",
+                   "MDSCHEMA_ACTIONS",
+                   "MDSCHEMA_CUBES",
+                   "MDSCHEMA_DIMENSIONS",
+                   "MDSCHEMA_FUNCTIONS",
+                   "MDSCHEMA_HIERARCHIES",
+                   "MDSCHEMA_MEASURES",
+                   "MDSCHEMA_MEMBERS",
+                   "MDSCHEMA_PROPERTIES",
+                   "MDSCHEMA_SETS"
+                   ]
 
 class XMLAConnection(object):
     
@@ -62,15 +61,14 @@ class XMLAConnection(object):
         
     @classmethod
     def setupMembers(cls):
-        def getFunc(schemaName, keyname):
+        def getFunc(schemaName):
             return lambda this, *args, **kw: cls.Discover(this, 
                                                           schemaName, 
-                                                          keyname, 
                                                           *args, **kw)
         
-        for schemaName, keyname in xmla1_1_rowsets.items():
+        for schemaName in xmla1_1_rowsets:
             mname = schemaNameToMethodName(schemaName)
-            cls.addMethod( mname, getFunc(schemaName, keyname) )
+            cls.addMethod( mname, getFunc(schemaName) )
 
     def __init__(self, url, location, username, password, spn, sslverify):
 
@@ -94,7 +92,7 @@ class XMLAConnection(object):
         self.sessionid = None
              
         
-    def Discover(self, what, keyname=None, restrictions=None, properties=None):
+    def Discover(self, what, restrictions=None, properties=None):
         rl = None
         pl = None
         if restrictions:
@@ -106,12 +104,10 @@ class XMLAConnection(object):
             res = getattr(self.client.service.Discover(what, rl, pl).\
                               DiscoverResponse["return"].root, "row", [])
             if res:
-                if keyname:
-                    res = mapify(res, keyname)
-                else:
-                    res = listify(res)
+                res = aslist(res)
         except WebFault, fault:
-            raise XMLAException(fault.message, listify(fault.fault))
+            raise XMLAException(fault.message, dictify(fault.fault))
+        logger.debug( res )
         return res
 
 
@@ -126,7 +122,7 @@ class XMLAConnection(object):
             root = self.client.service.Execute(command, pl).ExecuteResponse["return"].root
             return TupleFormatReader(root)
         except WebFault, fault:
-            raise XMLAException(fault.message, listify(fault.fault))
+            raise XMLAException(fault.message, dictify(fault.fault))
         
         
     def BeginSession(self):
