@@ -10,22 +10,6 @@ def aslist(something):
     """If something is not a list already make it one, otherwise simply return something"""
     return something if isinstance(something, list) else [something]
 
-def listify(result):
-    data = aslist(result)
-        
-    res = []
-    for row in data:
-        if isinstance(row, _UnmarshallableType):
-            prop=row
-        else:
-            prop = {}
-            for (k, v) in row:
-                if not isinstance(v, _UnmarshallableType):
-                    v=listify(v)
-                prop[k] = v 
-        res.append(prop)
-    return res
-
 def dictify(r):
 
     if isinstance(r, list):
@@ -39,12 +23,6 @@ def dictify(r):
         return unicode(r)
     return r
 
-def mapify(result, keyname):
-    erg = listify(result)
-    res = {}
-    for  elem in erg: res[elem[keyname]] = elem
-    return res
-    
 
 def schemaNameToMethodName(schemaName):
     """

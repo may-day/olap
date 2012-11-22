@@ -40,6 +40,7 @@ setup(
     ],
    tests_require = [
         'nose',
+        'nose-testconfig',
         'docutils'
     ],
 

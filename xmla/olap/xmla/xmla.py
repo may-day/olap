@@ -100,10 +100,7 @@ class XMLAClass(object):
         func = getattr(self._conn, et["XMLA_FUNC"])
         props = func(r, properties)
 
-        if isinstance(props, dict):
-            props=props.values()
-
-        if len(props) == 0:
+        if props is None or len(props) == 0:
             raise oxi.SchemaElementNotFound(r, properties)
 
         if generate_instance:
@@ -117,6 +114,7 @@ class XMLAClass(object):
         if not aslist:
             result = result[0]
         return result
+
     def query(self, mdx_stmt):
         return self._conn.Execute(mdx_stmt, Catalog=self.CATALOG_NAME)
 

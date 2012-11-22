@@ -88,7 +88,7 @@ class XMLAConnection(object):
         
         # optional, call might fail
         self.getMDSchemaLevels = lambda *args, **kw: self.Discover("MDSCHEMA_LEVELS", 
-                                                                   None, *args, **kw)
+                                                                   *args, **kw)
         self.sessionid = None
              
         
