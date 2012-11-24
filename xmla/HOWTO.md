@@ -124,7 +124,7 @@ Say i want to add palo server tests.
 In testDiscovery and testExecute i add a new
 configuration dictionary:
 
-```
+```python
 palo={
 "type":"palo",
 "spn":None,          
