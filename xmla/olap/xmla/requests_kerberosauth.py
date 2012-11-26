@@ -7,20 +7,39 @@ from requests.auth import AuthBase
 from requests.compat import urlparse
 from requests import get as reqget
 from requests import session
-import kerberos as k
-import s4u2p
 import re
 import logging
 
-def getLogger():
-    log = logging.getLogger("http_kerberos_auth_handler")
-    handler = logging.StreamHandler()
-    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
-    handler.setFormatter(formatter)
-    log.addHandler(handler)
-    return log
+log = logging.getLogger(__name__)
 
-log = getLogger()
+# this will still let you talk to other non kerberos protected sites
+# and the calling http module can proceed
+
+try:
+    import kerberos as k
+except:
+    log.warning("No kerberos module, so you won't be able to talk to kerberos protected sites")
+    def notimplemented_kerb(*args, **kw):
+        raise Exception("failed to load kerberos")
+    class k:
+        gss_step = notimplemented_kerb
+        gss_response = notimplemented_kerb
+        gss_clean = notimplemented_kerb
+        gss_init = notimplemented_kerb
+        GSSError = notimplemented_kerb
+
+try:
+    import s4u2p
+except:
+    log.warning("No s4u2p module, so you won't be able to impersonate a user.")
+    def notimplemented_s4u2p(*args, **kw):
+        raise Exception("failed to load s4u2p")
+    class s4u2p:
+        gss_step = notimplemented_s4u2p
+        gss_response = notimplemented_s4u2p
+        gss_clean = notimplemented_s4u2p
+        gss_init = notimplemented_s4u2p
+        GSSError = notimplemented_s4u2p
 
 class HTTPKerberosAuth(AuthBase):
     """Attaches Kerberos Authentication to the given Request object."""
