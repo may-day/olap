@@ -1,8 +1,19 @@
 #-*- coding:utf-8 -*-
 
 from setuptools import setup
+from distutils.util import get_platform
+
 long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.md").read() 
 
+install_requires=[
+    'olap',
+    'suds',
+    'requests'
+    ]
+
+if not platform.startswith('win'):
+    install_requires.extend(['kerberos','s4u2p'])
+    
 # hack, or test wont run on py2.7
 try:
     import multiprocessing
@@ -31,14 +42,8 @@ setup(
     namespace_packages=['olap'],
     package_dir={'olap':'olap', 'olap.xmla': 'olap/xmla'},
     package_data={'olap.xmla': ['vs.wsdl']},
-    install_requires=[
-      'olap',
-      'suds',
-      'kerberos',
-      's4u2p',
-      'requests'
-    ],
-   tests_require = [
+    install_requires=platform.startswith,
+    tests_require = [
         'nose',
         'nose-testconfig',
         'docutils'
