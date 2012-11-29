@@ -19,6 +19,11 @@ def dictify(r):
         for (k, v) in r:
             d[k] = dictify(v)
         return d
+    if isinstance(r, dict):
+        d = {}
+        for (k, v) in r.items():
+            d[k] = dictify(v)
+        return d
     if isinstance(r, sudsText):
         return unicode(r)
     return r
