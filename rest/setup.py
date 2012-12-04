@@ -1,19 +1,13 @@
 #-*- coding:utf-8 -*-
 
 from setuptools import setup
-from distutils.util import get_platform
 
 long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.md").read() 
 
 install_requires=[
-    'olap',
-    'suds',
-    'requests'
+    'olap', 'xmla', 'pyramid', 'cornice', 'zope.component'
     ]
 
-if not get_platform().startswith('win'):
-    install_requires.extend(['kerberos','s4u2p'])
-    
 # hack, or test wont run on py2.7
 try:
     import multiprocessing
@@ -22,8 +16,8 @@ except:
     pass
 
 setup(
-    name='xmla',
-    version='0.6',
+    name='olap.rest',
+    version='0.1',
     url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
     classifiers = [
@@ -34,14 +28,13 @@ setup(
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules"
         ],
-    description='Access olap data sources through xmla',
+    description='REST access to a pyramid backed olap connection.',
     long_description=long_description,
     author='Norman Krämer',
     author_email='kraemer.norman@googlemail.com',
-    packages=['olap', 'olap.xmla'],
+    packages=['olap', 'olap.rest'],
     namespace_packages=['olap'],
-    package_dir={'olap':'olap', 'olap.xmla': 'olap/xmla'},
-    package_data={'olap.xmla': ['vs.wsdl']},
+    package_dir={'olap':'olap', 'olap.rest': 'olap/rest'},
     install_requires=install_requires,
     tests_require = [
         'nose',
