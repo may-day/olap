@@ -22,12 +22,13 @@ except:
     def notimplemented_kerb(*args, **kw):
         raise Exception("failed to load kerberos")
     class k:
-        gss_step = notimplemented_kerb
-        gss_response = notimplemented_kerb
-        gss_clean = notimplemented_kerb
-        gss_init = notimplemented_kerb
+        authGSSClientStep = notimplemented_kerb
+        authGSSClientResponse = notimplemented_kerb
+        authGSSClientClean = notimplemented_kerb
+        authGSSClientInit = notimplemented_kerb
         GSSError = notimplemented_kerb
-
+        GSS_C_MUTUAL_FLAG = 0
+        GSS_C_SEQUENCE_FLAG = 0
 try:
     import s4u2p
 except:
@@ -35,11 +36,13 @@ except:
     def notimplemented_s4u2p(*args, **kw):
         raise Exception("failed to load s4u2p")
     class s4u2p:
-        gss_step = notimplemented_s4u2p
-        gss_response = notimplemented_s4u2p
-        gss_clean = notimplemented_s4u2p
-        gss_init = notimplemented_s4u2p
+        authGSSClientStep = notimplemented_s4u2p
+        authGSSClientResponse = notimplemented_s4u2p
+        authGSSClientClean = notimplemented_s4u2p
+        authGSSClientInit = notimplemented_s4u2p
         GSSError = notimplemented_s4u2p
+        GSS_C_MUTUAL_FLAG = 0
+        GSS_C_SEQUENCE_FLAG = 0
 
 class HTTPKerberosAuth(AuthBase):
     """Attaches Kerberos Authentication to the given Request object."""

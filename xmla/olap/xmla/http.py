@@ -1,4 +1,3 @@
-
 """
 Implementation of Transport based on the requests package.
 This packages lets us reuse connections. 
@@ -10,7 +9,8 @@ from cookielib import CookieJar
 from logging import getLogger
 import requests as req
 from requests_kerberosauth import HTTPKerberosAuth
-from urllib2 import urlopen
+import urllib2
+import sys
 
 log = getLogger(__name__)
 
@@ -22,7 +22,39 @@ class DummyFile:
         return self.data
     def close(self):
         pass
-        
+
+# on windows urlopen doesn't work with file:// if it contains a drive specification
+if sys.platform.startswith("win"):
+    import urllib
+    import os
+    import mimetools
+    import email.utils
+    import mimetypes
+    try:
+        from cStringIO import StringIO
+    except ImportError:
+        from StringIO import StringIO
+
+    class MyDriveFileHandler(urllib2.FileHandler):
+        def open_local_file(self, req):
+            try:
+                host = req.get_host()
+                filename = req.get_selector()
+                # if that bombs, then go on with original method
+                localfile = urllib.url2pathname(host+filename)
+                stats = os.stat(localfile) 
+                size = stats.st_size
+                modified = email.utils.formatdate(stats.st_mtime, usegmt=True)
+                mtype = mimetypes.guess_type(filename)[0]
+                headers = mimetools.Message(StringIO(
+                        'Content-type: %s\nContent-length: %d\nLast-modified: %s\n' %
+                        (mtype or 'text/plain', size, modified)))
+                origurl = 'file://' + host + filename
+                return urllib.addinfourl(open(localfile, 'rb'), headers, origurl)
+            except:
+                pass
+            return urllib2.FileHandler.open_local_file(self, req)
+
 class HttpTransport(Transport):
     """
     HTTP transport using urllib2.  Provided basic http transport
@@ -82,9 +114,16 @@ class HttpTransport(Transport):
         @return: The opened file-like object or requests Response object.
         @rtype: fp or requests.models.Response
         """
-        # d'oh, requests doesn't know what to do with a file schema... so fall back to good old trusted urllib2
+        # d'oh, requests doesn't know what to do with a file schema... 
+        # so fall back to good old trusted urllib2
         if url.startswith("file://"):
-            return urlopen(url)
+            if sys.platform.startswith("win") and url[8:9] == ":":
+                # we likely have a drive letter, which urlopen will fail with :(
+                try:
+                    return urllib2.build_opener(MyDriveFileHandler).open(url)
+                except:
+                    raise
+            return urllib2.urlopen(url)
         tm = self.options.timeout
         self.modifyargs(moreargs)
         return self.session.request("GET" if data is None else "POST", 
