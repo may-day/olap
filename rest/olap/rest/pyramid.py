@@ -2,6 +2,7 @@ import zope.component
 import olap.interfaces as oi
 import olap.xmla.interfaces as oxi
 import olap.xmla.utils as utils
+from olap.xmla.xmla import TREE_OP
 import uuid
 
 from cornice.resource import resource
@@ -242,6 +243,10 @@ resourceelements = {
         ("levels", "level", "LEVEL_UNIQUE_NAME", "HIERARCHY"),
     "HIERARCHY_MEMBER":
         ("members", "member", "MEMBER_UNIQUE_NAME", "HIERARCHY"),
+    "HM_CHILDREN_WRT":
+        ("existingchildren", "", "DUMMY", "HIERARCHY_MEMBER"),
+    "HM_CHILDREN":
+        ("children", "", "DUMMY", "HIERARCHY_MEMBER"),
     "MEMBER":
         ("members", "member", "MEMBER_UNIQUE_NAME", "LEVEL"),
     "PROPERTY":
@@ -259,6 +264,9 @@ def restify(exposefully=False, **kw):
         services = {}
         fixedvars = {}
         fixedvalues = {}
+        neededvars = {}
+
+        "CATALOG_DIMENSION",  "CATALOG_HIERARCHY", "CATALOG_SET", "CATALOG_MEASURE"
 
         for schemaElementName, opts in re.items():
             fixedvalue = getattr(klass, schemaElementName, None)
@@ -269,11 +277,27 @@ def restify(exposefully=False, **kw):
         for schemaElementName, opts in re.items():
             if schemaElementName in fixedvars and not exposefully:
                 continue
-            
+
+            if "CUBE" in fixedvars and "CATALOG" and not exposefully \
+                    and schemaElementName in ["CATALOG_DIMENSION",  
+                                              "CATALOG_HIERARCHY", 
+                                              "CATALOG_SET", 
+                                              "CATALOG_MEASURE",
+                                              "DIMENSION_MEMBER"]:
+                continue
+
+            single_invalid = False
+            coll_invalid = False
+            paramlist = []
             coll_path = single_path = ""
             coll_path, single_path, param, parent_path = opts
+
+            single_invalid = single_invalid or not single_path
+            coll_invalid = coll_invalid or not coll_path
+
             coll_method = [("get" + coll_path.capitalize(), None)]
             single_method = [("get" + single_path.capitalize(), param)]
+            paramlist.append(param)
 
             klass.name_parametername = param
             single_path = single_path + "/{" + param + "}"
@@ -286,18 +310,32 @@ def restify(exposefully=False, **kw):
                 # only in the root can there be a collection requested
                 coll_method.insert(0, seq)
                 single_method.insert(0, seq)
+                paramlist.append(param)
+
+                single_invalid = single_invalid or not single
+                coll_invalid = coll_invalid or not single
+
                 if not hidden:
                     coll_path = single+"/{"+param + "}/" + coll_path
                     single_path = single+"/{"+param + "}/" + single_path
 
             coll_path = "/" + coll_path
             single_path = "/" + single_path
+            neededvars[schemaElementName] = paramlist
             #print coll_path
+            #print single_path
             
             single_name=schemaElementName + klass.__name__.lower()
             coll_name="collection_"+schemaElementName + klass.__name__.lower()
-            for (n,p,c,prefix) in [(single_name, single_path, single_method, ""),
-                            (coll_name, coll_path, coll_method, "collection_")]:
+
+            servicelist = []
+            if not single_invalid: servicelist.append(
+                (single_name, single_path, single_method, ""))
+
+            if not coll_invalid: servicelist.append(
+                (coll_name, coll_path, coll_method, "collection_"))
+
+            for (n,p,c,prefix) in servicelist:
 
                 dockey = schemaElementName + (prefix and "_coll" or "_single") + "_get"
                 desc = doc.get(dockey, "") or klass.__doc__ or klass.__name__
@@ -330,6 +368,7 @@ def restify(exposefully=False, **kw):
                     service.add_view(verb, wrappername, klass=klass)
         setattr(klass,'_services', services)
         setattr(klass,'fixedvalues', fixedvalues)
+        setattr(klass, 'neededvars', neededvars)
 
         if VENUSIAN:
             def callback(context, name, ob):
@@ -346,12 +385,13 @@ def restify(exposefully=False, **kw):
 
     return wrapper
 
-@restify()
 class OLAPREST(object):
     def __init__(self, request):
         self.request = request
         self.kw=self.request.matchdict.copy()
-        self.kw.update(self.fixedvalues)
+        if self.fixedvalues:
+            self.kw.update(self.fixedvalues)
+                
         try:
             s = self.request.session
             if "queries" not in s:
@@ -414,16 +454,26 @@ class OLAPREST(object):
         listresult = lastobj if isinstance(lastobj, list) else [lastobj]
         return [utils.dictify(e.getElementProperties()) for e in listresult]
 
-    def get(self, schemaElementName=None, callsequence=None, aslist=False):
+    def get(self, schemaElementName=None, callsequence=None, aslist=False, 
+            altSchemaElementName=None):
         ds = self.datasource_get()
         self.kw.pop("ds_name")
+
+        # if we ask for, say catalogs, but have also a fixed cube defined
+        # we will have the variable for the CUBE in the kw.
+        # we have to remove that or the getSchemaElements will bomb
+        for k, v in self.fixedvalues.items():
+            if k not in self.neededvars[schemaElementName]:
+                del self.kw[k]
+
         try:
             if oxi.IXMLASource.providedBy(ds):
-                return utils.dictify(ds.getSchemaElements(schemaElementName, 
-                                            None, 
-                                            aslist=aslist, 
-                                            more_restrictions=self.kw, 
-                                            generate_instance=False))
+                return utils.dictify(ds.getSchemaElements(
+                        altSchemaElementName or schemaElementName, 
+                        None, 
+                        aslist=aslist, 
+                        more_restrictions=self.kw, 
+                        generate_instance=False))
             else:
                 return self.get_iolap(ds, callsequence)
         except oxi.SchemaElementNotFound, e:
@@ -432,6 +482,49 @@ class OLAPREST(object):
             msg = {"errormessage":e.message, "errorfault":str(e.detail)}
             raise _502(msg)
 
+    def collection_hm_children_get(self, 
+                                   schemaElementName=None, 
+                                   callsequence=None, 
+                                   aslist=False):
+
+        self.kw["TREE_OP"] = TREE_OP.CHILDREN
+        return self.get(schemaElementName=schemaElementName, 
+                        callsequence=callsequence, aslist=True,
+                        altSchemaElementName="TREE_MEMBER")
+
+    def collection_hm_children_wrt_get(self, 
+                                   schemaElementName=None, 
+                                   callsequence=None, 
+                                   aslist=False):
+
+        set2 = self.request.GET.get("set2", "{}")
+#        mg = self.request.GET.get("measuregroup", None)
+#        if mg:
+#            set2 = set2 + ", " + mg
+        ds = self.datasource_get()
+        cat = ds.getCatalog(self.kw["CATALOG_NAME"])
+        cube = self.kw["CUBE_NAME"]
+        member = self.kw["MEMBER_UNIQUE_NAME"] + ".children"
+        cmd="SELECT NON EMPTY %s ON COLUMNS, %s on ROWS FROM [%s]" %\
+            (member, set2, cube)
+        res=cat.query(cmd)
+        axistuple = utils.dictify(res.getAxisTuple(0))
+        result = []
+        for member in res.getAxisTuple(0):
+            # in case someone played with MAMBER_UNIQUE_NAME
+            #if isinstance(member, list):
+            #    member = member[0]
+            children = int(member.DisplayInfo) & 0xffff
+            m = {}
+            m["CHILDREN_CARDINALITY"] = str(children)
+            m["MEMBER_CAPTION"] = member.Caption
+            m["MEMBER_UNIQUE_NAME"] = member.UName
+            m["LEVEL_NUMBER"] = member.LNum
+            m["LEVEL_UNIQUE_NAME"] = member.LName
+            result.append(m)
+
+        return result
+        
     ############################ query related methods #########################
     def collection_query_get(self, schemaElementName=None, callsequence=None):
         return self.q
