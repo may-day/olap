@@ -66,6 +66,8 @@ def main():
     config.include(reg_all, route_prefix="/all")
     config.include(reg_fixed, route_prefix="/fixed")
 
+    config.end()
+
     app = config.make_wsgi_app()
     server = make_server('0.0.0.0', 6543, app)
     server.serve_forever()
