@@ -13,6 +13,8 @@ install_requires=[
 
 if not get_platform().startswith('win'):
     install_requires.extend(['kerberos','s4u2p'])
+else:
+    install_requires.extend(['kerberos-sspi'])
     
 # hack, or test wont run on py2.7
 try:

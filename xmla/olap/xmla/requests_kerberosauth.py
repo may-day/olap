@@ -18,17 +18,20 @@ log = logging.getLogger(__name__)
 try:
     import kerberos as k
 except:
-    log.warning("No kerberos module, so you won't be able to talk to kerberos protected sites")
-    def notimplemented_kerb(*args, **kw):
-        raise Exception("failed to load kerberos")
-    class k:
-        authGSSClientStep = notimplemented_kerb
-        authGSSClientResponse = notimplemented_kerb
-        authGSSClientClean = notimplemented_kerb
-        authGSSClientInit = notimplemented_kerb
-        GSSError = notimplemented_kerb
-        GSS_C_MUTUAL_FLAG = 0
-        GSS_C_SEQUENCE_FLAG = 0
+    try:
+        import kerberos_sspi as k
+    except:
+        log.warning("No kerberos module, so you won't be able to talk to kerberos protected sites")
+        def notimplemented_kerb(*args, **kw):
+            raise Exception("failed to load kerberos")
+        class k:
+            authGSSClientStep = notimplemented_kerb
+            authGSSClientResponse = notimplemented_kerb
+            authGSSClientClean = notimplemented_kerb
+            authGSSClientInit = notimplemented_kerb
+            GSSError = notimplemented_kerb
+            GSS_C_MUTUAL_FLAG = 0
+            GSS_C_SEQUENCE_FLAG = 0
 try:
     import s4u2p
 except:
