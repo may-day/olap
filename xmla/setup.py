@@ -11,10 +11,13 @@ install_requires=[
     'requests'
     ]
 
-if not get_platform().startswith('win'):
-    install_requires.extend(['kerberos','s4u2p'])
-else:
-    install_requires.extend(['kerberos-sspi'])
+extras_require = {
+    "kerberos": ["kerberos"],
+    "s4u2p":["s4u2p"]
+}
+
+if get_platform().startswith('win'):
+    extras_require["sspi"] = ["kerberos-sspi"]
     
 # hack, or test wont run on py2.7
 try:
@@ -45,6 +48,7 @@ setup(
     package_dir={'olap':'olap', 'olap.xmla': 'olap/xmla'},
     package_data={'olap.xmla': ['vs.wsdl']},
     install_requires=install_requires,
+    extras_require = extras_require,
     tests_require = [
         'nose',
         'nose-testconfig',
