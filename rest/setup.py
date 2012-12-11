@@ -5,7 +5,7 @@ from setuptools import setup
 long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.md").read() 
 
 install_requires=[
-    'olap', 'xmla', 'pyramid', 'cornice', 'zope.component'
+    'olap>=0.3', 'xmla>=0.6', 'pyramid', 'cornice', 'zope.component'
     ]
 
 # hack, or test wont run on py2.7

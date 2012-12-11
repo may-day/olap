@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+0.6
+----
+* dependency on kerberos and s4u2p is now optional
+* added optional kerberos-sspi package for kerberos on windows through sspi via pywin32
+
 0.5
 ----
 * ``as_user`` and ``spn`` are no longer ignored in the kerberos authentication
