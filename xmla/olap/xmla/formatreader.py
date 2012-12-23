@@ -141,12 +141,12 @@ class TupleFormatReader(object):
                 axisranges[0][1].append(cell)
             else:
                 if isinstance(properties, basestring):
-                    d = cell.get(properties, 
+                    d = getattr(cell, properties, 
                                        "Property %s does not exist" % property)
                 else:
                     d = {}
                     for prop in aslist(properties): 
-                        d[prop] = cell.get(prop, 
+                        d[prop] = getattr(cell, prop, 
                                            "Property %s does not exist" % property)
                 axisranges[0][1].append(d)
             
