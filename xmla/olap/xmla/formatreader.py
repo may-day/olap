@@ -33,7 +33,7 @@ class TupleFormatReader(object):
             if isinstance(axis, basestring):
                 ax = filter(lambda x: x._name == axis, aslist(self.root.Axes.Axis))[0]
             else:
-                ax = self.root.Axes.Axis[axis]
+                ax = aslist(self.root.Axes.Axis)[axis]
             res = []
             for tup in aslist(getattr(ax.Tuples, "Tuple", [])):
                 res.append(tup.Member)
@@ -142,12 +142,12 @@ class TupleFormatReader(object):
             else:
                 if isinstance(properties, basestring):
                     d = getattr(cell, properties, 
-                                       "Property %s does not exist" % property)
+                                       None)
                 else:
                     d = {}
                     for prop in aslist(properties): 
                         d[prop] = getattr(cell, prop, 
-                                           "Property %s does not exist" % property)
+                                           None)
                 axisranges[0][1].append(d)
             
             # advance to next requested element in slice
