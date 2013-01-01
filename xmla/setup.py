@@ -28,7 +28,7 @@ except:
 
 setup(
     name='xmla',
-    version='0.6',
+    version='0.7',
     url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
     classifiers = [

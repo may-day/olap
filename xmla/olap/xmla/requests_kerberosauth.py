@@ -118,6 +118,7 @@ class HTTPKerberosAuth(AuthBase):
                 firstround = False
                 log.debug("gss_init() succeeded")
 
+            #import pdb; pdb.set_trace()
             result = self.gss_step(self.context, neg_value)
 
             if result < 0:
