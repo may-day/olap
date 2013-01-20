@@ -102,12 +102,16 @@ class HTTPKerberosAuth(AuthBase):
     def handle_401(self, r):
         """Takes the given response and tries kerberos negotiation, if needed."""
 
+        log.info("kerberosauth: handle_401...")
+
         ret = r
         r.request.deregister_hook('response', self.handle_401)
 
         neg_value = self.negotiate_value(r.headers) #Check for auth_header
         firstround = False
         if neg_value is not None:
+            
+            log.info("kerberosauth: neg_value not none")
             
             if self.context is None:
                 spn = self.get_spn(r)
@@ -118,7 +122,7 @@ class HTTPKerberosAuth(AuthBase):
                     return None
 
                 firstround = False
-                log.debug("gss_init() succeeded")
+                log.info("gss_init() succeeded")
 
             result = self.gss_step(self.context, neg_value)
 
@@ -128,7 +132,7 @@ class HTTPKerberosAuth(AuthBase):
                 log.warning("gss_step returned result %d" % result)
                 return None
 
-            log.debug("gss_step() succeeded")
+            log.info("gss_step() succeeded")
 
             if result == k.AUTH_GSS_CONTINUE or \
                     (result == k.AUTH_GSS_COMPLETE and \
@@ -157,11 +161,12 @@ class HTTPKerberosAuth(AuthBase):
                                            , proxies = self.proxies
                                            )
                 r2.history.append(r)
-                ret = r2
+                ret = self.handle_401(r2)
 
             if result == k.AUTH_GSS_COMPLETE and self.context:
-                 self.gss_clean(self.context)
-                 self.context = None
+                log.info("auth complete, now cleaning context...")
+                self.gss_clean(self.context)
+                self.context = None
 
         return ret
 
