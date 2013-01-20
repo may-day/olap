@@ -5,6 +5,7 @@ Created on 22.05.2012
 '''
 from requests.auth import AuthBase
 from requests.compat import urlparse
+from requests import __version__ as reqver
 import re
 import logging
 
@@ -119,7 +120,6 @@ class HTTPKerberosAuth(AuthBase):
                 firstround = False
                 log.debug("gss_init() succeeded")
 
-            #import pdb; pdb.set_trace()
             result = self.gss_step(self.context, neg_value)
 
             if result < 0:
@@ -147,13 +147,15 @@ class HTTPKerberosAuth(AuthBase):
                 # shed unread content to be able to release connection back to the pool
                 r.content
                 r.raw.release_conn()
-                r2 = r.connection.send(req
-                                       , verify = self.sslverify
-                                       , proxies = self.proxies
-                                       )
-                # pre requests 1.0
-                #r.request.send(anyway=True)
-                #r2 = r.request.response
+                log.info("REQUESTS version %s", reqver)
+                if reqver.split(".")[0] == "0":
+                    r.request.send(anyway=True)
+                    r2 = r.request.response
+                else:
+                    r2 = r.connection.send(req
+                                           , verify = self.sslverify
+                                           , proxies = self.proxies
+                                           )
                 r2.history.append(r)
                 ret = r2
 
