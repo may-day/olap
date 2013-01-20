@@ -79,6 +79,8 @@ class HttpTransport(Transport):
         self.proxy = {}
         self.urlopener = None
         self.session = req.Session()
+        self.session.proxies = self.proxy
+        self.session.verify=self.sslverify
          
     def open(self, request):
         url = request.url
@@ -128,7 +130,7 @@ class HttpTransport(Transport):
         self.modifyargs(moreargs)
         return self.session.request("GET" if data is None else "POST", 
                                     url, data=data, headers=headers, 
-                                    proxies=self.proxy, cookies=cookies, timeout=tm, verify=self.sslverify, **moreargs)
+                                    cookies=cookies, timeout=tm, **moreargs)
             
     def __deepcopy__(self, memo={}):
         clone = self.__class__()
@@ -169,7 +171,8 @@ class HttpKerberosAuthenticated(HttpTransport):
         HttpTransport.__init__(self, **kwargs)
         self.as_user = as_user
         self.spn = spn
-        self.auth = HTTPKerberosAuth(as_user=as_user, spn=spn)
+        self.auth = HTTPKerberosAuth(as_user=as_user, spn=spn, 
+                                     sslverify=self.sslverify, proxies=self.proxy)
         
     def modifyargs(self, moreargs):
         HttpTransport.modifyargs(self, moreargs)

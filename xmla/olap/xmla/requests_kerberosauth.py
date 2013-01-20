@@ -5,8 +5,6 @@ Created on 22.05.2012
 '''
 from requests.auth import AuthBase
 from requests.compat import urlparse
-from requests import get as reqget
-from requests import session
 import re
 import logging
 
@@ -53,11 +51,14 @@ class HTTPKerberosAuth(AuthBase):
     rx = re.compile('(?:.*,)*\s*Negotiate\s*([^,]*),?', re.I)
     auth_header = 'www-authenticate'
 
-    def __init__(self, as_user=None, spn=None, gssflags=k.GSS_C_MUTUAL_FLAG|k.GSS_C_SEQUENCE_FLAG):
-        self.retried = 0
-        self.context = None
-        self.gssflags=gssflags
-        self.spn = spn
+    def __init__(self, as_user=None, spn=None, gssflags=k.GSS_C_MUTUAL_FLAG|k.GSS_C_SEQUENCE_FLAG
+                 , sslverify=True, proxies=None):
+        self.sslverify = sslverify
+        self.proxies   = proxies
+        self.retried   = 0
+        self.context   = None
+        self.gssflags  = gssflags
+        self.spn       = spn
         if as_user:
             self.gss_step = s4u2p.authGSSImpersonationStep
             self.gss_response = s4u2p.authGSSImpersonationResponse
@@ -129,14 +130,33 @@ class HTTPKerberosAuth(AuthBase):
 
             log.debug("gss_step() succeeded")
 
-            if result == k.AUTH_GSS_CONTINUE or (result == k.AUTH_GSS_COMPLETE and not (self.gssflags & k.GSS_C_MUTUAL_FLAG) and firstround):
+            if result == k.AUTH_GSS_CONTINUE or \
+                    (result == k.AUTH_GSS_COMPLETE and \
+                         not (self.gssflags & k.GSS_C_MUTUAL_FLAG) and firstround):
                 response = self.gss_response(self.context)
-                r.request.headers['Authorization'] = "Negotiate %s" % response
-                r.request.send(anyway=True)
-                _r = r.request.response
-                _r.history.append(r)
+                req=r.request
+                req.headers['Authorization'] = "Negotiate %s" % response
 
-                ret = _r
+                # Right now there is no way to be sure to reply using the same socket connection
+                # since, after all, we are using a connection pool. So we try
+                # to release the conn and immediatly request a connection which will _likely_ 
+                # be the same as long as there are no concurrent requests using our session
+                # (well one way would be to implement a KerberosConnectionpool for urllib3, but
+                # then requests needs some patching as well to use that pool).
+
+                # shed unread content to be able to release connection back to the pool
+                r.content
+                r.raw.release_conn()
+                r2 = r.connection.send(req
+                                       , verify = self.sslverify
+                                       , proxies = self.proxies
+                                       )
+                # pre requests 1.0
+                #r.request.send(anyway=True)
+                #r2 = r.request.response
+                r2.history.append(r)
+                ret = r2
+
             if result == k.AUTH_GSS_COMPLETE and self.context:
                  self.gss_clean(self.context)
                  self.context = None
@@ -148,6 +168,7 @@ class HTTPKerberosAuth(AuthBase):
         return r
 
 def test(args):
+    from requests import session
     log.setLevel(logging.DEBUG)
     log.info("starting test")
     if args.keytab:
@@ -156,7 +177,8 @@ def test(args):
     r=s.get(args.url)
     print r.text
 #    if website is set up to keep auth, the next calls will not authenticate again
-#    (in IIS accomplish this by setting the windowsAuthentication properties: authPersistNonNTLM="true" and authPersistSingleRequest="false")
+#    (in IIS accomplish this by setting the windowsAuthentication properties: 
+#       authPersistNonNTLM="true" and authPersistSingleRequest="false")
 #    for i in range(20):
 #        r=s.get(args.url)
 #        print i, r.text
