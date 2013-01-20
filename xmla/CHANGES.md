@@ -1,6 +1,10 @@
 CHANGES
 =======
 
+0.7.1
+-----
+* kerberos-auth was sent twice
+
 0.7
 ---
 * works now with requests 0.14- and 1.-series of requests

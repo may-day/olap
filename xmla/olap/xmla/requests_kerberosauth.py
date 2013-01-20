@@ -155,13 +155,15 @@ class HTTPKerberosAuth(AuthBase):
                 if reqver.split(".")[0] == "0":
                     r.request.send(anyway=True)
                     r2 = r.request.response
+                    r2.history.append(r)
+                    ret = r2
                 else:
                     r2 = r.connection.send(req
                                            , verify = self.sslverify
                                            , proxies = self.proxies
                                            )
-                r2.history.append(r)
-                ret = self.handle_401(r2)
+                    r2.history.append(r)
+                    ret = self.handle_401(r2)
 
             if result == k.AUTH_GSS_COMPLETE and self.context:
                 log.info("auth complete, now cleaning context...")
