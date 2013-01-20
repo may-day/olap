@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+0.7
+---
+* works now with requests 0.14- and 1.-series of requests
+* selection of cell properties failed
+
 0.6
 ----
 * dependency on kerberos and s4u2p is now optional
