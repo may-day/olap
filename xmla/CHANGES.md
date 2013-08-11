@@ -1,6 +1,11 @@
 CHANGES
 =======
 
+0.7.2
+-----
+* now relies on requests 1.2.3
+* fixed race condition in kerberos auth
+
 0.7.1
 -----
 * kerberos-auth was sent twice

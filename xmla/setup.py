@@ -8,7 +8,7 @@ long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.md").read
 install_requires=[
     'olap',
     'suds',
-    'requests'
+    'requests == 1.2.3'
     ]
 
 extras_require = {
@@ -28,7 +28,7 @@ except:
 
 setup(
     name='xmla',
-    version='0.7.1',
+    version='0.7.2',
     url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
     classifiers = [

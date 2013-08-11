@@ -3,7 +3,7 @@ Implementation of Transport based on the requests package.
 This packages lets us reuse connections. 
 """
 
-from suds.transport import Transport, Reply
+from suds.transport import Transport, Reply, TransportError
 from suds.properties import Unskin
 from cookielib import CookieJar
 from logging import getLogger
@@ -11,6 +11,7 @@ import requests as req
 from requests_kerberosauth import HTTPKerberosAuth
 import urllib2
 import sys
+import sessions
 
 log = getLogger(__name__)
 
@@ -78,7 +79,7 @@ class HttpTransport(Transport):
         self.cookiejar = CookieJar()
         self.proxy = {}
         self.urlopener = None
-        self.session = req.Session()
+        self.session = sessions.Session()
         self.session.proxies = self.proxy
         self.session.verify=self.sslverify
          
@@ -99,7 +100,9 @@ class HttpTransport(Transport):
         self.proxy = self.options.proxy
         log.debug('sending:\n%s', request)
         resp = self.doOpen(url, data=msg, headers=headers, cookies=self.cookiejar)
-        result = Reply(200, resp.headers, resp.content)
+        if resp.status_code not in (200,):
+            raise TransportError("Error: %s"%resp.reason, resp.status_code, DummyFile(resp.content))
+        result = Reply(resp.status_code, resp.headers, resp.content)
         log.debug('received:\n%s', result)
         #except u2.HTTPError, e:
         #    if e.code in (202,204):

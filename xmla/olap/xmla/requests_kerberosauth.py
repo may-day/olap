@@ -8,6 +8,8 @@ from requests.compat import urlparse
 from requests import __version__ as reqver
 import re
 import logging
+import os.path
+import time
 
 log = logging.getLogger(__name__)
 
@@ -57,7 +59,6 @@ class HTTPKerberosAuth(AuthBase):
         self.sslverify = sslverify
         self.proxies   = proxies
         self.retried   = 0
-        self.context   = None
         self.gssflags  = gssflags
         self.spn       = spn
         if as_user:
@@ -98,82 +99,82 @@ class HTTPKerberosAuth(AuthBase):
             log.debug("calculated SPN as  %s" % spn)
 
         return self.spn
-    
-    def handle_401(self, r):
+
+    def getContext(self, resp):
+        return resp.connection.krb5_context
+
+    def setContext(self, resp, context):
+        resp.connection.krb5_context = context
+
+    def handle_401_guarded(self, r, **kwargs):
+        try:
+            res = self.handle_401(r, **kwargs)
+        except Exception, e:
+            self.setContext(r, None)
+            r.reason = str(e)
+            return r
+
+        return res
+
+    def handle_401(self, r, **kwargs):
         """Takes the given response and tries kerberos negotiation, if needed."""
 
         log.info("kerberosauth: handle_401...")
-
         ret = r
-        r.request.deregister_hook('response', self.handle_401)
 
         neg_value = self.negotiate_value(r.headers) #Check for auth_header
         firstround = False
         if neg_value is not None:
             
             log.info("kerberosauth: neg_value not none")
-            
-            if self.context is None:
+  
+            context = self.getContext(r)
+            if context is None:
                 spn = self.get_spn(r)
-                result, self.context = self.gss_init(spn, self.gssflags)
-                
+                result, context = self.gss_init(spn, self.gssflags)
                 if result < 1:
-                    log.warning("gss_init returned result %d" % result)
-                    return None
+                    raise Excetion("gss_init returned result %d" % result)
 
                 firstround = False
                 log.info("gss_init() succeeded")
 
-            result = self.gss_step(self.context, neg_value)
+            result = self.gss_step(context, neg_value)
 
             if result < 0:
-                self.gss_clean(self.context)
-                self.context = None
-                log.warning("gss_step returned result %d" % result)
-                return None
+                self.gss_clean(context)
+                self.setContext(r, None)
+                raise Excetion("gss_step returned result %d" % result)
 
             log.info("gss_step() succeeded")
 
             if result == k.AUTH_GSS_CONTINUE or \
                     (result == k.AUTH_GSS_COMPLETE and \
                          not (self.gssflags & k.GSS_C_MUTUAL_FLAG) and firstround):
-                response = self.gss_response(self.context)
+                response = self.gss_response(context)
                 req=r.request
                 req.headers['Authorization'] = "Negotiate %s" % response
 
-                # Right now there is no way to be sure to reply using the same socket connection
-                # since, after all, we are using a connection pool. So we try
-                # to release the conn and immediatly request a connection which will _likely_ 
-                # be the same as long as there are no concurrent requests using our session
-                # (well one way would be to implement a KerberosConnectionpool for urllib3, but
-                # then requests needs some patching as well to use that pool).
-
-                # shed unread content to be able to release connection back to the pool
                 r.content
+                self.setContext(r, context)
                 r.raw.release_conn()
-                log.info("REQUESTS version %s", reqver)
-                if reqver.split(".")[0] == "0":
-                    r.request.send(anyway=True)
-                    r2 = r.request.response
-                    r2.history.append(r)
-                    ret = r2
-                else:
-                    r2 = r.connection.send(req
-                                           , verify = self.sslverify
-                                           , proxies = self.proxies
-                                           )
-                    r2.history.append(r)
-                    ret = self.handle_401(r2)
 
-            if result == k.AUTH_GSS_COMPLETE and self.context:
+                log.info("REQUESTS version %s", reqver)
+                kwargs.setdefault("verify", self.sslverify)
+                kwargs.setdefault("proxies", self.proxies)
+
+                r2 = r.connection.send(req, **kwargs)
+                r2.history.append(r)
+                ret = self.handle_401(r2)
+
+            if result == k.AUTH_GSS_COMPLETE and context:
                 log.info("auth complete, now cleaning context...")
-                self.gss_clean(self.context)
-                self.context = None
+                self.gss_clean(context)
+                self.setContext(r, None)
 
         return ret
 
     def __call__(self, r):
-        r.register_hook('response', self.handle_401)
+        r.register_hook('response', self.handle_401_guarded)
         return r
 
 def test(args):
