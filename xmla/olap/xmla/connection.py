@@ -70,16 +70,18 @@ class XMLAConnection(object):
             mname = schemaNameToMethodName(schemaName)
             cls.addMethod( mname, getFunc(schemaName) )
 
-    def __init__(self, url, location, username, password, spn, sslverify):
+    def __init__(self, url, location, username, password, spn, sslverify, **kwargs):
 
         if password is None:
             transport = http.HttpKerberosAuthenticated(as_user=username, 
                                                        spn=spn, 
-                                                       sslverify=sslverify)
+                                                       sslverify=sslverify,
+                                                       **kwargs)
         else:
             transport = http.HttpAuthenticated(username=username, 
                                                password=password, 
-                                               sslverify=sslverify)
+                                               sslverify=sslverify,
+                                               **kwargs)
         self.client = Client(url, 
                              location=location, 
                              transport=transport, 
