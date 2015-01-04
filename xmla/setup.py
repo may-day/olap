@@ -7,7 +7,7 @@ long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.md").read
 
 install_requires=[
     'olap',
-    'suds',
+    'suds-jurko == 0.6',
     'requests == 1.2.3'
     ]
 
@@ -34,6 +34,7 @@ setup(
     classifiers = [
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
