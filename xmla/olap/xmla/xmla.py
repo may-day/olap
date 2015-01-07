@@ -1,7 +1,8 @@
 import zope.interface
-from connection import XMLAConnection
+from .connection import XMLAConnection
 import olap.xmla.interfaces as oxi
 import olap.interfaces as ooi
+from .utils import u
 
 from pkg_resources import ResourceManager
 rm = ResourceManager()
@@ -51,7 +52,7 @@ class XMLAClass(object):
 
     def getUniqueName(self):
         if hasattr(self, self.unique_name_property):
-            return u""+getattr(self, self.unique_name_property)
+            return u("")+getattr(self, self.unique_name_property)
         return None
 
     def objectfactory(self, clazzname, unp, schemaElementName, props):

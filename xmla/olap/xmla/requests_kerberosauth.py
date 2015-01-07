@@ -109,7 +109,7 @@ class HTTPKerberosAuth(AuthBase):
     def handle_401_guarded(self, r, **kwargs):
         try:
             res = self.handle_401(r, **kwargs)
-        except Exception, e:
+        except Exception as e:
             self.setContext(r, None)
             r.reason = str(e)
             return r
@@ -185,7 +185,7 @@ def test(args):
         s4u2p.authGSSKeytab(args.keytab)
     s = session(auth=HTTPKerberosAuth(as_user=args.user, spn=args.spn))
     r=s.get(args.url)
-    print r.text
+    print(r.text)
 #    if website is set up to keep auth, the next calls will not authenticate again
 #    (in IIS accomplish this by setting the windowsAuthentication properties: 
 #       authPersistNonNTLM="true" and authPersistSingleRequest="false")

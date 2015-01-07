@@ -109,9 +109,9 @@ class XMLA(object):
     def getSchemaRowsetSupport(self):
         if XMLA.supported is None:
             XMLA.supported=[x["SchemaName"] for x in self.c.getSchemaRowsets()]
-            XMLA.proprietary = filter(lambda x: not(x in xmla1_1_rowsets), self.supported)
-            XMLA.conform = filter(lambda x: (x in xmla1_1_rowsets), self.supported)
-            XMLA.unsupported = filter(lambda x: not (x in self.supported), xmla1_1_rowsets)
+            XMLA.proprietary = [x for x in self.supported if not(x in xmla1_1_rowsets)]
+            XMLA.conform = [x for x in self.supported if (x in xmla1_1_rowsets)]
+            XMLA.unsupported = [x for x in xmla1_1_rowsets if not (x in self.supported)]
     
     def tearDown(self):
         self.c.EndSession()

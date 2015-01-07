@@ -9,6 +9,7 @@ install_requires=[
     'olap',
     'suds-jurko == 0.6',
     'requests == 1.2.3'
+    'six == 1.9.0'
     ]
 
 extras_require = {

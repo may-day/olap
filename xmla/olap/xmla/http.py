@@ -5,13 +5,13 @@ This packages lets us reuse connections.
 
 from suds.transport import Transport, Reply, TransportError
 from suds.properties import Unskin
-from cookielib import CookieJar
+from six.moves.http_cookiejar import CookieJar
 from logging import getLogger
 import requests as req
-from requests_kerberosauth import HTTPKerberosAuth
-import urllib2
+from .requests_kerberosauth import HTTPKerberosAuth
+import six.moves.urllib.request as url
 import sys
-import sessions
+from . import sessions
 
 log = getLogger(__name__)
 
@@ -26,35 +26,32 @@ class DummyFile:
 
 # on windows urlopen doesn't work with file:// if it contains a drive specification
 if sys.platform.startswith("win"):
-    import urllib
+    from six.moves.urllib.response import addinfourl
     import os
     import mimetools
     import email.utils
     import mimetypes
-    try:
-        from cStringIO import StringIO
-    except ImportError:
-        from StringIO import StringIO
+    from six.moves import cStringIO
 
-    class MyDriveFileHandler(urllib2.FileHandler):
+    class MyDriveFileHandler(url.FileHandler):
         def open_local_file(self, req):
             try:
                 host = req.get_host()
                 filename = req.get_selector()
                 # if that bombs, then go on with original method
-                localfile = urllib.url2pathname(host+filename)
+                localfile = url.url2pathname(host+filename)
                 stats = os.stat(localfile) 
                 size = stats.st_size
                 modified = email.utils.formatdate(stats.st_mtime, usegmt=True)
                 mtype = mimetypes.guess_type(filename)[0]
-                headers = mimetools.Message(StringIO(
+                headers = mimetools.Message(cStringIO(
                         'Content-type: %s\nContent-length: %d\nLast-modified: %s\n' %
                         (mtype or 'text/plain', size, modified)))
                 origurl = 'file://' + host + filename
-                return urllib.addinfourl(open(localfile, 'rb'), headers, origurl)
+                return addinfourl(open(localfile, 'rb'), headers, origurl)
             except:
                 pass
-            return urllib2.FileHandler.open_local_file(self, req)
+            return url.FileHandler.open_local_file(self, req)
 
 class HttpTransport(Transport):
     """
@@ -125,10 +122,10 @@ class HttpTransport(Transport):
             if sys.platform.startswith("win") and url[8:9] == ":":
                 # we likely have a drive letter, which urlopen will fail with :(
                 try:
-                    return urllib2.build_opener(MyDriveFileHandler).open(url)
+                    return url.build_opener(MyDriveFileHandler).open(url)
                 except:
                     raise
-            return urllib2.urlopen(url)
+            return url.urlopen(url)
         tm = self.options.timeout
         self.modifyargs(moreargs)
         return self.session.request("GET" if data is None else "POST", 

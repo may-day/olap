@@ -6,10 +6,10 @@ Created on 18.04.2012
 from olap.xmla.interfaces import XMLAException
 from suds.client import Client
 from suds import WebFault
-import http
+from . import http
 import types
-from formatreader import TupleFormatReader
-from utils import *
+from .formatreader import TupleFormatReader
+from .utils import *
 import logging
 
 logger = logging.getLogger(__name__)
@@ -107,7 +107,7 @@ class XMLAConnection(object):
                               DiscoverResponse["return"].root, "row", [])
             if res:
                 res = aslist(res)
-        except WebFault, fault:
+        except WebFault as fault:
             raise XMLAException(fault.message, dictify(fault.fault))
         logger.debug( res )
         return res
@@ -115,7 +115,7 @@ class XMLAConnection(object):
 
     def Execute(self, command, dimformat="Multidimensional", 
                 axisFormat="TupleFormat", **kwargs):
-        if isinstance(command, types.StringTypes):
+        if isinstance(command, stringTypes):
             command = {"Statement":command}
         props = {"Format":dimformat, "AxisFormat":axisFormat}
         props.update(kwargs)
@@ -123,7 +123,7 @@ class XMLAConnection(object):
         try:
             root = self.client.service.Execute(command, pl).ExecuteResponse["return"].root
             return TupleFormatReader(root)
-        except WebFault, fault:
+        except WebFault as fault:
             raise XMLAException(fault.message, dictify(fault.fault))
         
         

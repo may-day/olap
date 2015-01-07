@@ -9,6 +9,7 @@ from zope.interface import Interface
 import zope.schema
 from olap import xmla
 import olap.interfaces as ooi
+from .utils import u
 
 class XMLAException(ooi.OlapException): pass
 class SchemaElementNotFound(Exception):
@@ -22,41 +23,41 @@ class SchemaElementNotFound(Exception):
 class IXMLASource(ooi.IOLAPSource):
 
     urlwsdl = zope.schema.TextLine(
-        title=u"WSDL URL",
-        description=u"URL of wsdl defining the XMLA service, leave empty to use default.",
+        title=u("WSDL URL"),
+        description=u("URL of wsdl defining the XMLA service, leave empty to use default."),
         required=False
         )
 
     location= zope.schema.TextLine(
-        title=u"XMLA Server location",
-        description=u"URL of this XMLA Server",
+        title=u("XMLA Server location"),
+        description=u("URL of this XMLA Server"),
         required=True
         )
 
     username= zope.schema.TextLine(
-        title=u"username",
-        description=u"Server access is done as this user",
+        title=u("username"),
+        description=u("Server access is done as this user"),
         required=False
         )
 
     password= zope.schema.TextLine(
-        title=u"password",
-        description=u"Users password the server is accessed as",
+        title=u("password"),
+        description=u("Users password the server is accessed as"),
         required=False
         )
 
     spn= zope.schema.TextLine(
-        title=u"spn",
-        description=u"""Service principal name (for MS Analysis Services).
-If not given, a default is made from the location URL's host called: HTTP@host""",
+        title=u("spn"),
+        description=u("""Service principal name (for MS Analysis Services).
+If not given, a default is made from the location URL's host called: HTTP@host"""),
         required=False
         )
 
     sslverify= zope.schema.TextLine(
-        title=u"sslverify",
-        description=u"""Verify ssl certificate on ssl connections. 
+        title=u("sslverify"),
+        description=u("""Verify ssl certificate on ssl connections. 
 Leave empty to accept any certifacte or point to a file on this server 
-containing a certicate bundle""",
+containing a certicate bundle"""),
         required=False
         )
 
