@@ -59,12 +59,12 @@ class XMLAExecute(object):
 
     def setUp(self):
         self.cube = self.be["cube"]
-	self.set1 = self.be["set1"]
-	self.set2 = self.be["set2"]
-	self.set3 = self.be["set3"] 
-	self.catalog = self.be["catalog"]
+        self.set1 = self.be["set1"]
+        self.set2 = self.be["set2"]
+        self.set3 = self.be["set3"] 
+        self.catalog = self.be["catalog"]
         self.p = xmla.XMLAProvider()
-	self.c = self.p.connect(location=self.be["location"], 
+        self.c = self.p.connect(location=self.be["location"], 
 				username=self.be["username"], 
 				password=self.be["password"], 
 				spn=self.be["spn"])
@@ -80,7 +80,7 @@ class XMLAExecute(object):
 	     "cube":self.cube}
 
         erg = self.c.Execute(cmd, Catalog=self.catalog)
-	erg.getSlice(property="Value")
+        erg.getSlice(property="Value")
 
     def test3Axes(self):
         cmd= """select %(set1)s on columns, 
@@ -89,28 +89,28 @@ class XMLAExecute(object):
 	    {"set1":self.set1, "set2":self.set2, "set3":self.set3, 
 	     "cube":self.cube}
         erg = self.c.Execute(cmd, Catalog=self.catalog)
-	erg.getSlice(property="Value")
+        erg.getSlice(property="Value")
 
     def testNoAxesButOneCell(self): 
     # well there is a sliceraxis of course ...
         cmd= "select from %(cube)s" % {"cube":self.cube}
-	erg = self.c.Execute(cmd, Catalog=self.catalog)
-	erg.getSlice(property="Value")
+        erg = self.c.Execute(cmd, Catalog=self.catalog)
+        erg.getSlice(property="Value")
 
     def testOneDimensional(self): 
 	# columns with cells but no rows
-	cmd= "select %(set1)s on columns from %(cube)s" %\
+        cmd= "select %(set1)s on columns from %(cube)s" %\
 	    {"cube":self.cube, "set1":self.set1}
-	erg = self.c.Execute(cmd, Catalog=self.catalog)
-	erg.getSlice(property="Value")
+        erg = self.c.Execute(cmd, Catalog=self.catalog)
+        erg.getSlice(property="Value")
 
     def testOneDimensional2(self): 
         # empty column with no cells but rows
-	if self.be["type"] == "mondrian": return # NPE in Mondrian's backend
-	cmd= "select {} on columns, %(set1)s on rows from %(cube)s" %\
+        if self.be["type"] == "mondrian": return # NPE in Mondrian's backend
+        cmd= "select {} on columns, %(set1)s on rows from %(cube)s" %\
 	    {"cube":self.cube, "set1":self.set1}
-	erg = self.c.Execute(cmd, Catalog=self.catalog)
-	erg.getSlice(property="Value")
+        erg = self.c.Execute(cmd, Catalog=self.catalog)
+        erg.getSlice(property="Value")
 		
 
 try:

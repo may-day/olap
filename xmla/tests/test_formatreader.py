@@ -20,7 +20,7 @@ class TestFormatReader(unittest.TestCase):
         self.res = utils.PropDict(mdx1.result)
         self.fr=TupleFormatReader(self.res)
         self.cm = self.fr.cellmap
-        self.ordinal1 = filter(lambda cell: cell._CellOrdinal == "1", self.res.CellData.Cell)[0]
+        self.ordinal1 = list(filter(lambda cell: cell._CellOrdinal == "1", self.res.CellData.Cell))[0]
         self.ax_tupel0 = [tup.Member for tup in self.res.Axes.Axis[0].Tuples.Tuple]
 
         self.res_noaxistuple = utils.PropDict(mdx_noaxistuple.result)

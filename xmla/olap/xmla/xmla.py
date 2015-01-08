@@ -18,18 +18,17 @@ class TREE_OP(object):
     DESCENDANTS = 0x10
     ANCESTORS = 0x20
     
-
+@zope.interface.implementer(ooi.IProvider)
 class XMLAProvider(object):
     
-    zope.interface.implements(ooi.IProvider)
     
     def connect(self, url=defaultwsdl, location=None, username=None, 
                 password=None, spn=None, sslverify=True, **kwargs):
         return XMLASource(url, location, username, password, spn, sslverify, **kwargs)
 
 
+@zope.interface.implementer(ooi.IOLAPSchemaElement)
 class XMLAClass(object):
-    zope.interface.implements(ooi.IOLAPSchemaElement)
 
     def __init__(self, unique_name_property, properties, schemaElementName, conn):
         self._properties = properties
@@ -119,9 +118,8 @@ class XMLAClass(object):
     def query(self, mdx_stmt):
         return self._conn.Execute(mdx_stmt, Catalog=self.CATALOG_NAME)
 
+@zope.interface.implementer(oxi.IXMLASource, ooi.IOLAPSource, ooi.IConnection)
 class XMLASource(XMLAConnection, XMLAClass):
-    zope.interface.implements(oxi.IXMLASource, ooi.IOLAPSource, ooi.IConnection)
-
 
     def __init__(self, urlwsdl=defaultwsdl, 
                  location=None, username=None, password=None, spn=None,
@@ -150,8 +148,8 @@ class XMLASource(XMLAConnection, XMLAClass):
         return self.getSchemaElements("CATALOG", unique_name,
                                       aslist=unique_name==None)
 
+@zope.interface.implementer(ooi.ICatalog)
 class XMLACatalog(XMLAClass):
-    zope.interface.implements(ooi.ICatalog)
     
     def getCubes(self):
         return self.getCube(None)
@@ -184,8 +182,8 @@ class XMLACatalog(XMLAClass):
     def getMeasure(self, unique_name):
         return self.getSchemaElements("CATALOG_MEASURE", unique_name,
                                       aslist=unique_name==None)
+@zope.interface.implementer(ooi.ICube)
 class XMLACube(XMLAClass):
-    zope.interface.implements(ooi.ICube)
 
     def getHierarchies(self):
         return self.getHierarchy(None)
@@ -216,8 +214,8 @@ class XMLACube(XMLAClass):
                                       aslist=unique_name==None)
 
 
+@zope.interface.implementer(ooi.IHierarchy)
 class XMLAHierarchy(XMLAClass):
-    zope.interface.implements(ooi.IHierarchy)
 
     def getLevels(self):
         return self.getLevel(None)
@@ -233,8 +231,8 @@ class XMLAHierarchy(XMLAClass):
                                       aslist=unique_name==None)
 
 
+@zope.interface.implementer(ooi.ILevel)
 class XMLALevel(XMLAClass):
-    zope.interface.implements(ooi.ILevel)
 
     def getMembers(self):
         return self.getMember(None)
@@ -250,8 +248,8 @@ class XMLALevel(XMLAClass):
         return self.getSchemaElements("PROPERTY", unique_name,
                                       aslist=unique_name==None)
 
+@zope.interface.implementer(ooi.IMember)
 class XMLAMember(XMLAClass):
-    zope.interface.implements(ooi.IMember)
 
     def getParent(self):
         """Return this members parent member or None if this is the root
@@ -299,17 +297,17 @@ class XMLAMember(XMLAClass):
                                       aslist=True, 
                                       more_restrictions={"TREE_OP":TREE_OP.ANCESTORS})
 
-class XMLAMeasure(XMLAClass):
-    zope.interface.implements(ooi.IMeasure)
+@zope.interface.implementer(ooi.IMeasure)
+class XMLAMeasure(XMLAClass): pass
 
-class XMLAProperty(XMLAClass):
-    zope.interface.implements(ooi.IProperty)
+@zope.interface.implementer(ooi.IProperty)
+class XMLAProperty(XMLAClass): pass
 
-class XMLASet(XMLAClass):
-    zope.interface.implements(ooi.ISet)
+@zope.interface.implementer(ooi.ISet)
+class XMLASet(XMLAClass): pass
 
+@zope.interface.implementer(ooi.IDimension)
 class XMLADimension(XMLAClass):
-    zope.interface.implements(ooi.IDimension)
 
     def getHierarchies(self):
         return self.getHierarchy(None)

@@ -56,7 +56,8 @@ class XMLAConnection(object):
     
     @classmethod
     def addMethod(cls, funcname, func):
-        return setattr(cls, funcname, types.MethodType(func, None, cls))
+#        return setattr(cls, funcname, types.MethodType(func, None, cls))
+        return setattr(cls, funcname, func)
 
         
     @classmethod

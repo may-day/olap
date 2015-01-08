@@ -3,8 +3,8 @@ import types
 from olap.interfaces import IMDXResult
 import zope.interface
 
+@zope.interface.implementer(IMDXResult)
 class TupleFormatReader(object):
-    zope.interface.implements(IMDXResult)
 
     def __init__(self, tupleresult):
         self.root = tupleresult
@@ -31,7 +31,7 @@ class TupleFormatReader(object):
         res = None
         try:
             if isinstance(axis, stringtypes):
-                ax = filter(lambda x: x._name == axis, aslist(self.root.Axes.Axis))[0]
+                ax = [x for x in  aslist(self.root.Axes.Axis) if x._name == axis][0]
             else:
                 ax = aslist(self.root.Axes.Axis)[axis]
             res = []
