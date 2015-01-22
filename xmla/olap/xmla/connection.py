@@ -24,6 +24,14 @@ class UseDefaultNamespace(MessagePlugin):
             d.prefix = None
             d.set("xmlns", "urn:schemas-microsoft-com:xml-analysis")
 
+class SessionPlugin(MessagePlugin):
+  def __init__(self, xmlaconn):
+      self.xmlaconn = xmlaconn
+
+  def parsed(self, context):
+      if self.xmlaconn.getListenOnSessionId():
+          self.xmlaconn.setSessionId(context.reply.childAtPath("/Envelope/Header/Session").getAttribute("SessionId").getValue())
+
 #import logging
 #logging.basicConfig(level=logging.INFO)
 #logging.getLogger('suds.client').setLevel(logging.DEBUG)
@@ -83,17 +91,28 @@ class XMLAConnection(object):
                                                password=password, 
                                                sslverify=sslverify,
                                                **kwargs)
+        self.sessionplugin=SessionPlugin(self)
         self.client = Client(url, 
                              location=location, 
                              transport=transport, 
                              cache=None, 
-                             plugins=[UseDefaultNamespace()])
+                             plugins=[UseDefaultNamespace(), self.sessionplugin])
         
         # optional, call might fail
         self.getMDSchemaLevels = lambda *args, **kw: self.Discover("MDSCHEMA_LEVELS", 
                                                                    *args, **kw)
-        self.sessionid = None
+        self.setListenOnSessionId(False)
+        self.setSessionId(None)
              
+
+    def getListenOnSessionId(self):
+        return self.listenOnSessionId
+
+    def setListenOnSessionId(self, trueOrFalse):
+        self.listenOnSessionId = trueOrFalse
+
+    def setSessionId(self, sessionId):
+        self.sessionId = sessionId
         
     def Discover(self, what, restrictions=None, properties=None):
         rl = None
@@ -116,7 +135,7 @@ class XMLAConnection(object):
 
     def Execute(self, command, dimformat="Multidimensional", 
                 axisFormat="TupleFormat", **kwargs):
-        if isinstance(command, stringTypes):
+        if isinstance(command, stringtypes):
             command = {"Statement":command}
         props = {"Format":dimformat, "AxisFormat":axisFormat}
         props.update(kwargs)
@@ -134,20 +153,21 @@ class XMLAConnection(object):
         sess= self.client.factory.create("Session")
         sess._mustUnderstand = 1
         self.client.set_options(soapheaders={"BeginSession":bs})
+        self.setListenOnSessionId(True)
         self.client.service.Execute({"Statement":None})
-        sess._SessionId=self.client.last_received().\
-            childAtPath("/Envelope/Header/Session").getAttribute("SessionId").getValue()
-        self.sessionid = sess._SessionId
+        self.setListenOnSessionId(False)
+        #print(self.client)
+        sess._SessionId=self.sessionId
         self.client.set_options(soapheaders=sess)
         
     def EndSession(self):
-        if self.sessionid is not None:
+        if self.sessionId is not None:
             es= self.client.factory.create("EndSession")
             es._mustUnderstand = 1
-            es._SessionId = self.sessionid
+            es._SessionId = self.sessionId
             self.client.set_options(soapheaders={"EndSession":es})
             self.client.service.Execute({"Statement":None})
-            self.sessionid = None
+            self.setSessionId(None)
             self.client.set_options(soapheaders=None)
 
                 
