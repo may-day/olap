@@ -44,8 +44,8 @@ Here is an example how to use it:
     #               password="demo")
 
     # getting info about provided data
-    print c.getDatasources()
-    print c.getMDSchemaCubes()
+    print(c.getDatasources())
+    print(c.getMDSchemaCubes())
     # for ssas a catalog is needed, so the call would be like
     # get a catalogname from a call to c.getDBSchemaCatalogs()
     # c.getMDSchemaCubes(properties={"Catalog":"a catalogname"})
@@ -82,7 +82,7 @@ Using the procedural interface:
 
     p = xmla.XMLAProvider()
     c = p.connect(location="http://localhost:8080/mondrian/xmla")
-    s = p.getOLAPSource()
+    s = c.getOLAPSource()
 
     # import olap.interfaces as oi
     # oi.IOLAPSource.providedBy(s) == True
