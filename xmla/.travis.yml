@@ -1,4 +1,9 @@
 language: python
+# whitelist
+branches:
+  only:
+    - master
+    - py3
 python:
 - "2.6"
 - "2.7"
