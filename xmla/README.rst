@@ -28,7 +28,7 @@ Sample
 
 Here is an example how to use it:
 
-::
+.. code:: python
 
     import olap.xmla.xmla as xmla
 
@@ -76,7 +76,7 @@ Here is an example how to use it:
 
 Using the procedural interface:
 
-::
+.. code:: python
 
     import olap.xmla.xmla as xmla
 

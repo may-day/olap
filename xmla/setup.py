@@ -3,7 +3,7 @@
 from setuptools import setup
 from distutils.util import get_platform
 
-long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.md").read() 
+long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.rest").read() 
 
 install_requires=[
     'olap',

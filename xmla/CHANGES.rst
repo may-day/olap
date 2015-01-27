@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+0.8.0
+-----
+* XMLAConnection keyword parameters that are passed through to the requests' HttpConnection
+* now relies on requests 2.5.1, suds-jurko 0.6
+* now works with python 2.7, 3.3, 3.4
+
 0.7.2
 -----
 * now relies on requests 1.2.3
