@@ -54,7 +54,8 @@ setup(
     tests_require = [
         'nose',
         'nose-testconfig',
-        'docutils'
+        'docutils',
+        'Pygments == 1.6'
     ],
 
     test_suite = 'nose.collector',
