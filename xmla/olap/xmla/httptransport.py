@@ -28,10 +28,8 @@ class DummyFile:
 if sys.platform.startswith("win"):
     from six.moves.urllib.response import addinfourl
     import os
-    import mimetools
     import email.utils
-    import mimetypes
-    from six.moves import cStringIO
+    import email
 
     class MyDriveFileHandler(url.FileHandler):
         def open_local_file(self, req):
@@ -44,9 +42,9 @@ if sys.platform.startswith("win"):
                 size = stats.st_size
                 modified = email.utils.formatdate(stats.st_mtime, usegmt=True)
                 mtype = mimetypes.guess_type(filename)[0]
-                headers = mimetools.Message(cStringIO(
+                headers = email.message_from_string(
                         'Content-type: %s\nContent-length: %d\nLast-modified: %s\n' %
-                        (mtype or 'text/plain', size, modified)))
+                        (mtype or 'text/plain', size, modified))
                 origurl = 'file://' + host + filename
                 return addinfourl(open(localfile, 'rb'), headers, origurl)
             except:

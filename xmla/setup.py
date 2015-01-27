@@ -9,12 +9,11 @@ install_requires=[
     'olap',
     'suds-jurko == 0.6',
     'requests == 2.5.1',
-#    'requests == 1.2.3',
     'six == 1.9.0'
     ]
 
 extras_require = {
-    "kerberos": ["kerberos"],
+    "kerberos": ["kerberos-py23 == 1.1.1.0"],
     "s4u2p":["s4u2p"]
 }
 
@@ -30,7 +29,7 @@ except:
 
 setup(
     name='xmla',
-    version='0.7.2',
+    version='0.8.0',
     url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
     classifiers = [

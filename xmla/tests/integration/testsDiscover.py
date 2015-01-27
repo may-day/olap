@@ -40,6 +40,7 @@ mondrian={
 "cube_measures":5,
 "schema_levels":3,
 "schema_sets":1,
+"schema_sets_needs_cubename":False,
 "schema_tables":1
 }
 
@@ -62,6 +63,7 @@ ssas={
 "cube_measures": 51,
 "schema_levels":6,
 "schema_sets":1,
+"schema_sets_needs_cubename":True, # not really, but if you have a few DBs on your server this will bring it to it's knees
 "schema_tables":1
 }
 
@@ -84,6 +86,7 @@ iccube={
 "cube_measures": 2,
 "schema_levels":4,
 "schema_sets":0,
+"schema_sets_needs_cubename":False,
 "schema_tables":0
 }
 
@@ -95,8 +98,6 @@ import logging
 
 class XMLA(object):
 
-    supported = proprietary = conform = unsupported = None
-
     def setUp(self):
         self.p = xmla.XMLAProvider()
         self.c = self.p.connect(location=self.be["location"], 
@@ -107,11 +108,11 @@ class XMLA(object):
         self.getSchemaRowsetSupport()
          
     def getSchemaRowsetSupport(self):
-        if XMLA.supported is None:
-            XMLA.supported=[x["SchemaName"] for x in self.c.getSchemaRowsets()]
-            XMLA.proprietary = [x for x in self.supported if not(x in xmla1_1_rowsets)]
-            XMLA.conform = [x for x in self.supported if (x in xmla1_1_rowsets)]
-            XMLA.unsupported = [x for x in xmla1_1_rowsets if not (x in self.supported)]
+        if self.supported is None:
+            self.supported=[x["SchemaName"] for x in self.c.getSchemaRowsets()]
+            self.proprietary = [x for x in self.supported if not(x in xmla1_1_rowsets)]
+            self.conform = [x for x in self.supported if (x in xmla1_1_rowsets)]
+            self.unsupported = [x for x in xmla1_1_rowsets if not (x in self.supported)]
     
     def tearDown(self):
         self.c.EndSession()
@@ -165,7 +166,7 @@ class XMLA(object):
 
     def testGetMDSchemaActions(self):
         erg=self.c.getMDSchemaActions(
-            restrictions={"CUBE_NAME":self.be["restrict_cube"]})
+            restrictions={"CUBE_NAME":self.be["restrict_cube"], "COORDINATE":self.be["restrict_cube"], "COORDINATE_TYPE":1})
         assert_true(len(erg)==0, "no actions expected")
 
     def testGetMDSchemaCubes(self):
@@ -209,7 +210,10 @@ class XMLA(object):
                         "There should be more than one schema property.")
 
     def testGetMDSchemaSets(self):
-        erg=self.c.getMDSchemaSets()
+        if self.be["schema_sets_needs_cubename"]:
+            erg=self.c.getMDSchemaSets(restrictions={"CUBE_NAME":self.be["restrict_cube"]})
+        else:
+            erg=self.c.getMDSchemaSets()
         
         assert_true(len(erg)>= self.be["schema_sets"], 
                         "There should be a schema set.")
@@ -285,14 +289,17 @@ except:
 if "mondrian" in server:
     class TestMondrian(XMLA, unittest.TestCase):
         be = mondrian
+        supported = proprietary = conform = unsupported = None
 
 if "iccube" in server:
     class TestICCube(XMLA, unittest.TestCase):
         be = iccube
+        supported = proprietary = conform = unsupported = None
 
 if "ssas" in server:
     class TestSSAS(XMLA, unittest.TestCase):
         be = ssas
+        supported = proprietary = conform = unsupported = None
 
 #def test_suite():
 #    #import s4u2p

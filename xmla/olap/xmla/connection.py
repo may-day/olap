@@ -6,7 +6,7 @@ Created on 18.04.2012
 from olap.xmla.interfaces import XMLAException
 from suds.client import Client
 from suds import WebFault
-from . import http
+from . import httptransport
 import types
 from .formatreader import TupleFormatReader
 from .utils import *
@@ -82,12 +82,12 @@ class XMLAConnection(object):
     def __init__(self, url, location, username, password, spn, sslverify, **kwargs):
 
         if password is None:
-            transport = http.HttpKerberosAuthenticated(as_user=username, 
+            transport = httptransport.HttpKerberosAuthenticated(as_user=username, 
                                                        spn=spn, 
                                                        sslverify=sslverify,
                                                        **kwargs)
         else:
-            transport = http.HttpAuthenticated(username=username, 
+            transport = httptransport.HttpAuthenticated(username=username, 
                                                password=password, 
                                                sslverify=sslverify,
                                                **kwargs)
@@ -128,7 +128,7 @@ class XMLAConnection(object):
             if res:
                 res = aslist(res)
         except WebFault as fault:
-            raise XMLAException(fault.message, dictify(fault.fault))
+            raise XMLAException(fault.fault, dictify(fault.fault))
         logger.debug( res )
         return res
 
@@ -144,7 +144,7 @@ class XMLAConnection(object):
             root = self.client.service.Execute(command, pl).ExecuteResponse["return"].root
             return TupleFormatReader(root)
         except WebFault as fault:
-            raise XMLAException(fault.message, dictify(fault.fault))
+            raise XMLAException(fault.fault, dictify(fault.fault))
         
         
     def BeginSession(self):
