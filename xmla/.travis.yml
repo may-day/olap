@@ -1,0 +1,10 @@
+language: python
+# whitelist
+branches:
+  only:
+    - master
+python:
+- "2.7"
+script:
+- cd xmla
+- python setup.py test
