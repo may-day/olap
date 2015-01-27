@@ -9,7 +9,7 @@ def test_rst_readme():
     rst2html("README.rst")
 
 def test_rst_changes():
-    rst2html("CHANGES.md")
+    rst2html("CHANGES.rst")
 
 def rst2html(what):
     fname = os.path.join(os.path.split(__file__)[0], "..", what)

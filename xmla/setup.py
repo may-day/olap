@@ -3,7 +3,7 @@
 from setuptools import setup
 from distutils.util import get_platform
 
-long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.rest").read() 
+long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.rst").read() 
 
 install_requires=[
     'olap',
@@ -54,7 +54,8 @@ setup(
     tests_require = [
         'nose',
         'nose-testconfig',
-        'docutils'
+        'docutils',
+        'Pygments'
     ],
 
     test_suite = 'nose.collector',
