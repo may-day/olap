@@ -18,7 +18,7 @@ extras_require = {
 }
 
 if get_platform().startswith('win'):
-    extras_require["sspi"] = ["kerberos-sspi"]
+    extras_require["sspi"] = ["kerberos-sspi == 0.2"]
     
 # hack, or test wont run on py2.7
 try:

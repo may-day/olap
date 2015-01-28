@@ -30,12 +30,13 @@ if sys.platform.startswith("win"):
     import os
     import email.utils
     import email
+    import mimetypes
 
     class MyDriveFileHandler(url.FileHandler):
         def open_local_file(self, req):
             try:
-                host = req.get_host()
-                filename = req.get_selector()
+                host = req.host
+                filename = req.selector
                 # if that bombs, then go on with original method
                 localfile = url.url2pathname(host+filename)
                 stats = os.stat(localfile) 
