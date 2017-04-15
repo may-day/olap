@@ -23,8 +23,8 @@ class XMLAProvider(object):
     zope.interface.implements(ooi.IProvider)
     
     def connect(self, url=defaultwsdl, location=None, username=None, 
-                password=None, spn=None, sslverify=True):
-        return XMLASource(url, location, username, password, spn, sslverify)
+                password=None, spn=None, sslverify=True, **kwargs):
+        return XMLASource(url, location, username, password, spn, sslverify, **kwargs)
 
 
 class XMLAClass(object):
@@ -124,7 +124,7 @@ class XMLASource(XMLAConnection, XMLAClass):
 
     def __init__(self, urlwsdl=defaultwsdl, 
                  location=None, username=None, password=None, spn=None,
-                 sslverify=True):
+                 sslverify=True, **kwargs):
         self.urlwsdl=urlwsdl
         self.location=location
         self.username=username
@@ -134,7 +134,7 @@ class XMLASource(XMLAConnection, XMLAClass):
             
         XMLAClass.__init__(self, None, {}, None, self)
         XMLAConnection.__init__(self, urlwsdl, location, username, 
-                                           password, spn, sslverify)
+                                           password, spn, sslverify, **kwargs)
 
     # IConnection interface
     def getOLAPSource(self):
