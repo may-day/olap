@@ -83,6 +83,11 @@ class ICatalog(IOLAPSchemaElement):
 
     def query(mdx_stmt):
         """Return a IMDXResult resulting from executing the mdx statement."""
+    
+    def getRelationships(unique_name=None):
+        """Returns a list of IRelationships in the catalog optionally 
+        matching the given name."""
+
 
 class IMDXResult(Interface):
     def getSlice(properties=None, **kw):
@@ -211,4 +216,7 @@ class IProperty(IOLAPSchemaElement):
     pass
 
 class ISet(IOLAPSchemaElement):
+    pass
+
+class IRelationship(IOLAPSchemaElement):
     pass

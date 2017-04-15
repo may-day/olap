@@ -183,6 +183,10 @@ class XMLACatalog(XMLAClass):
     def getMeasure(self, unique_name):
         return self.getSchemaElements("CATALOG_MEASURE", unique_name,
                                       aslist=unique_name==None)
+
+    def getRelationships(self, unique_name=None):
+        return self.getSchemaElements("MEASUREGROUP_DIMENSION", unique_name, aslist=True)
+
 class XMLACube(XMLAClass):
     zope.interface.implements(ooi.ICube)
 
@@ -306,6 +310,9 @@ class XMLAProperty(XMLAClass):
 
 class XMLASet(XMLAClass):
     zope.interface.implements(ooi.ISet)
+
+class XMLARelationship(XMLAClass):
+    zope.interface.implements(ooi.IRelationship)
 
 class XMLADimension(XMLAClass):
     zope.interface.implements(ooi.IDimension)

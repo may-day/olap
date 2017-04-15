@@ -168,7 +168,12 @@ schemaElementTypes = {
                  "PROPERTY_NAME":"PROPERTY_NAME",
                  "ELEMENT_CLASS":"XMLAProperty",
                  "XMLA_FUNC":"getMDSchemaProperties",
-                 "RESTRICT_ON":["CUBE", "HIERARCHY", "LEVEL"]}
+                 "RESTRICT_ON":["CUBE", "HIERARCHY", "LEVEL"]},
+    "MEASUREGROUP_DIMENSION": {"RESTRICTION_NAME":"CATALOG_NAME",
+                "PROPERTY_NAME":"CATALOG_NAME",
+                "ELEMENT_CLASS":"XMLARelationship",
+                "XMLA_FUNC":"getMDSchemaMeasuregroupDimensions",
+                "RESTRICT_ON": ["CATALOG"]},
 
     }
 
