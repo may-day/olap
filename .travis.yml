@@ -3,8 +3,12 @@ language: python
 branches:
   only:
     - master
+    - py3
 python:
 - "2.7"
+- "3.2"
+- "3.3"
+- "3.4"
 script:
 - cd xmla
 - python setup.py test
