@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s0="urn:schemas-microsoft-com:xml-analysis" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="urn:schemas-microsoft-com:xml-analysis" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <s:schema attributeFormDefault="qualified" elementFormDefault="unqualified" targetNamespace="urn:schemas-microsoft-com:xml-analysis">
+      <s:element name="BeginSession">
+        <s:complexType>
+          <s:attribute form="unqualified" name="mustUnderstand" type="s:int" />
+        </s:complexType>
+      </s:element>
+      <s:element name="EndSession">
+        <s:complexType>
+          <s:attribute form="unqualified" name="SessionId" type="s:string" />
+          <s:attribute form="unqualified" name="mustUnderstand" type="s:int" />
+        </s:complexType>
+      </s:element>
+      <s:element name="Session">
+        <s:complexType>
+          <s:attribute form="unqualified" name="SessionId" type="s:string" />
+          <s:attribute form="unqualified" name="mustUnderstand" type="s:int" />
+        </s:complexType>
+      </s:element>
+      <s:element name="Discover">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="RequestType" nillable="true" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="Restrictions" nillable="true">
+              <s:complexType>
+                <s:sequence>
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+            <s:element minOccurs="1" maxOccurs="1" name="Properties" nillable="true">
+              <s:complexType>
+                <s:sequence>
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="DiscoverResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="return">
+              <s:complexType>
+                <s:sequence>
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Execute">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="Command" nillable="true">
+              <s:complexType>
+                <s:sequence>
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+            <s:element minOccurs="1" maxOccurs="1" name="Properties" nillable="true">
+              <s:complexType>
+                <s:sequence>
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ExecuteResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="return">
+              <s:complexType>
+                <s:sequence>
+                  <s:any />
+                </s:sequence>
+              </s:complexType>
+            </s:element>
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </types>
+  <message name="DiscoverSoapIn">
+    <part name="parameters" element="s0:Discover" />
+    <part name="Session" element="s0:Session" />
+    <part name="BeginSession" element="s0:BeginSession" />
+    <part name="EndSession" element="s0:EndSession" />
+  </message>
+  <message name="DiscoverSoapIn1">
+    <part name="parameters" element="s0:Discover" />
+  </message>
+  <message name="DiscoverSoapOut">
+    <part name="parameters" element="s0:DiscoverResponse" />
+    <part name="Session" element="s0:Session" />
+  </message>
+  <message name="ExecuteSoapIn">
+    <part name="parameters" element="s0:Execute" />
+    <part name="Session" element="s0:Session" />
+    <part name="BeginSession" element="s0:BeginSession" />
+    <part name="EndSession" element="s0:EndSession" />
+  </message>
+  <message name="ExecuteSoapOut">
+    <part name="parameters" element="s0:ExecuteResponse" />
+    <part name="Session" element="s0:Session" />
+  </message>
+  <portType name="MsXmlAnalysisSoap">
+    <operation name="Discover">
+      <input message="s0:DiscoverSoapIn" />
+      <output message="s0:DiscoverSoapOut" />
+    </operation>
+    <operation name="Execute">
+      <input message="s0:ExecuteSoapIn" />
+      <output message="s0:ExecuteSoapOut" />
+    </operation>
+  </portType>
+  <binding name="MsXmlAnalysisSoap" type="s0:MsXmlAnalysisSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
+    <operation name="Discover">
+      <soap:operation soapAction="urn:schemas-microsoft-com:xml-analysis:Discover" style="document" />
+      <input>
+        <soap:body parts="parameters" use="literal" />
+        <soap:header message="s0:DiscoverSoapIn" part="Session" use="literal" />
+        <soap:header message="s0:DiscoverSoapIn" part="BeginSession" use="literal" />
+        <soap:header message="s0:DiscoverSoapIn" part="EndSession" use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+        <soap:header message="s0:DiscoverSoapOut" part="Session" use="literal" />
+      </output>
+    </operation>
+    <operation name="Execute">
+      <soap:operation soapAction="urn:schemas-microsoft-com:xml-analysis:Execute" style="document" />
+      <input>
+        <soap:body parts="parameters" use="literal" />
+        <soap:header message="s0:ExecuteSoapIn" part="Session" use="literal" />
+        <soap:header message="s0:ExecuteSoapIn" part="BeginSession" use="literal" />
+        <soap:header message="s0:ExecuteSoapIn" part="EndSession" use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+        <soap:header message="s0:ExecuteSoapOut" part="Session" use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="MsXmlAnalysis">
+    <port name="MsXmlAnalysisSoap" binding="s0:MsXmlAnalysisSoap">
+      <soap:address location="http://localhost/olap/msmdpump.dll" />
+    </port>
+  </service>
+</definitions>
