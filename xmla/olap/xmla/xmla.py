@@ -39,6 +39,8 @@ class XMLAClass(object):
     def __str__(self):
         return self.__class__.__name__ + ":" + str(self.getElementProperties())
 
+    __repr__ = __str__
+
     def getElementProperties(self):
         return self._properties
 
