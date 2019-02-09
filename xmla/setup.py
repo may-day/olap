@@ -8,7 +8,7 @@ long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.rst").rea
 install_requires=[
     'olap',
     'suds-jurko == 0.6',
-    'requests == 2.5.1',
+    'requests',
     'six == 1.9.0'
     ]
 
