@@ -2,11 +2,21 @@ olap.xmla
 =========
 This package is meant for accessing xmla datasources - see http://en.wikipedia.org/wiki/XML_for_Analysis
 
-Builing
+Setting up your env
 =======
-In this directory, run:
+In your workdir run:
 
-    python setup.py build
+    # create virtualenv (using ubuntu)
+    virtualenv -p python2 zzz
+    cd zzz
+    source bin/activate
+    # side note - make sure you have no other PATH pointing to easy_install, e.g. if you installed anaconda on your system
+    git clone https://github.com/may-day/olap
+    cd olap
+    pip install zc.buildout
+    buildout
+    
+
 
 Testing
 =======
@@ -22,6 +32,7 @@ Sample
 Here is an example how to use it:
 
 ```python
+# we run the bin/python created in the setup described above
 import olap.xmla.xmla as xmla
 
 p = xmla.XMLAProvider()
