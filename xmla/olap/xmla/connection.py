@@ -95,7 +95,7 @@ class XMLAConnection(object):
         self.client = Client(url, 
                              location=location, 
                              transport=transport, 
-                             cache=None, 
+                             cache=None, unwrap=False,
                              plugins=[UseDefaultNamespace(), self.sessionplugin])
         
         # optional, call might fail
@@ -123,8 +123,9 @@ class XMLAConnection(object):
             pl = {"PropertyList":properties}
             
         try:
-            res = getattr(self.client.service.Discover(what, rl, pl).\
-                              DiscoverResponse["return"].root, "row", [])
+            import pdb; pdb.set_trace()
+            doc=self.client.service.Discover(what, rl, pl)
+            res = getattr(doc.DiscoverResponse["return"].root, "row", [])
             if res:
                 res = aslist(res)
         except WebFault as fault:
