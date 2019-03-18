@@ -3,7 +3,7 @@ Created on 18.04.2012
 
 @author: norman
 '''
-from olap.xmla.interfaces import XMLAException
+from .interfaces import XMLAException
 from suds.client import Client
 from suds import WebFault
 from . import httptransport

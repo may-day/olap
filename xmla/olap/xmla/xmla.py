@@ -1,6 +1,6 @@
 import zope.interface
+from .interfaces import IXMLASource, schemaElementTypes, SchemaElementNotFound
 from .connection import XMLAConnection
-import olap.xmla.interfaces as oxi
 import olap.interfaces as ooi
 from .utils import u
 
@@ -62,7 +62,7 @@ class XMLAClass(object):
                           aslist=False, more_restrictions=None, 
                           more_properties=None,
                           generate_instance=True):
-        types = oxi.schemaElementTypes
+        types = schemaElementTypes
         et = types[schemaElementName]
         
         r=restrictions = {}
@@ -101,7 +101,7 @@ class XMLAClass(object):
         props = func(r, properties)
 
         if props is None or len(props) == 0:
-            raise oxi.SchemaElementNotFound(r, properties)
+            raise SchemaElementNotFound(r, properties)
 
         if generate_instance:
             result = self.objectfactory(et["ELEMENT_CLASS"], 
@@ -118,7 +118,7 @@ class XMLAClass(object):
     def query(self, mdx_stmt):
         return self._conn.Execute(mdx_stmt, Catalog=self.CATALOG_NAME)
 
-@zope.interface.implementer(oxi.IXMLASource, ooi.IOLAPSource, ooi.IConnection)
+@zope.interface.implementer(IXMLASource, ooi.IOLAPSource, ooi.IConnection)
 class XMLASource(XMLAConnection, XMLAClass):
 
     def __init__(self, urlwsdl=defaultwsdl, 

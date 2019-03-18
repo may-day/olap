@@ -7,7 +7,7 @@ Created on 18.04.2012
 
 from zope.interface import Interface
 import zope.schema
-from olap import xmla
+#from olap import xmla
 import olap.interfaces as ooi
 from .utils import u
 

@@ -7,25 +7,13 @@ long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.rst").rea
 
 install_requires=[
     'olap',
-    'suds-jurko == 0.6',
-    'requests == 2.5.1',
-    'six == 1.9.0'
+    'zeep',
+    'requests'
     ]
 
 extras_require = {
-    "kerberos": ["kerberos-py23 == 1.1.1.0"],
-    "s4u2p":["s4u2p"]
+    "kerberos": ["requests_kerberos"]
 }
-
-if get_platform().startswith('win'):
-    extras_require["sspi"] = ["kerberos-sspi == 0.2"]
-    
-# hack, or test wont run on py2.7
-try:
-    import multiprocessing
-    import logging
-except:
-    pass
 
 setup(
     name='xmla',
@@ -34,7 +22,6 @@ setup(
     license='Apache Software License 2.0',
     classifiers = [
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
@@ -55,7 +42,7 @@ setup(
         'nose',
         'nose-testconfig',
         'docutils',
-        'Pygments == 1.6'
+        'Pygments'
     ],
 
     test_suite = 'nose.collector',

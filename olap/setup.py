@@ -18,7 +18,7 @@ setup(name='olap',
     license='Apache Software License 2.0',
     classifiers = [
         "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Topic :: Software Development :: Libraries :: Python Modules"

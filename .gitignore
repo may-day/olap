@@ -5,6 +5,7 @@
 /parts
 /develop-eggs
 /bin
+/.venv
 cover
 
 PKG-INFO
