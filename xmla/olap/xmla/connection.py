@@ -4,33 +4,35 @@ Created on 18.04.2012
 @author: norman
 '''
 from .interfaces import XMLAException
-from suds.client import Client
-from suds import WebFault
-from . import httptransport
+from zeep import Client
+from zeep.exceptions import Fault
+from zeep.transports import Transport
 import types
 from .formatreader import TupleFormatReader
 from .utils import *
 import logging
+from requests_kerberos import HTTPKerberosAuth
 
 logger = logging.getLogger(__name__)
 
-from suds.plugin import MessagePlugin
+from zeep import lugin
 
 # the following along with changes to the wsdl (elementFormDefault="unqualified") is needed
 # to make it fly with icCube, which expects elements w/o namespace prefix
-class UseDefaultNamespace(MessagePlugin):
-    def marshalled(self, context):
-        for d in context.envelope.getChild('Body').children:
-            d.prefix = None
-            d.set("xmlns", "urn:schemas-microsoft-com:xml-analysis")
+class UseDefaultNamespace(Plugin):
+    def egress(self, envelope, http_headers, operation, binding_options):
+        for d in envelope.find('Body'):
+            if '}' in d.tag:
+                d.tag = d.tag.split('}', 1)[1]  # strip all namespaces
+                #d.set("xmlns", "urn:schemas-microsoft-com:xml-analysis")
 
-class SessionPlugin(MessagePlugin):
+class SessionPlugin(Plugin):
   def __init__(self, xmlaconn):
       self.xmlaconn = xmlaconn
 
-  def parsed(self, context):
+  def ingress(self, envelope, http_headers, operation):
       if self.xmlaconn.getListenOnSessionId():
-          self.xmlaconn.setSessionId(context.reply.childAtPath("/Envelope/Header/Session").getAttribute("SessionId").getValue())
+          self.xmlaconn.setSessionId(envelope.xpath("/Envelope/Header/Session").attrib.get("SessionId"))
 
 #import logging
 #logging.basicConfig(level=logging.INFO)
@@ -81,16 +83,10 @@ class XMLAConnection(object):
 
     def __init__(self, url, location, username, password, spn, sslverify, **kwargs):
 
-        if password is None:
-            transport = httptransport.HttpKerberosAuthenticated(as_user=username, 
-                                                       spn=spn, 
-                                                       sslverify=sslverify,
-                                                       **kwargs)
-        else:
-            transport = httptransport.HttpAuthenticated(username=username, 
-                                               password=password, 
-                                               sslverify=sslverify,
-                                               **kwargs)
+        transport = Transport()
+        service, host = spn.split("@",1)
+        transport.session.auth = HTTPKerberosAuth(service=service, hostname_override=host, principal=username)
+
         self.sessionplugin=SessionPlugin(self)
         self.client = Client(url, 
                              location=location, 
@@ -128,8 +124,8 @@ class XMLAConnection(object):
             res = getattr(doc.DiscoverResponse["return"].root, "row", [])
             if res:
                 res = aslist(res)
-        except WebFault as fault:
-            raise XMLAException(fault.fault, dictify(fault.fault))
+        except Fault as fault:
+            raise XMLAException(fault.message, dictify(fault))
         logger.debug( res )
         return res
 
@@ -144,8 +140,8 @@ class XMLAConnection(object):
         try:
             root = self.client.service.Execute(command, pl).ExecuteResponse["return"].root
             return TupleFormatReader(root)
-        except WebFault as fault:
-            raise XMLAException(fault.fault, dictify(fault.fault))
+        except Fault as fault:
+            raise XMLAException(fault.message, dictify(fault))
         
         
     def BeginSession(self):

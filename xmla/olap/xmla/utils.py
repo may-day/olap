@@ -1,7 +1,7 @@
 import sys
 import six
-from suds.sax.text import Text as sudsText
-from suds.sudsobject import Object as sudsObject
+#from suds.sax.text import Text as sudsText
+#from suds.sudsobject import Object as sudsObject
 
 stringtypes = six.string_types
 _UnmarshallableType=(type(None), six.string_types, six.integer_types, float, bool)
@@ -16,18 +16,18 @@ def dictify(r):
 
     if isinstance(r, list):
         return [dictify(x) for x in r]
-    if isinstance(r, sudsObject):
-        d = {}
-        for (k, v) in r:
-            d[k] = dictify(v)
-        return d
+    # if isinstance(r, sudsObject):
+    #     d = {}
+    #     for (k, v) in r:
+    #         d[k] = dictify(v)
+    #     return d
     if isinstance(r, dict):
         d = {}
         for (k,v) in r.items():
             d[k] = dictify(v)
         return d
-    if isinstance(r, sudsText):
-        return six.u(r)
+    # if isinstance(r, sudsText):
+    #     return six.u(r)
     return r
 
 
