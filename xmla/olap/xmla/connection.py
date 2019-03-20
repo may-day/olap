@@ -15,7 +15,8 @@ from requests_kerberos import HTTPKerberosAuth
 
 logger = logging.getLogger(__name__)
 
-from zeep import lugin
+from zeep import Plugin
+from zeep import xsd
 
 # the following along with changes to the wsdl (elementFormDefault="unqualified") is needed
 # to make it fly with icCube, which expects elements w/o namespace prefix
@@ -84,16 +85,23 @@ class XMLAConnection(object):
     def __init__(self, url, location, username, password, spn, sslverify, **kwargs):
 
         transport = Transport()
-        service, host = spn.split("@",1)
-        transport.session.auth = HTTPKerberosAuth(service=service, hostname_override=host, principal=username)
+        kw = {}
+        if spn:
+            service, host = spn.split("@",1)
+            kw["service"]=service
+            kw["hostname_override"]=host
+        if username:
+            kw["principal"] = username
+            
+        transport.session.auth = HTTPKerberosAuth(**kw)
 
         self.sessionplugin=SessionPlugin(self)
         self.client = Client(url, 
-                             location=location, 
                              transport=transport, 
-                             cache=None, unwrap=False,
+                             # cache=None, unwrap=False,
                              plugins=[UseDefaultNamespace(), self.sessionplugin])
-        
+        self.service = self.client.create_service('{urn:schemas-microsoft-com:xml-analysis}MsXmlAnalysisSoap', location)
+
         # optional, call might fail
         self.getMDSchemaLevels = lambda *args, **kw: self.Discover("MDSCHEMA_LEVELS", 
                                                                    *args, **kw)
@@ -120,7 +128,7 @@ class XMLAConnection(object):
             
         try:
             import pdb; pdb.set_trace()
-            doc=self.client.service.Discover(what, rl, pl)
+            doc=self.service.Discover(what, rl, pl)
             res = getattr(doc.DiscoverResponse["return"].root, "row", [])
             if res:
                 res = aslist(res)
@@ -134,11 +142,17 @@ class XMLAConnection(object):
                 axisFormat="TupleFormat", **kwargs):
         if isinstance(command, stringtypes):
             command = {"Statement":command}
+            #command = [[xsd.AnyObject(xsd.String(), command)]]
         props = {"Format":dimformat, "AxisFormat":axisFormat}
         props.update(kwargs)
         pl = {"PropertyList":props}
+        #pl = [[xsd.AnyObject(xsd.String(), "woopy")]]
+        exec_value=self.client.get_element("{urn:schemas-microsoft-com:xml-analysis}Execute")(command, pl)
+        print(exec_value)
         try:
-            root = self.client.service.Execute(command, pl).ExecuteResponse["return"].root
+            
+            res = self.service.Execute(exec_value)
+            root = res.ExecuteResponse["return"].root
             return TupleFormatReader(root)
         except Fault as fault:
             raise XMLAException(fault.message, dictify(fault))
@@ -163,7 +177,7 @@ class XMLAConnection(object):
             es._mustUnderstand = 1
             es._SessionId = self.sessionId
             self.client.set_options(soapheaders={"EndSession":es})
-            self.client.service.Execute({"Statement":None})
+            self.service.Execute({"Statement":None})
             self.setSessionId(None)
             self.client.set_options(soapheaders=None)
 

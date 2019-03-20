@@ -6,9 +6,9 @@ import os.path
 
 
 def main(mdxfile, location, catalog, username, password, spn, sslverify):
-
-    pyfile = os.path.splitext(mdxfile)[0] + os.path.extsep + "py"
-    cmd = file(mdxfile).read()
+    p = os.path.dirname(os.path.realpath(__file__))
+    pyfile = os.path.join(p, os.path.splitext(mdxfile)[0] + os.path.extsep + "py")
+    cmd = open(os.path.join(p,mdxfile)).read()
 
     p = xmla.XMLAProvider()
     c=p.connect(location=location, username=username, 
@@ -17,7 +17,7 @@ def main(mdxfile, location, catalog, username, password, spn, sslverify):
     x=utils.dictify(res.root)
 
     erg=pprint.pformat(x)
-    file(pyfile, "wb+").write('"""\n%s\n"""\n\nresult=%s\n' % (cmd, erg))
+    open(pyfile, "wb+").write('"""\n%s\n"""\n\nresult=%s\n' % (cmd, erg))
 
 if __name__ == "__main__":
     import argparse
@@ -35,10 +35,11 @@ if __name__ == "__main__":
     parser.add_argument("--password", dest="password", help="use password", 
                         default=None)
     parser.add_argument("--spn", dest="spn", 
-                        help="spn, defaults to HTTP@domain if omitted")
+                        help="spn, defaults to HTTP@host if omitted")
     parser.add_argument("--sslverify", dest="sslverify", default=True,
                         help="sslverify, either False or path of cert file")
-    args = parser.parse_args()
+    args = parser.parse_args(['--location=http://dwh-bi.kiebackpeter.kup/olap/msmdpump.dll', 
+                                '--catalog=Adventure Works DW 2008R2', 'tt.txt'])
 
     if isinstance(args.sslverify, str):
         if args.sslverify.upper() in ["0", "FALSE", "NO", "NEIN"]:
@@ -46,3 +47,7 @@ if __name__ == "__main__":
 
     main(args.mdxfile, args.location, args.catalog, 
          args.username, args.password, args.spn, args.sslverify)
+
+else:
+    main("tt.txt", "http://dwh-bi.kiebackpeter.kup/ola/msmdpump.dll", "Adventure Works DW 2008R2", 
+         None, None, None, False)
