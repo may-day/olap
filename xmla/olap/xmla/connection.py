@@ -123,7 +123,6 @@ class XMLAConnection(object):
             pl = {"PropertyList":properties}
             
         try:
-            import pdb; pdb.set_trace()
             doc=self.client.service.Discover(what, rl, pl)
             res = getattr(doc.DiscoverResponse["return"].root, "row", [])
             if res:
