@@ -6,10 +6,10 @@ Created on 18.04.2012
 from olap.xmla.interfaces import XMLAException
 from suds.client import Client
 from suds import WebFault
-import http
+from . import httptransport
 import types
-from formatreader import TupleFormatReader
-from utils import *
+from .formatreader import TupleFormatReader
+from .utils import *
 import logging
 
 logger = logging.getLogger(__name__)
@@ -23,6 +23,14 @@ class UseDefaultNamespace(MessagePlugin):
         for d in context.envelope.getChild('Body').children:
             d.prefix = None
             d.set("xmlns", "urn:schemas-microsoft-com:xml-analysis")
+
+class SessionPlugin(MessagePlugin):
+  def __init__(self, xmlaconn):
+      self.xmlaconn = xmlaconn
+
+  def parsed(self, context):
+      if self.xmlaconn.getListenOnSessionId():
+          self.xmlaconn.setSessionId(context.reply.childAtPath("/Envelope/Header/Session").getAttribute("SessionId").getValue())
 
 #import logging
 #logging.basicConfig(level=logging.INFO)
@@ -46,6 +54,7 @@ xmla1_1_rowsets = ["DISCOVER_DATASOURCES",
                    "MDSCHEMA_DIMENSIONS",
                    "MDSCHEMA_FUNCTIONS",
                    "MDSCHEMA_HIERARCHIES",
+                   "MDSCHEMA_MEASUREGROUP_DIMENSIONS",
                    "MDSCHEMA_MEASURES",
                    "MDSCHEMA_MEMBERS",
                    "MDSCHEMA_PROPERTIES",
@@ -56,7 +65,8 @@ class XMLAConnection(object):
     
     @classmethod
     def addMethod(cls, funcname, func):
-        return setattr(cls, funcname, types.MethodType(func, None, cls))
+#        return setattr(cls, funcname, types.MethodType(func, None, cls))
+        return setattr(cls, funcname, func)
 
         
     @classmethod
@@ -70,27 +80,40 @@ class XMLAConnection(object):
             mname = schemaNameToMethodName(schemaName)
             cls.addMethod( mname, getFunc(schemaName) )
 
-    def __init__(self, url, location, username, password, spn, sslverify):
+    def __init__(self, url, location, username, password, spn, sslverify, **kwargs):
 
         if password is None:
-            transport = http.HttpKerberosAuthenticated(as_user=username, 
+            transport = httptransport.HttpKerberosAuthenticated(as_user=username, 
                                                        spn=spn, 
-                                                       sslverify=sslverify)
+                                                       sslverify=sslverify,
+                                                       **kwargs)
         else:
-            transport = http.HttpAuthenticated(username=username, 
+            transport = httptransport.HttpAuthenticated(username=username, 
                                                password=password, 
-                                               sslverify=sslverify)
+                                               sslverify=sslverify,
+                                               **kwargs)
+        self.sessionplugin=SessionPlugin(self)
         self.client = Client(url, 
                              location=location, 
                              transport=transport, 
                              cache=None, 
-                             plugins=[UseDefaultNamespace()])
+                             plugins=[UseDefaultNamespace(), self.sessionplugin])
         
         # optional, call might fail
         self.getMDSchemaLevels = lambda *args, **kw: self.Discover("MDSCHEMA_LEVELS", 
                                                                    *args, **kw)
-        self.sessionid = None
+        self.setListenOnSessionId(False)
+        self.setSessionId(None)
              
+
+    def getListenOnSessionId(self):
+        return self.listenOnSessionId
+
+    def setListenOnSessionId(self, trueOrFalse):
+        self.listenOnSessionId = trueOrFalse
+
+    def setSessionId(self, sessionId):
+        self.sessionId = sessionId
         
     def Discover(self, what, restrictions=None, properties=None):
         rl = None
@@ -105,15 +128,15 @@ class XMLAConnection(object):
                               DiscoverResponse["return"].root, "row", [])
             if res:
                 res = aslist(res)
-        except WebFault, fault:
-            raise XMLAException(fault.message, dictify(fault.fault))
+        except WebFault as fault:
+            raise XMLAException(fault.fault, dictify(fault.fault))
         logger.debug( res )
         return res
 
 
     def Execute(self, command, dimformat="Multidimensional", 
                 axisFormat="TupleFormat", **kwargs):
-        if isinstance(command, types.StringTypes):
+        if isinstance(command, stringtypes):
             command = {"Statement":command}
         props = {"Format":dimformat, "AxisFormat":axisFormat}
         props.update(kwargs)
@@ -121,8 +144,8 @@ class XMLAConnection(object):
         try:
             root = self.client.service.Execute(command, pl).ExecuteResponse["return"].root
             return TupleFormatReader(root)
-        except WebFault, fault:
-            raise XMLAException(fault.message, dictify(fault.fault))
+        except WebFault as fault:
+            raise XMLAException(fault.fault, dictify(fault.fault))
         
         
     def BeginSession(self):
@@ -131,21 +154,23 @@ class XMLAConnection(object):
         sess= self.client.factory.create("Session")
         sess._mustUnderstand = 1
         self.client.set_options(soapheaders={"BeginSession":bs})
+        self.setListenOnSessionId(True)
         self.client.service.Execute({"Statement":None})
-        sess._SessionId=self.client.last_received().\
-            childAtPath("/Envelope/Header/Session").getAttribute("SessionId").getValue()
-        self.sessionid = sess._SessionId
+        self.setListenOnSessionId(False)
+        #print(self.client)
+        sess._SessionId=self.sessionId
         self.client.set_options(soapheaders=sess)
         
     def EndSession(self):
-        if self.sessionid is not None:
+        if self.sessionId is not None:
             es= self.client.factory.create("EndSession")
             es._mustUnderstand = 1
-            es._SessionId = self.sessionid
+            es._SessionId = self.sessionId
             self.client.set_options(soapheaders={"EndSession":es})
             self.client.service.Execute({"Statement":None})
-            self.sessionid = None
+            self.setSessionId(None)
             self.client.set_options(soapheaders=None)
 
                 
 XMLAConnection.setupMembers()
+

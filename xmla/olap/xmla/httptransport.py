@@ -5,13 +5,13 @@ This packages lets us reuse connections.
 
 from suds.transport import Transport, Reply, TransportError
 from suds.properties import Unskin
-from cookielib import CookieJar
+from six.moves.http_cookiejar import CookieJar
 from logging import getLogger
 import requests as req
-from requests_kerberosauth import HTTPKerberosAuth
-import urllib2
+from .requests_kerberosauth import HTTPKerberosAuth
+import six.moves.urllib.request as url
 import sys
-import sessions
+from . import sessions
 
 log = getLogger(__name__)
 
@@ -26,35 +26,31 @@ class DummyFile:
 
 # on windows urlopen doesn't work with file:// if it contains a drive specification
 if sys.platform.startswith("win"):
-    import urllib
+    from six.moves.urllib.response import addinfourl
     import os
-    import mimetools
     import email.utils
+    import email
     import mimetypes
-    try:
-        from cStringIO import StringIO
-    except ImportError:
-        from StringIO import StringIO
 
-    class MyDriveFileHandler(urllib2.FileHandler):
+    class MyDriveFileHandler(url.FileHandler):
         def open_local_file(self, req):
             try:
-                host = req.get_host()
-                filename = req.get_selector()
+                host = req.host
+                filename = req.selector
                 # if that bombs, then go on with original method
-                localfile = urllib.url2pathname(host+filename)
+                localfile = url.url2pathname(host+filename)
                 stats = os.stat(localfile) 
                 size = stats.st_size
                 modified = email.utils.formatdate(stats.st_mtime, usegmt=True)
                 mtype = mimetypes.guess_type(filename)[0]
-                headers = mimetools.Message(StringIO(
+                headers = email.message_from_string(
                         'Content-type: %s\nContent-length: %d\nLast-modified: %s\n' %
-                        (mtype or 'text/plain', size, modified)))
+                        (mtype or 'text/plain', size, modified))
                 origurl = 'file://' + host + filename
-                return urllib.addinfourl(open(localfile, 'rb'), headers, origurl)
+                return addinfourl(open(localfile, 'rb'), headers, origurl)
             except:
                 pass
-            return urllib2.FileHandler.open_local_file(self, req)
+            return url.FileHandler.open_local_file(self, req)
 
 class HttpTransport(Transport):
     """
@@ -84,22 +80,20 @@ class HttpTransport(Transport):
         self.session.verify=self.sslverify
          
     def open(self, request):
-        url = request.url
-        log.debug('opening (%s)', url)
+        log.debug('opening (%s)', request.url)
         self.proxy = self.options.proxy
-        res = self.doOpen(url)
+        res = self.doOpen(request.url)
         # TODO: fake a file like object if it isn't already
         if isinstance(res, req.models.Response):
             res = DummyFile(res.content)
         return res
 
     def send(self, request):
-        url = request.url
         msg = request.message
         headers = request.headers
         self.proxy = self.options.proxy
         log.debug('sending:\n%s', request)
-        resp = self.doOpen(url, data=msg, headers=headers, cookies=self.cookiejar)
+        resp = self.doOpen(request.url, data=msg, headers=headers, cookies=self.cookiejar)
         if resp.status_code not in (200,):
             raise TransportError("Error: %s"%resp.reason, resp.status_code, DummyFile(resp.content))
         result = Reply(resp.status_code, resp.headers, resp.content)
@@ -111,28 +105,28 @@ class HttpTransport(Transport):
         #        raise TransportError(e.msg, e.code, e.fp)
         return result
 
-    def doOpen(self, url, data=None, headers=None, cookies=None, **moreargs):
+    def doOpen(self, theUrl, data=None, headers=None, cookies=None, **moreargs):
         """
         Open a connection.
-        @param url: an url
-        @type url: string
+        @param theUrl: an url
+        @type theUrl: string
         @return: The opened file-like object or requests Response object.
         @rtype: fp or requests.models.Response
         """
         # d'oh, requests doesn't know what to do with a file schema... 
         # so fall back to good old trusted urllib2
-        if url.startswith("file://"):
-            if sys.platform.startswith("win") and url[8:9] == ":":
+        if theUrl.startswith("file://"):
+            if sys.platform.startswith("win") and theUrl[8:9] == ":":
                 # we likely have a drive letter, which urlopen will fail with :(
                 try:
-                    return urllib2.build_opener(MyDriveFileHandler).open(url)
+                    return url.build_opener(MyDriveFileHandler).open(theUrl)
                 except:
                     raise
-            return urllib2.urlopen(url)
+            return url.urlopen(theUrl)
         tm = self.options.timeout
         self.modifyargs(moreargs)
         return self.session.request("GET" if data is None else "POST", 
-                                    url, data=data, headers=headers, 
+                                    theUrl, data=data, headers=headers, 
                                     cookies=cookies, timeout=tm, **moreargs)
             
     def __deepcopy__(self, memo={}):
@@ -180,3 +174,4 @@ class HttpKerberosAuthenticated(HttpTransport):
     def modifyargs(self, moreargs):
         HttpTransport.modifyargs(self, moreargs)
         moreargs["auth"] = self.auth
+

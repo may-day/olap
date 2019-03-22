@@ -1,9 +1,11 @@
-import types
+import sys
+import six
 from suds.sax.text import Text as sudsText
 from suds.sudsobject import Object as sudsObject
 
-_UnmarshallableType=(types.NoneType, types.StringTypes, types.IntType, 
-                    types.LongType, types.FloatType, types.BooleanType)
+stringtypes = six.string_types
+_UnmarshallableType=(type(None), six.string_types, six.integer_types, float, bool)
+u=six.u
 
 
 def aslist(something):
@@ -21,11 +23,11 @@ def dictify(r):
         return d
     if isinstance(r, dict):
         d = {}
-        for (k, v) in r.items():
+        for (k,v) in r.items():
             d[k] = dictify(v)
         return d
     if isinstance(r, sudsText):
-        return unicode(r)
+        return six.u(r)
     return r
 
 
@@ -79,3 +81,4 @@ class PropDict(dict):
         #    super(PropDict,self).__delattr__(name)
         #except:
         #    super(PropDict,self).__delattr__(name)
+

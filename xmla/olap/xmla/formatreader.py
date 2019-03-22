@@ -1,10 +1,10 @@
-from utils import *
+from .utils import *
 import types
 from olap.interfaces import IMDXResult
 import zope.interface
 
+@zope.interface.implementer(IMDXResult)
 class TupleFormatReader(object):
-    zope.interface.implements(IMDXResult)
 
     def __init__(self, tupleresult):
         self.root = tupleresult
@@ -30,8 +30,8 @@ class TupleFormatReader(object):
         """
         res = None
         try:
-            if isinstance(axis, basestring):
-                ax = filter(lambda x: x._name == axis, aslist(self.root.Axes.Axis))[0]
+            if isinstance(axis, stringtypes):
+                ax = [x for x in  aslist(self.root.Axes.Axis) if x._name == axis][0]
             else:
                 ax = aslist(self.root.Axes.Axis)[axis]
             res = []
@@ -80,7 +80,7 @@ class TupleFormatReader(object):
         
         axlist= aslist(getattr(self.root.Axes, "Axis", []))
         # filter out possible SlicerAxis
-        axlist = filter(lambda ax: ax._name != "SlicerAxis", axlist)
+        axlist = [ax for ax in axlist if ax._name != "SlicerAxis"]
             
         for ax in axlist:
             
@@ -92,7 +92,7 @@ class TupleFormatReader(object):
 
                 # are the tupleindices valid?
                 maxtups = len(getattr(ax.Tuples, "Tuple", []))
-                toolarge=filter(lambda idx: idx >= maxtups or idx < 0, indexrange)
+                toolarge=[idx for idx in indexrange if idx >= maxtups or idx < 0]
                 if toolarge:
                     raise ValueError(
                         "The tuple requested do not exist on axis '%s': %s" % \
@@ -100,7 +100,7 @@ class TupleFormatReader(object):
                         
             else:
                 # include all possible indices
-                indexrange=range(len(getattr(ax.Tuples, "Tuple", [])))
+                indexrange=list(range(len(getattr(ax.Tuples, "Tuple", []))))
             
             if not indexrange:
                 # we have requested an empty set from an axis
@@ -140,7 +140,7 @@ class TupleFormatReader(object):
             if properties is None:
                 axisranges[0][1].append(cell)
             else:
-                if isinstance(properties, basestring):
+                if isinstance(properties, stringtypes):
                     d = getattr(cell, properties, 
                                        None)
                 else:
@@ -169,3 +169,4 @@ class TupleFormatReader(object):
         # so we can safely unpack the first element
         # in that element our resulting multidimensional array has been accumulated
         return axisranges[lastdimchange-1][1][0]
+

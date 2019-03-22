@@ -108,8 +108,11 @@ class HTTPKerberosAuth(AuthBase):
 
     def handle_401_guarded(self, r, **kwargs):
         try:
+            log.info("handle_401_guarded")
             res = self.handle_401(r, **kwargs)
-        except Exception, e:
+        except Exception as e:
+            raise e
+            log.error(e)
             self.setContext(r, None)
             r.reason = str(e)
             return r
@@ -131,7 +134,7 @@ class HTTPKerberosAuth(AuthBase):
             context = self.getContext(r)
             if context is None:
                 spn = self.get_spn(r)
-                result, context = self.gss_init(spn, self.gssflags)
+                result, context = self.gss_init(spn, gssflags=self.gssflags)
                 if result < 1:
                     raise Excetion("gss_init returned result %d" % result)
 
@@ -174,34 +177,8 @@ class HTTPKerberosAuth(AuthBase):
         return ret
 
     def __call__(self, r):
+        log.info("register handle_401_guarded")
         r.register_hook('response', self.handle_401_guarded)
         return r
 
-def test(args):
-    from requests import session
-    log.setLevel(logging.DEBUG)
-    log.info("starting test")
-    if args.keytab:
-        s4u2p.authGSSKeytab(args.keytab)
-    s = session(auth=HTTPKerberosAuth(as_user=args.user, spn=args.spn))
-    r=s.get(args.url)
-    print r.text
-#    if website is set up to keep auth, the next calls will not authenticate again
-#    (in IIS accomplish this by setting the windowsAuthentication properties: 
-#       authPersistNonNTLM="true" and authPersistSingleRequest="false")
-#    for i in range(20):
-#        r=s.get(args.url)
-#        print i, r.text
-    
 
-if __name__ == '__main__':
-    import argparse
-
-    parser = argparse.ArgumentParser(description="Kerberos authentication handler for the requests package.")
-    parser.add_argument("--user", dest="user", help="user to impersonate, otherwise the current kerberos principal will be used", default=None)
-    parser.add_argument("--url", dest="url", help="kerberos protected site")
-    parser.add_argument("--spn", dest="spn", help="spn to use, if not given HTTP@domain will be used")
-    parser.add_argument("--keytab", dest="keytab", help="path to keytab if you won't use system's default one (only needed for impersonation)", default=None)
-    args = parser.parse_args()
-    
-    test(args)

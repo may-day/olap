@@ -40,9 +40,10 @@ if __name__ == "__main__":
                         help="sslverify, either False or path of cert file")
     args = parser.parse_args()
 
-    if isinstance(args.sslverify, basestring):
+    if isinstance(args.sslverify, str):
         if args.sslverify.upper() in ["0", "FALSE", "NO", "NEIN"]:
             args.sslverify = False
 
     main(args.mdxfile, args.location, args.catalog, 
          args.username, args.password, args.spn, args.sslverify)
+
