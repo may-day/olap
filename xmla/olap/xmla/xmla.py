@@ -22,9 +22,8 @@ class TREE_OP(object):
 class XMLAProvider(object):
     
     
-    def connect(self, url=defaultwsdl, location=None, username=None, 
-                password=None, spn=None, sslverify=True, **kwargs):
-        return XMLASource(url, location, username, password, spn, sslverify, **kwargs)
+    def connect(self, url=defaultwsdl, location=None, sslverify=True, **kwargs):
+        return XMLASource(url, location, sslverify, **kwargs)
 
 
 @zope.interface.implementer(ooi.IOLAPSchemaElement)
@@ -122,18 +121,14 @@ class XMLAClass(object):
 class XMLASource(XMLAConnection, XMLAClass):
 
     def __init__(self, urlwsdl=defaultwsdl, 
-                 location=None, username=None, password=None, spn=None,
+                 location=None, 
                  sslverify=True, **kwargs):
         self.urlwsdl=urlwsdl
         self.location=location
-        self.username=username
-        self.password=password
-        self.spn=spn
         self.sslverify=sslverify
             
         XMLAClass.__init__(self, None, {}, None, self)
-        XMLAConnection.__init__(self, urlwsdl, location, username, 
-                                           password, spn, sslverify, **kwargs)
+        XMLAConnection.__init__(self, urlwsdl, location, sslverify, **kwargs)
 
     # IConnection interface
     def getOLAPSource(self):

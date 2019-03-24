@@ -34,25 +34,6 @@ class IXMLASource(ooi.IOLAPSource):
         required=True
         )
 
-    username= zope.schema.TextLine(
-        title=u("username"),
-        description=u("Server access is done as this user"),
-        required=False
-        )
-
-    password= zope.schema.TextLine(
-        title=u("password"),
-        description=u("Users password the server is accessed as"),
-        required=False
-        )
-
-    spn= zope.schema.TextLine(
-        title=u("spn"),
-        description=u("""Service principal name (for MS Analysis Services).
-If not given, a default is made from the location URL's host called: HTTP@host"""),
-        required=False
-        )
-
     sslverify= zope.schema.TextLine(
         title=u("sslverify"),
         description=u("""Verify ssl certificate on ssl connections. 

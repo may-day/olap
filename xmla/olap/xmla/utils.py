@@ -122,6 +122,8 @@ def fromETree(e, ns="urn:schemas-microsoft-com:xml-analysis:mddataset"):
     for (k,v) in e.attrib.items():
         setattr(p, "_"+k, v)
     p.text = e.text
+    if p.text and p.text.strip() == "":
+        p.text=None
     if valtype in e.attrib:
         if e.attrib[valtype] == "xsd:int":
           p.text = int(p.text)  

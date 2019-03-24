@@ -11,7 +11,6 @@ import types
 from .formatreader import TupleFormatReader
 from .utils import *
 import logging
-from requests_kerberos import HTTPKerberosAuth
 
 logger = logging.getLogger(__name__)
 
@@ -94,21 +93,12 @@ class XMLAConnection(object):
             mname = schemaNameToMethodName(schemaName)
             cls.addMethod( mname, getFunc(schemaName) )
 
-    def __init__(self, url, location, username, password, spn, sslverify, **kwargs):
+    def __init__(self, url, location, sslverify, **kwargs):
 
         transport = Transport()
-        kw = {}
-        if spn:
-            service, host = spn.split("@",1)
-            kw["service"]=service
-            kw["hostname_override"]=host
-        if username:
-            kw["principal"] = username
         if "auth" in kwargs:
             transport.session.auth = kwargs["auth"]
             del kwargs["auth"]
-        else:
-            transport.session.auth = HTTPKerberosAuth(**kw)
 
         self.sessionplugin=SessionPlugin(self)
         self.client = Client(url, 
@@ -136,15 +126,23 @@ class XMLAConnection(object):
     def Discover(self, what, restrictions=None, properties=None):
         rl = None
         pl = None
+        nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
         if restrictions:
-            rl = {"RestrictionList":restrictions}
+            rl = etree.Element("PropertyList", nsmap=nsmap)
+            for (k,v) in restrictions.items():
+                e=etree.SubElement(rl, k)
+                e.text=v
         if properties:
-            pl = {"PropertyList":properties}
+            pl = etree.Element("PropertyList", nsmap=nsmap)
+            for (k,v) in properties.items():
+                e=etree.SubElement(pl, k)
+                e.text=v
             
         try:
-            import pdb; pdb.set_trace()
-            doc=self.service.Discover(what, rl, pl)
-            res = getattr(doc.DiscoverResponse["return"].root, "row", [])
+            #import pdb; pdb.set_trace()
+            doc=self.service.Discover(RequestType=what, Restrictions=rl, Properties=pl)
+            root = fromETree(doc.body["return"]["_value_1"])
+            res = getattr(root, "row", [])
             if res:
                 res = aslist(res)
         except Fault as fault:

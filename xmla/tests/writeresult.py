@@ -3,16 +3,30 @@ import olap.xmla.xmla as xmla
 import olap.xmla.utils as utils
 import pprint
 import os.path
+from requests_kerberos import HTTPKerberosAuth
+from requests.auth import HTTPBasicAuth
 
-
-def main(mdxfile, location, catalog, username, password, spn, sslverify):
+def main(mdxfile, location, catalog, krb, username, password, spn, sslverify):
     p = os.path.dirname(os.path.realpath(__file__))
     pyfile = os.path.join(p, os.path.splitext(mdxfile)[0] + os.path.extsep + "py")
     cmd = open(os.path.join(p,mdxfile)).read()
 
     p = xmla.XMLAProvider()
-    c=p.connect(location=location, username=username, 
-                password=password, spn=spn, sslverify=sslverify)
+
+    auth = None
+    if krb:
+        kw = {}
+        if spn:
+            service, host = spn.split("@",1)
+            kw["service"]=service
+            kw["hostname_override"]=host
+        if username:
+            kw["principal"] = username
+        auth = HTTPKerberosAuth(**kw)
+    elif username:
+        auth = HTTPBasicAuth(username, password)
+
+    c=p.connect(location=location, sslverify=sslverify, auth=auth)
     res=c.Execute(cmd, Catalog=catalog)
     x=utils.dictify(res.root)
 
@@ -35,20 +49,18 @@ if __name__ == "__main__":
                         default=None)
     parser.add_argument("--password", dest="password", help="use password", 
                         default=None)
+    parser.add_argument("--krb", action="store_const", const=True, default=False, dest="krb", 
+                        help="kerberos auth")
     parser.add_argument("--spn", dest="spn", 
                         help="spn, defaults to HTTP@host if omitted")
     parser.add_argument("--sslverify", dest="sslverify", default=True,
                         help="sslverify, either False or path of cert file")
-    args = parser.parse_args(['--location=http://dwh-bi.kiebackpeter.kup/olap/msmdpump.dll', 
-                                '--catalog=Adventure Works DW 2008R2', 'tt.txt'])
+    args = parser.parse_args()
 
     if isinstance(args.sslverify, str):
         if args.sslverify.upper() in ["0", "FALSE", "NO", "NEIN"]:
             args.sslverify = False
 
-    main(args.mdxfile, args.location, args.catalog, 
+    main(args.mdxfile, args.location, args.catalog, args.krb,
          args.username, args.password, args.spn, args.sslverify)
 
-else:
-    main("tt.txt", "http://dwh-bi.kiebackpeter.kup/ola/msmdpump.dll", "Adventure Works DW 2008R2", 
-         None, None, None, False)
