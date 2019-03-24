@@ -9,7 +9,7 @@ from . import mdx_rows_but_no_columns_no_cells
 """
 import olap.xmla.xmla as xmla
 p = xmla.XMLAProvider()
-c=p.connect(location="http://localhost:8080/mondrian/xmla")
+c=p.connect(location="http://localhost:8080/xmondrian/xmla")
 res=c.Execute(cmd, Catalog="FoodMart")
 """
 class TestFormatReader(unittest.TestCase):

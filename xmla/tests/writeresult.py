@@ -17,7 +17,8 @@ def main(mdxfile, location, catalog, username, password, spn, sslverify):
     x=utils.dictify(res.root)
 
     erg=pprint.pformat(x)
-    open(pyfile, "wb+").write('"""\n%s\n"""\n\nresult=%s\n' % (cmd, erg))
+    print("erg-type",type(erg))
+    open(pyfile, "w+").write('"""\n%s\n"""\n\nresult=%s\n' % (cmd, erg))
 
 if __name__ == "__main__":
     import argparse
@@ -26,7 +27,7 @@ if __name__ == "__main__":
     parser.add_argument("mdxfile")
     parser.add_argument("--location", dest="location", 
                         help="location von XMLASource", 
-                        default="http://localhost:8080/mondrian/xmla")
+                        default="http://localhost:8080/xmondrian/xmla")
     parser.add_argument("--catalog", dest="catalog", 
                         help="catalog to execute the mdx in", 
                         default="FoodMart")

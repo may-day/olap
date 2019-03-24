@@ -2,10 +2,13 @@ import sys
 import six
 #from suds.sax.text import Text as sudsText
 #from suds.sudsobject import Object as sudsObject
+from lxml.etree import QName
 
 stringtypes = six.string_types
 _UnmarshallableType=(type(None), six.string_types, six.integer_types, float, bool)
 u=six.u
+
+class Data: pass
 
 
 def aslist(something):
@@ -16,6 +19,12 @@ def dictify(r):
 
     if isinstance(r, list):
         return [dictify(x) for x in r]
+    if isinstance(r, Data):
+        d = {}
+        for (k,v) in r.__dict__.items():
+            if k == "text" and v is None: continue
+            d[k] = dictify(v)
+        return d
     # if isinstance(r, sudsObject):
     #     d = {}
     #     for (k, v) in r:
@@ -81,3 +90,58 @@ class PropDict(dict):
         #    super(PropDict,self).__delattr__(name)
         #except:
         #    super(PropDict,self).__delattr__(name)
+
+class ETAttrAccess(object):
+    def __init__(self, root, defaultns=None):
+        self.__root = root
+        self.__defaultns = defaultns
+        self.__defns = "{"+(defaultns or "")+"}"
+        self.__m = {}
+
+    def __getattr__(self, name):
+        try:
+            value = self.__m[name]
+        except:
+            if name.startswith("_"): # attr
+                return self.__root.attrib[name[1:]]
+            if name == "text":
+                return self.__root.text
+            r = self.__root.find(self.__defns+name)
+            if r is None:
+                raise KeyError("{tag} has no child named {child}".format(tag=self.__root.tag, child=name))
+            etaa = ETAttrAccess(r, defaultns=self.__defaultns)
+            self.__m[name] = etaa
+            return etaa
+        return value
+
+
+def fromETree(e, ns="urn:schemas-microsoft-com:xml-analysis:mddataset"):
+    p = Data()
+    nst = "{{{}}}*".format(ns)
+    valtype = "{http://www.w3.org/2001/XMLSchema-instance}type"
+    for (k,v) in e.attrib.items():
+        setattr(p, "_"+k, v)
+    p.text = e.text
+    if valtype in e.attrib:
+        if e.attrib[valtype] == "xsd:int":
+          p.text = int(p.text)  
+          delattr(p, "_"+valtype)
+        if e.attrib[valtype] == "xsd:double":
+          p.text = float(p.text)  
+          delattr(p, "_"+valtype)
+        if e.attrib[valtype] == "xsd:float":
+          p.text = float(p.text)  
+          delattr(p, "_"+valtype)
+    for c in e.findall(nst):
+        t = QName(c)
+        cd = fromETree(c, ns)
+        if len(cd.__dict__) == 1:
+            cd = cd.text
+        v = getattr(p, t.localname, None)
+        if v is not None:
+            if not isinstance(v, list):
+                setattr(p, t.localname, [v])
+            getattr(p, t.localname).append(cd)
+        else:
+            setattr(p, t.localname, cd)
+    return p
