@@ -42,6 +42,12 @@ containing a certicate bundle"""),
         required=False
         )
 
+    log= zope.schema.TextLine(
+        title=u("log"),
+        description=u("""Provide your own instance of a Zeep logging plugin or set to True to use builtin"""),
+        required=False
+        )
+
     def getSchemaElements(schemaElementType, unique_name, 
                           aslist=False, more_restrictions=None, 
                           more_properties=None,
