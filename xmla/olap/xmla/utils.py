@@ -8,8 +8,9 @@ stringtypes = six.string_types
 _UnmarshallableType=(type(None), six.string_types, six.integer_types, float, bool)
 u=six.u
 
-class Data: pass
-
+class Data:
+    def __getitem__(self, item):
+        return getattr(self, item)
 
 def aslist(something):
     """If something is not a list already make it one, otherwise simply return something"""
