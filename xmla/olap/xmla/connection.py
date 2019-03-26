@@ -23,11 +23,21 @@ ns = {"soap-env":"http://schemas.xmlsoap.org/soap/envelope/"}
 # the following along with changes to the wsdl (elementFormDefault="unqualified") is needed
 # to make it fly with icCube, which expects elements w/o namespace prefix
 class LogRequest(Plugin):
-    def xegress(self, envelope, http_headers, operation, binding_options):
-        print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
+    def __init__(self, enabled=True):
+        self.enabled = enabled
 
-    def xingress(self, envelope, http_headers, operation):
-        print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
+    def egress(self, envelope, http_headers, operation, binding_options):
+        if self.enabled:
+            print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
+
+    def ingress(self, envelope, http_headers, operation):
+        if self.enabled:
+            print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
+
+    def enable(self):
+        self.enabled=True
+    def disable(self):
+        self.enabled=False
 
 class UseDefaultNamespace(Plugin):
     def xegress(self, envelope, http_headers, operation, binding_options):
@@ -105,11 +115,22 @@ class XMLAConnection(object):
             transport.session.auth = kwargs["auth"]
             del kwargs["auth"]
 
+        transport.session.verify = sslverify
         self.sessionplugin=SessionPlugin(self)
+        plugins=[UseDefaultNamespace(), self.sessionplugin]
+
+        if "log" in kwargs:
+            log = kwargs.get("log")
+            if isinstance(log, Plugin):
+                plugins.append(log)
+            elif log == True:
+                plugins.append(LogRequest())
+            del kwargs["log"]
+            
         self.client = Client(url, 
                              transport=transport, 
                              # cache=None, unwrap=False,
-                             plugins=[UseDefaultNamespace(), self.sessionplugin, LogRequest()])
+                             plugins=plugins)
 
         self.service = self.client.create_service('{urn:schemas-microsoft-com:xml-analysis}MsXmlAnalysisSoap', location)
         self.client.set_ns_prefix(None, "urn:schemas-microsoft-com:xml-analysis")
@@ -135,7 +156,7 @@ class XMLAConnection(object):
         pl = None
         nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
         if restrictions:
-            rl = etree.Element("PropertyList", nsmap=nsmap)
+            rl = etree.Element("RestrictionList", nsmap=nsmap)
             for (k,v) in restrictions.items():
                 e=etree.SubElement(rl, k)
                 if v is not None:
@@ -150,7 +171,7 @@ class XMLAConnection(object):
         try:
             #import pdb; pdb.set_trace()
             doc=self.service.Discover(RequestType=what, Restrictions=rl, Properties=pl, _soapheaders=self._soapheaders)
-            root = fromETree(doc.body["return"]["_value_1"])
+            root = fromETree(doc.body["return"]["_value_1"], ns="urn:schemas-microsoft-com:xml-analysis:rowset")
             res = getattr(root, "row", [])
             if res:
                 res = aslist(res)
