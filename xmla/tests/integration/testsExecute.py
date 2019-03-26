@@ -15,24 +15,23 @@ n.b.:
 import unittest
 import olap.xmla.xmla as xmla
 from nose.tools import *
+from requests_kerberos import HTTPKerberosAuth
+from requests.auth import HTTPBasicAuth
 
-mondrian={"type":"mondrian",
-	  "location":"http://localhost:8080/mondrian/xmla",
-	  "username":None,
-	  "password":None,
-	  "spn":"dummy",
-	  "catalog":"FoodMart",
-	  "cube":"[Sales]",
-	  "set1":"[Measures].ALLMEMBERS",
-	  "set2":"[Time].[1997].[Q2].children",
-	  "set3":"[Gender].[Gender].ALLMEMBERS",
+mondrian={
+    "type":"mondrian",
+    "location":"http://localhost:8080/xmondrian/xmla",
+    "auth": None,
+    "catalog":"FoodMart",
+    "cube":"[Sales]",
+    "set1":"[Measures].ALLMEMBERS",
+    "set2":"[Time].[1997].[Q2].children",
+    "set3":"[Gender].[Gender].ALLMEMBERS",
 }
 ssas={
 	"type":"ssas",
 	"location":"http://dwh-bi/olap/msmdpump.dll",
-	"username":None,
-	"password":None,
-	"spn":"HOST@DWH-BI",
+    "auth" : HTTPKerberosAuth(),
 	"catalog":"Adventure Works DW 2008R2",
 	"cube":"[Sales Summary]",
 	"set1":"[Measures].ALLMEMBERS",
@@ -42,10 +41,8 @@ ssas={
 
 iccube={
 	"type":"icCube",
-	"spn":"",
 	"location":"http://localhost:80/icCube/xmla",
-	"username":"demo",
-	"password":"demo",
+    "auth": HTTPBasicAuth("demo", "demo"),
 	"catalog":"Sales",
 	"cube":"[Sales]",
 	"set1":"[Measures].ALLMEMBERS",
@@ -64,10 +61,7 @@ class XMLAExecute(object):
         self.set3 = self.be["set3"] 
         self.catalog = self.be["catalog"]
         self.p = xmla.XMLAProvider()
-        self.c = self.p.connect(location=self.be["location"], 
-				username=self.be["username"], 
-				password=self.be["password"], 
-				spn=self.be["spn"])
+        self.c = self.p.connect(location=self.be["location"], auth=self.be["auth"])
 
     def tearDown(self):
         pass

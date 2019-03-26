@@ -91,30 +91,6 @@ class PropDict(dict):
         #except:
         #    super(PropDict,self).__delattr__(name)
 
-class ETAttrAccess(object):
-    def __init__(self, root, defaultns=None):
-        self.__root = root
-        self.__defaultns = defaultns
-        self.__defns = "{"+(defaultns or "")+"}"
-        self.__m = {}
-
-    def __getattr__(self, name):
-        try:
-            value = self.__m[name]
-        except:
-            if name.startswith("_"): # attr
-                return self.__root.attrib[name[1:]]
-            if name == "text":
-                return self.__root.text
-            r = self.__root.find(self.__defns+name)
-            if r is None:
-                raise KeyError("{tag} has no child named {child}".format(tag=self.__root.tag, child=name))
-            etaa = ETAttrAccess(r, defaultns=self.__defaultns)
-            self.__m[name] = etaa
-            return etaa
-        return value
-
-
 def fromETree(e, ns="urn:schemas-microsoft-com:xml-analysis:mddataset"):
     p = Data()
     nst = "{{{}}}*".format(ns)

@@ -13,7 +13,8 @@ def test_rst_changes():
 
 def rst2html(what):
     fname = os.path.join(os.path.split(__file__)[0], "..", what)
-    rst=open(fname, "r").read()
+    with open(fname, "r") as f:
+        rst=f.read()
     erg=publish_string(rst, writer_name='html', settings_overrides={"halt_level":2})
     assert(erg != "")
 

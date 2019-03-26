@@ -18,76 +18,72 @@ n.b.:
 import unittest
 from nose.tools import *
 import olap.xmla.xmla as xmla
+from requests_kerberos import HTTPKerberosAuth
+from requests.auth import HTTPBasicAuth
+
 from olap.xmla.connection import xmla1_1_rowsets
 
-
 mondrian={
-"type":"mondrian",
-"spn":None,          
-"location":"http://localhost:8080/mondrian/xmla",
-"username":None,
-"password":None,
-"ds": "Provider=Mondrian;DataSource=MondrianFoodMart;",
-"catalog":"FoodMart",
-"restrict_cube":"HR",
-"restrict_dim":"Position",
-"restrict_unique_dim":"[Gender]",
-"cubes_expected":7,
-"restrict_funcname":"||",
-"restrict_hier":"Time",
-"restrict_level_unique_name":"[Employees].[Employee Id]",
-"restrict_hierarchy_unique_name":"[Time]",
-"cube_measures":5,
-"schema_levels":3,
-"schema_sets":1,
-"schema_sets_needs_cubename":False,
-"schema_tables":1
+    "type":"mondrian",
+    "auth": None,
+    "location":"http://localhost:8080/xmondrian/xmla",
+    "ds": "Provider=Mondrian;DataSource=MondrianFoodMart;",
+    "catalog":"FoodMart",
+    "restrict_cube":"HR",
+    "restrict_dim":"Position",
+    "restrict_unique_dim":"[Gender]",
+    "cubes_expected":7,
+    "restrict_funcname":"||",
+    "restrict_hier":"Time",
+    "restrict_level_unique_name":"[Employees].[Employee Id]",
+    "restrict_hierarchy_unique_name":"[Time]",
+    "cube_measures":5,
+    "schema_levels":3,
+    "schema_sets":1,
+    "schema_sets_needs_cubename":False,
+    "schema_tables":1
 }
 
 ssas={
-"type":"ssas",
-"spn":"HOST@DWH-BI",
-"location":"http://dwh-bi/olap/msmdpump.dll",
-"username":None,
-"password":None,
-"ds":"DWH-BI",
-"catalog":"Adventure Works DW 2008R2",
-"restrict_cube":"Adventure Works",
-"restrict_dim":"Account",
-"restrict_unique_dim":"[Account]",
-"cubes_expected":7,
-"restrict_funcname":"TRIM",
-"restrict_hier":"Account Number",
-"restrict_level_unique_name":"[Customer].[Customer Geography].[Country]",
-"restrict_hierarchy_unique_name":"[Customer].[Customer Geography]",
-"cube_measures": 51,
-"schema_levels":6,
-"schema_sets":1,
-"schema_sets_needs_cubename":True, # not really, but if you have a few DBs on your server this will bring it to it's knees
-"schema_tables":1
+    "type":"ssas",
+    "location":"http://dwh-bi/olap/msmdpump.dll",
+    "auth" : HTTPKerberosAuth(),
+    "ds":"DWH-BI",
+    "catalog":"Adventure Works DW 2008R2",
+    "restrict_cube":"Adventure Works",
+    "restrict_dim":"Account",
+    "restrict_unique_dim":"[Account]",
+    "cubes_expected":7,
+    "restrict_funcname":"TRIM",
+    "restrict_hier":"Account Number",
+    "restrict_level_unique_name":"[Customer].[Customer Geography].[Country]",
+    "restrict_hierarchy_unique_name":"[Customer].[Customer Geography]",
+    "cube_measures": 51,
+    "schema_levels":6,
+    "schema_sets":1,
+    "schema_sets_needs_cubename":True, # not really, but if you have a few DBs on your server this will bring it to it's knees
+    "schema_tables":1
 }
 
 iccube={
-"type":"icCube",
-"spn":"",
-"location":"http://localhost:80/icCube/xmla",
-"username":"demo",
-"password":"demo",
-"ds":"icCube-datasource",
-"catalog":"Sales",
-"restrict_cube":"Sales",
-"restrict_dim":"Customers",
-"restrict_unique_dim":"[Customers]",
-"cubes_expected":1,
-"restrict_funcname":"TRIM",
-"restrict_hier":"Geography",
-"restrict_level_unique_name":"[Customers].[Geography].[Region]",
-"restrict_hierarchy_unique_name":"[Customers].[Geography]",
-"cube_measures": 2,
-"schema_levels":4,
-"schema_sets":0,
-"schema_sets_needs_cubename":False,
-"schema_tables":0
+    "type":"icCube",
+    "location":"http://localhost:80/icCube/xmla",
+    "auth": HTTPBasicAuth("demo", "demo"),
+    "ds":"icCube-datasource",
+    "catalog":"Sales",
+    "restrict_cube":"Sales",
+    "restrict_dim":"Customers",
+    "restrict_unique_dim":"[Customers]",
+    "cubes_expected":1,
+    "restrict_funcname":"TRIM",
+    "restrict_hier":"Geography",
+    "restrict_level_unique_name":"[Customers].[Geography].[Region]",
+    "restrict_hierarchy_unique_name":"[Customers].[Geography]",
+    "cube_measures": 2,
+    "schema_levels":4,
+    "schema_sets":0,
+    "schema_sets_needs_cubename":False,
+    "schema_tables":0
 }
 
 
@@ -101,9 +97,7 @@ class XMLA(object):
     def setUp(self):
         self.p = xmla.XMLAProvider()
         self.c = self.p.connect(location=self.be["location"], 
-                                username=self.be["username"], 
-                                password=self.be["password"], 
-                                spn=self.be["spn"])
+                                auth=self.be["auth"])
         self.c.BeginSession()
         self.getSchemaRowsetSupport()
          
@@ -275,6 +269,7 @@ class XMLA(object):
 
 
 try:
+    print("yo")
     from testconfig import config
     server=config['xmla']['server'] or ""
     server = server.split(",")
@@ -283,6 +278,7 @@ try:
             globals()[server_section].update(config.get(server_section, {}))
             
 except:
+    print("darn")
     server=[]
     config = {}
 

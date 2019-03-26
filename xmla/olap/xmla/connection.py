@@ -23,10 +23,10 @@ ns = {"soap-env":"http://schemas.xmlsoap.org/soap/envelope/"}
 # the following along with changes to the wsdl (elementFormDefault="unqualified") is needed
 # to make it fly with icCube, which expects elements w/o namespace prefix
 class LogRequest(Plugin):
-    def egress(self, envelope, http_headers, operation, binding_options):
+    def xegress(self, envelope, http_headers, operation, binding_options):
         print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
 
-    def ingress(self, envelope, http_headers, operation):
+    def xingress(self, envelope, http_headers, operation):
         print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
 
 class UseDefaultNamespace(Plugin):
@@ -43,8 +43,13 @@ class SessionPlugin(Plugin):
       self.xmlaconn = xmlaconn
 
   def ingress(self, envelope, http_headers, operation):
-      if self.xmlaconn.getListenOnSessionId():
-          self.xmlaconn.setSessionId(envelope.xpath("/Envelope/Header/Session").attrib.get("SessionId"))
+    #print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
+    if self.xmlaconn.getListenOnSessionId():
+        nsmap={'se': 'http://schemas.xmlsoap.org/soap/envelope/',
+               'xmla': 'urn:schemas-microsoft-com:xml-analysis'}
+        s=envelope.xpath("/se:Envelope/se:Header/xmla:Session", namespaces=nsmap)[0]
+        sid=s.attrib.get("SessionId")
+        self.xmlaconn.setSessionId(sid)
 
 #import logging
 #logging.basicConfig(level=logging.INFO)
@@ -105,6 +110,7 @@ class XMLAConnection(object):
                              transport=transport, 
                              # cache=None, unwrap=False,
                              plugins=[UseDefaultNamespace(), self.sessionplugin, LogRequest()])
+
         self.service = self.client.create_service('{urn:schemas-microsoft-com:xml-analysis}MsXmlAnalysisSoap', location)
         self.client.set_ns_prefix(None, "urn:schemas-microsoft-com:xml-analysis")
         # optional, call might fail
@@ -112,6 +118,7 @@ class XMLAConnection(object):
                                                                    *args, **kw)
         self.setListenOnSessionId(False)
         self.setSessionId(None)
+        self._soapheaders=None
              
 
     def getListenOnSessionId(self):
@@ -131,16 +138,18 @@ class XMLAConnection(object):
             rl = etree.Element("PropertyList", nsmap=nsmap)
             for (k,v) in restrictions.items():
                 e=etree.SubElement(rl, k)
-                e.text=v
+                if v is not None:
+                    e.text=str(v)
         if properties:
             pl = etree.Element("PropertyList", nsmap=nsmap)
             for (k,v) in properties.items():
                 e=etree.SubElement(pl, k)
-                e.text=v
+                if v is not None:
+                    e.text=str(v)
             
         try:
             #import pdb; pdb.set_trace()
-            doc=self.service.Discover(RequestType=what, Restrictions=rl, Properties=pl)
+            doc=self.service.Discover(RequestType=what, Restrictions=rl, Properties=pl, _soapheaders=self._soapheaders)
             root = fromETree(doc.body["return"]["_value_1"])
             res = getattr(root, "row", [])
             if res:
@@ -156,17 +165,19 @@ class XMLAConnection(object):
         nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
         if isinstance(command, stringtypes):
             cmd = etree.Element("{urn:schemas-microsoft-com:xml-analysis}Statement", nsmap=nsmap)
-            cmd.text = command
+            if command is not None:
+                cmd.text = command
             command = cmd
         props = {"Format":dimformat, "AxisFormat":axisFormat}
         props.update(kwargs)
         plist = etree.Element("PropertyList", nsmap=nsmap)
         for (k,v) in props.items():
             e=etree.SubElement(plist, k)
-            e.text=v
+            if v is not None:
+                e.text=str(v)
         try:
             
-            res = self.service.Execute(Command=command, Properties=plist)
+            res = self.service.Execute(Command=command, Properties=plist, _soapheaders=self._soapheaders)
             root = res.body["return"]["_value_1"]
             return TupleFormatReader(fromETree(root))
         except Fault as fault:
@@ -174,27 +185,26 @@ class XMLAConnection(object):
         
         
     def BeginSession(self):
-        bs= self.client.factory.create("BeginSession")
-        bs._mustUnderstand = 1
-        sess= self.client.factory.create("Session")
-        sess._mustUnderstand = 1
-        self.client.set_options(soapheaders={"BeginSession":bs})
+        bs= self.client.get_element("{urn:schemas-microsoft-com:xml-analysis}BeginSession")(mustUnderstand=1)
         self.setListenOnSessionId(True)
-        self.client.service.Execute({"Statement":None})
+        #self.service.Execute("woop", _soapheaders={"BeginSession":bs})
+        nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
+        cmd = etree.Element("{urn:schemas-microsoft-com:xml-analysis}Statement", nsmap=nsmap)
+
+        self.service.Execute(Command=cmd,_soapheaders={"BeginSession":bs})
         self.setListenOnSessionId(False)
         #print(self.client)
-        sess._SessionId=self.sessionId
-        self.client.set_options(soapheaders=sess)
+        sess= self.client.get_element("{urn:schemas-microsoft-com:xml-analysis}Session")(SessionId=self.sessionId, mustUnderstand = 1)
+        self._soapheaders={"Session":sess}
         
     def EndSession(self):
         if self.sessionId is not None:
-            es= self.client.factory.create("EndSession")
-            es._mustUnderstand = 1
-            es._SessionId = self.sessionId
-            self.client.set_options(soapheaders={"EndSession":es})
-            self.service.Execute({"Statement":None})
+            nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
+            es= self.client.get_element("{urn:schemas-microsoft-com:xml-analysis}EndSession")(SessionId=self.sessionId, mustUnderstand = 1)
+            cmd = etree.Element("{urn:schemas-microsoft-com:xml-analysis}Statement", nsmap=nsmap)
+            self.service.Execute(Command=cmd, _soapheaders={"EndSession":es})
             self.setSessionId(None)
-            self.client.set_options(soapheaders=None)
+            self._soapheaders=None
 
                 
 XMLAConnection.setupMembers()

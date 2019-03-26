@@ -26,7 +26,7 @@ class TupleFormatReader(object):
     def getAxisTuple(self, axis):
         """Returns the tuple on axis with name <axis>, usually 'Axis0', 'Axis1', 'SlicerAxis'.
         If axis is a number return tuples on the <axis>-th axis.
-        If no axis information are available the retun None.
+        If no axis information are available the return None.
         """
         res = None
         try:
