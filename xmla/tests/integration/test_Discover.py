@@ -21,13 +21,15 @@ import olap.xmla.xmla as xmla
 from requests_kerberos import HTTPKerberosAuth
 from requests.auth import HTTPBasicAuth
 
-from olap.xmla.connection import xmla1_1_rowsets
+from olap.xmla.connection import xmla1_1_rowsets, LogRequest
 
 mondrian={
     "type":"mondrian",
     "auth": None,
     "location":"http://localhost:8080/xmondrian/xmla",
-    "ds": "Provider=Mondrian;DataSource=MondrianFoodMart;",
+    # Datasourcename depends on distribution
+    #"ds": "Provider=Mondrian;DataSource=MondrianFoodMart;",
+    "ds": "Foodmart",
     "catalog":"FoodMart",
     "restrict_cube":"HR",
     "restrict_dim":"Position",
@@ -96,8 +98,9 @@ class XMLA(object):
 
     def setUp(self):
         self.p = xmla.XMLAProvider()
+        self.log = LogRequest(enabled=False)
         self.c = self.p.connect(location=self.be["location"], 
-                                auth=self.be["auth"])
+                                auth=self.be["auth"], log=self.log)
         self.c.BeginSession()
         self.getSchemaRowsetSupport()
          
@@ -113,6 +116,7 @@ class XMLA(object):
         #pass
     
     def testGetDatasources(self):
+        #self.log.enable()
         erg=self.c.getDatasources()
         assert_true(len(erg) == 1, "One Datasource is expected")
         assert_equal(self.be["ds"], erg[0]["DataSourceName"])
@@ -130,6 +134,7 @@ class XMLA(object):
             assert_in(p.strip(), propnames)
 
     def testGetDBSchemaCatalogs(self):
+        #self.log.enable()
         erg=self.c.getDBSchemaCatalogs()
         assert_true(len(erg) > 0, "One Catalog is expected - at least")
         assert_in(self.be["catalog"], [x["CATALOG_NAME"] for x in erg])
@@ -170,6 +175,7 @@ class XMLA(object):
         props = {"Catalog":self.be["catalog"]}
         erg=self.c.getMDSchemaCubes(properties=props)
         assert_equals(len(erg), self.be["cubes_expected"])
+        self.log.enable()
         erg=self.c.getMDSchemaCubes(
             restrictions={"CUBE_NAME":self.be["restrict_cube"]}, 
             properties=props)
@@ -269,7 +275,6 @@ class XMLA(object):
 
 
 try:
-    print("yo")
     from testconfig import config
     server=config['xmla']['server'] or ""
     server = server.split(",")
@@ -279,7 +284,7 @@ try:
             
 except:
     print("darn")
-    server=[]
+    server=["mondrian"]
     config = {}
 
 if "mondrian" in server:
