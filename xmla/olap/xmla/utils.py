@@ -1,13 +1,13 @@
 import sys
 import six
-#from suds.sax.text import Text as sudsText
-#from suds.sudsobject import Object as sudsObject
+from lxml import etree
 from lxml.etree import QName
 
 stringtypes = six.string_types
 _UnmarshallableType=(type(None), six.string_types, six.integer_types, float, bool)
 u=six.u
 
+schema_instance="http://www.w3.org/2001/XMLSchema-instance"
 class Data:
     def __getitem__(self, item):
         return getattr(self, item)
@@ -26,18 +26,11 @@ def dictify(r):
             if k == "text" and v is None: continue
             d[k] = dictify(v)
         return d
-    # if isinstance(r, sudsObject):
-    #     d = {}
-    #     for (k, v) in r:
-    #         d[k] = dictify(v)
-    #     return d
     if isinstance(r, dict):
         d = {}
         for (k,v) in r.items():
             d[k] = dictify(v)
         return d
-    # if isinstance(r, sudsText):
-    #     return six.u(r)
     return r
 
 
@@ -92,10 +85,52 @@ class PropDict(dict):
         #except:
         #    super(PropDict,self).__delattr__(name)
 
-def fromETree(e, ns="urn:schemas-microsoft-com:xml-analysis:mddataset"):
+def etree_tostring(et):
+    return etree.tostring(et, pretty_print=True).decode("utf-8")
+
+def as_etree(dict_or_str, parent_if_content=None):
+
+    top = {}
+    if isinstance(dict_or_str, stringtypes):
+        top = {dict_or_str:None}
+    elif isinstance(dict_or_str, dict):
+        top = dict_or_str
+        if isinstance(parent_if_content, stringtypes) and top:
+            top = {parent_if_content:top}
+
+    elems = []
+    for (elem_name, elem_value) in top.items():
+        
+        elem=etree.Element(elem_name)
+        if isinstance(elem_value, dict):
+            subelem = as_etree(elem_value)
+            if subelem is not None:
+                if isinstance(subelem, list):
+                    for c in subelem:
+                        elem.append(c)
+                else:
+                    elem.append(subelem)
+        else:
+            if elem_value is not None:
+                elem.text = str(elem_value)
+        elems.append(elem)
+
+    res = None
+    if len(elems)==1:
+        res = elems[0]
+    elif len(elems)>1:
+        res = elems
+    return res
+
+def ns_name(ns, name):
+    if ns is None:
+        return name
+    return "{{{}}}{}".format(ns,name)
+
+def fromETree(e, ns):
     p = Data()
-    nst = "{{{}}}*".format(ns)
-    valtype = "{http://www.w3.org/2001/XMLSchema-instance}type"
+    nst = ns_name(ns, "*")
+    valtype = ns_name(schema_instance, "type")
     for (k,v) in e.attrib.items():
         setattr(p, "_"+k, v)
     p.text = e.text
@@ -113,6 +148,7 @@ def fromETree(e, ns="urn:schemas-microsoft-com:xml-analysis:mddataset"):
           delattr(p, "_"+valtype)
     for c in e.findall(nst):
         t = QName(c)
+        
         cd = fromETree(c, ns)
         if len(cd.__dict__) == 1:
             cd = cd.text

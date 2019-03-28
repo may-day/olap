@@ -263,10 +263,11 @@ class XMLA(object):
         assert_equals(len(erg), self.be["cube_measures"])
 
     def testGetSchemaLevels(self):
+        #self.log.enable()
         erg = self.c.getMDSchemaLevels(
             restrictions={"CUBE_NAME":self.be["restrict_cube"], 
              'HIERARCHY_UNIQUE_NAME': self.be["restrict_hierarchy_unique_name"]},
-            properties={"Catalog":self.be["catalog"]})
+            properties={"Catalog":self.be["catalog"], "Smootje":"wo"})
         assert_equals(len(erg), self.be["schema_levels"])
     
     def testGetDBSchemaSchemata(self):

@@ -4,22 +4,23 @@ Created on 18.04.2012
 @author: norman
 '''
 from .interfaces import XMLAException
-from zeep import Client
+from zeep import Client, Plugin, xsd
 from zeep.exceptions import Fault
 from zeep.transports import Transport
-import types
+
+#import types
 from .formatreader import TupleFormatReader
 from .utils import *
 import logging
 
 logger = logging.getLogger(__name__)
 
-from zeep import Plugin
-from zeep import xsd
-from lxml import etree
-from xml.etree import ElementTree as ET
 
-ns = {"soap-env":"http://schemas.xmlsoap.org/soap/envelope/"}
+schema_xmla="urn:schemas-microsoft-com:xml-analysis"
+schema_xmla_rowset="urn:schemas-microsoft-com:xml-analysis:rowset"
+schema_xmla_mddataset="urn:schemas-microsoft-com:xml-analysis:mddataset"
+schema_soap_env="http://schemas.xmlsoap.org/soap/envelope/"
+
 # the following along with changes to the wsdl (elementFormDefault="unqualified") is needed
 # to make it fly with icCube, which expects elements w/o namespace prefix
 class LogRequest(Plugin):
@@ -28,35 +29,26 @@ class LogRequest(Plugin):
 
     def egress(self, envelope, http_headers, operation, binding_options):
         if self.enabled:
-            print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
+            print(etree_tostring(envelope))
 
     def ingress(self, envelope, http_headers, operation):
         if self.enabled:
-            print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
+            print(etree_tostring(envelope))
 
     def enable(self):
         self.enabled=True
     def disable(self):
         self.enabled=False
 
-class UseDefaultNamespace(Plugin):
-    def xegress(self, envelope, http_headers, operation, binding_options):
-        body = envelope.find('soap-env:Body', ns)
-        for d in body:
-            if '}' in d.tag:
-                print(type(d.tag))
-                d.tag = d.tag.split('}', 1)[1]  # strip all namespaces
-                d.nsmap[None]="urn:schemas-microsoft-com:xml-analysis"
-
 class SessionPlugin(Plugin):
   def __init__(self, xmlaconn):
       self.xmlaconn = xmlaconn
 
   def ingress(self, envelope, http_headers, operation):
-    #print(etree.tostring(envelope, pretty_print=True).decode("utf-8"))
+    #print(etree_tostring(envelope))
     if self.xmlaconn.getListenOnSessionId():
-        nsmap={'se': 'http://schemas.xmlsoap.org/soap/envelope/',
-               'xmla': 'urn:schemas-microsoft-com:xml-analysis'}
+        nsmap={'se': schema_soap_env,
+               'xmla': schema_xmla}
         s=envelope.xpath("/se:Envelope/se:Header/xmla:Session", namespaces=nsmap)[0]
         sid=s.attrib.get("SessionId")
         self.xmlaconn.setSessionId(sid)
@@ -93,7 +85,6 @@ class XMLAConnection(object):
     
     @classmethod
     def addMethod(cls, funcname, func):
-#        return setattr(cls, funcname, types.MethodType(func, None, cls))
         return setattr(cls, funcname, func)
 
         
@@ -117,7 +108,7 @@ class XMLAConnection(object):
 
         transport.session.verify = sslverify
         self.sessionplugin=SessionPlugin(self)
-        plugins=[UseDefaultNamespace(), self.sessionplugin]
+        plugins=[self.sessionplugin]
 
         if "log" in kwargs:
             log = kwargs.get("log")
@@ -132,8 +123,8 @@ class XMLAConnection(object):
                              # cache=None, unwrap=False,
                              plugins=plugins)
 
-        self.service = self.client.create_service('{urn:schemas-microsoft-com:xml-analysis}MsXmlAnalysisSoap', location)
-        self.client.set_ns_prefix(None, "urn:schemas-microsoft-com:xml-analysis")
+        self.service = self.client.create_service(ns_name(schema_xmla,"MsXmlAnalysisSoap"), location)
+        self.client.set_ns_prefix(None, schema_xmla)
         # optional, call might fail
         self.getMDSchemaLevels = lambda *args, **kw: self.Discover("MDSCHEMA_LEVELS", 
                                                                    *args, **kw)
@@ -152,77 +143,53 @@ class XMLAConnection(object):
         self.sessionId = sessionId
         
     def Discover(self, what, restrictions=None, properties=None):
-        rl = None
-        pl = None
-        nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
-        if restrictions:
-            rl = etree.Element("RestrictionList", nsmap=nsmap)
-            for (k,v) in restrictions.items():
-                e=etree.SubElement(rl, k)
-                if v is not None:
-                    e.text=str(v)
-        if properties:
-            pl = etree.Element("PropertyList", nsmap=nsmap)
-            for (k,v) in properties.items():
-                e=etree.SubElement(pl, k)
-                if v is not None:
-                    e.text=str(v)
-            
+        rl = as_etree(restrictions, "RestrictionList")
+        pl = as_etree(properties, "PropertyList")
         try:
             #import pdb; pdb.set_trace()
             doc=self.service.Discover(RequestType=what, Restrictions=rl, Properties=pl, _soapheaders=self._soapheaders)
-            root = fromETree(doc.body["return"]["_value_1"], ns="urn:schemas-microsoft-com:xml-analysis:rowset")
+            root = fromETree(doc.body["return"]["_value_1"], ns=schema_xmla_rowset)
             res = getattr(root, "row", [])
             if res:
                 res = aslist(res)
         except Fault as fault:
-            raise XMLAException(fault.message, dictify(fault))
+            raise XMLAException(fault.message, dictify(fromETree(fault.detail, ns=None)))
         logger.debug( res )
         return res
 
 
     def Execute(self, command, dimformat="Multidimensional", 
                 axisFormat="TupleFormat", **kwargs):
-        nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
         if isinstance(command, stringtypes):
-            cmd = etree.Element("{urn:schemas-microsoft-com:xml-analysis}Statement", nsmap=nsmap)
-            if command is not None:
-                cmd.text = command
-            command = cmd
+            command=as_etree({"Statement": command})
         props = {"Format":dimformat, "AxisFormat":axisFormat}
         props.update(kwargs)
-        plist = etree.Element("PropertyList", nsmap=nsmap)
-        for (k,v) in props.items():
-            e=etree.SubElement(plist, k)
-            if v is not None:
-                e.text=str(v)
+
+        plist = as_etree({"PropertyList":props})
         try:
             
             res = self.service.Execute(Command=command, Properties=plist, _soapheaders=self._soapheaders)
             root = res.body["return"]["_value_1"]
-            return TupleFormatReader(fromETree(root))
+            return TupleFormatReader(fromETree(root, ns=schema_xmla_mddataset))
         except Fault as fault:
-            raise XMLAException(fault.message, dictify(fault))
+            raise XMLAException(fault.message, dictify(fromETree(fault.detail, ns=None)))
         
         
     def BeginSession(self):
-        bs= self.client.get_element("{urn:schemas-microsoft-com:xml-analysis}BeginSession")(mustUnderstand=1)
+        bs= self.client.get_element(ns_name(schema_xmla,"BeginSession"))(mustUnderstand=1)
         self.setListenOnSessionId(True)
-        #self.service.Execute("woop", _soapheaders={"BeginSession":bs})
-        nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
-        cmd = etree.Element("{urn:schemas-microsoft-com:xml-analysis}Statement", nsmap=nsmap)
+        cmd = as_etree("Statement")
 
         self.service.Execute(Command=cmd,_soapheaders={"BeginSession":bs})
         self.setListenOnSessionId(False)
-        #print(self.client)
-        sess= self.client.get_element("{urn:schemas-microsoft-com:xml-analysis}Session")(SessionId=self.sessionId, mustUnderstand = 1)
+
+        sess= self.client.get_element(ns_name(schema_xmla,"Session"))(SessionId=self.sessionId, mustUnderstand = 1)
         self._soapheaders={"Session":sess}
         
     def EndSession(self):
         if self.sessionId is not None:
-            nsmap={None:"urn:schemas-microsoft-com:xml-analysis"}
-            es= self.client.get_element("{urn:schemas-microsoft-com:xml-analysis}EndSession")(SessionId=self.sessionId, mustUnderstand = 1)
-            cmd = etree.Element("{urn:schemas-microsoft-com:xml-analysis}Statement", nsmap=nsmap)
+            es= self.client.get_element(ns_name(schema_xmla,"EndSession"))(SessionId=self.sessionId, mustUnderstand = 1)
+            cmd = as_etree("Statement")
             self.service.Execute(Command=cmd, _soapheaders={"EndSession":es})
             self.setSessionId(None)
             self._soapheaders=None
