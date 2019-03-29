@@ -6,6 +6,9 @@ verify_ssl = true
 [dev-packages]
 nose = "*"
 nose-testconfig = "*"
+docutils = "*"
+pygments = "*"
+v = {editable = true,version = "*"}
 
 [packages]
 zope-interface = "*"
