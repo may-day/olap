@@ -2,15 +2,26 @@ import sys
 import six
 from lxml import etree
 from lxml.etree import QName
+import collections.abc
 
 stringtypes = six.string_types
 _UnmarshallableType=(type(None), six.string_types, six.integer_types, float, bool)
 u=six.u
 
 schema_instance="http://www.w3.org/2001/XMLSchema-instance"
-class Data:
-    def __getitem__(self, item):
-        return getattr(self, item)
+class Data(dict):
+
+    def __getattr__(self, name):
+        if name in self:
+            return self[name]
+        return getattr(super(Data, self), name)
+
+    def __setattr__(self, name, value):
+        self[name] = value
+
+    def __delattr__(self, name):
+        del self[name]
+
 
 def aslist(something):
     """If something is not a list already make it one, otherwise simply return something"""
@@ -22,7 +33,7 @@ def dictify(r):
         return [dictify(x) for x in r]
     if isinstance(r, Data):
         d = {}
-        for (k,v) in r.__dict__.items():
+        for (k,v) in r.items():
             if k == "text" and v is None: continue
             d[k] = dictify(v)
         return d
@@ -150,7 +161,8 @@ def fromETree(e, ns):
         t = QName(c)
         
         cd = fromETree(c, ns)
-        if len(cd.__dict__) == 1:
+        #if len(cd.__dict__) == 1:
+        if len(cd) == 1:
             cd = cd.text
         v = getattr(p, t.localname, None)
         if v is not None:

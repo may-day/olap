@@ -101,7 +101,7 @@ class XMLA(object):
         self.log = LogRequest(enabled=False)
         self.c = self.p.connect(location=self.be["location"], 
                                 auth=self.be["auth"], log=self.log)
-        self.c.BeginSession()
+        #self.c.BeginSession()
         self.getSchemaRowsetSupport()
          
     def getSchemaRowsetSupport(self):
@@ -112,12 +112,15 @@ class XMLA(object):
             self.unsupported = [x for x in xmla1_1_rowsets if not (x in self.supported)]
     
     def tearDown(self):
-        self.c.EndSession()
-        #pass
+        #self.c.EndSession()
+        pass
     
     def testGetDatasources(self):
-        #self.log.enable()
+        self.log.enable()
         erg=self.c.getDatasources()
+        e = erg[0]
+        print(type(e))
+        print(e)
         assert_true(len(erg) == 1, "One Datasource is expected")
         assert_equal(self.be["ds"], erg[0]["DataSourceName"])
         
@@ -267,7 +270,7 @@ class XMLA(object):
         erg = self.c.getMDSchemaLevels(
             restrictions={"CUBE_NAME":self.be["restrict_cube"], 
              'HIERARCHY_UNIQUE_NAME': self.be["restrict_hierarchy_unique_name"]},
-            properties={"Catalog":self.be["catalog"], "Smootje":"wo"})
+            properties={"Catalog":self.be["catalog"]})
         assert_equals(len(erg), self.be["schema_levels"])
     
     def testGetDBSchemaSchemata(self):
