@@ -148,13 +148,10 @@ def fromETree(e, ns):
     if p.text and p.text.strip() == "":
         p.text=None
     if valtype in e.attrib:
-        if e.attrib[valtype] == "xsd:int":
+        if e.attrib[valtype] in ["xsd:int", "xsd:unsignedInt", "xsd:long"]:
           p.text = int(p.text)  
           delattr(p, "_"+valtype)
-        if e.attrib[valtype] == "xsd:double":
-          p.text = float(p.text)  
-          delattr(p, "_"+valtype)
-        if e.attrib[valtype] == "xsd:float":
+        if e.attrib[valtype] in ["xsd:double", "xsd:float"]:
           p.text = float(p.text)  
           delattr(p, "_"+valtype)
     for c in e.findall(nst):
