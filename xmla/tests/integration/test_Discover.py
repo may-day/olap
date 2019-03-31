@@ -18,7 +18,6 @@ n.b.:
 import unittest
 from nose.tools import *
 import olap.xmla.xmla as xmla
-from requests_kerberos import HTTPKerberosAuth
 from requests.auth import HTTPBasicAuth
 
 from olap.xmla.connection import xmla1_1_rowsets, LogRequest
@@ -49,7 +48,7 @@ mondrian={
 ssas={
     "type":"ssas",
     "location":"http://dwh-bi/olap/msmdpump.dll",
-    "auth" : HTTPKerberosAuth(),
+    "auth" : None,
     "ds":"DWH-BI",
     "catalog":"Adventure Works DW 2008R2",
     "restrict_cube":"Adventure Works",
@@ -302,6 +301,8 @@ if "iccube" in server:
         supported = proprietary = conform = unsupported = None
 
 if "ssas" in server:
+    from requests_kerberos import HTTPKerberosAuth
+    ssas["auth"] = HTTPKerberosAuth()
     class TestSSAS(XMLA, unittest.TestCase):
         be = ssas
         supported = proprietary = conform = unsupported = None

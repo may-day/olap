@@ -1,8 +1,6 @@
-import sys
 import six
 from lxml import etree
 from lxml.etree import QName
-import collections.abc
 
 stringtypes = six.string_types
 _UnmarshallableType=(type(None), six.string_types, six.integer_types, float, bool)

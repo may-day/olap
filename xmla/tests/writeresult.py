@@ -31,8 +31,8 @@ def main(mdxfile, location, catalog, krb, username, password, spn, sslverify):
     x=utils.dictify(res.root)
 
     erg=pprint.pformat(x)
-    print("erg-type",type(erg))
-    open(pyfile, "w+").write('"""\n%s\n"""\n\nresult=%s\n' % (cmd, erg))
+    encodinghint="# -*- coding: utf-8"
+    open(pyfile, "w+").write('%s\n"""\n%s\n"""\n\nresult=%s\n' % (encodinghint, cmd, erg))
 
 if __name__ == "__main__":
     import argparse
