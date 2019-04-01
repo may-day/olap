@@ -120,8 +120,8 @@ class XMLA(object):
         e = erg[0]
         print(type(e))
         print(e)
-        assert_true(len(erg) == 1, "One Datasource is expected")
-        assert_equal(self.be["ds"], erg[0]["DataSourceName"])
+        self.assertTrue(len(erg) == 1, "One Datasource is expected")
+        self.assertEqual(self.be["ds"], erg[0]["DataSourceName"])
         
     def testGetProperties(self):
         erg=self.c.getProperties()
@@ -133,42 +133,42 @@ class XMLA(object):
         if self.be == iccube: req = "Catalog,ProviderVersion"
         propnames = [x["PropertyName"] for x in erg]
         for p in req.split(","):
-            assert_in(p.strip(), propnames)
+            self.assertIn(p.strip(), propnames)
 
     def testGetDBSchemaCatalogs(self):
         #self.log.enable()
         erg=self.c.getDBSchemaCatalogs()
-        assert_true(len(erg) > 0, "One Catalog is expected - at least")
-        assert_in(self.be["catalog"], [x["CATALOG_NAME"] for x in erg])
+        self.assertTrue(len(erg) > 0, "One Catalog is expected - at least")
+        self.assertIn(self.be["catalog"], [x["CATALOG_NAME"] for x in erg])
         
     
     def testGetDBSchemaColumns(self):
         if "DBSCHEMA_COLUMNS" in self.conform:
             erg=self.c.getDBSchemaColumns()
-            assert_true(len(erg) > 0, 
+            self.assertTrue(len(erg) > 0, 
                             "There must be at least one column, really!")
         
     def testGetDBSchemaTables(self):
         erg=self.c.getDBSchemaTables()
-        assert_true(len(erg) >= self.be["schema_tables"], 
+        self.assertTrue(len(erg) >= self.be["schema_tables"], 
                         "There must be at least one table")
 
     def testGetDBSchemaProviderTypes(self):
         if "DBSCHEMA_PROVIDER_TYPES" in self.conform:
             erg=self.c.getDBSchemaProviderTypes()
             msg="There should be at least one type like INTEGER for example"
-            assert_true(len(erg) > 0, msg)
+            self.assertTrue(len(erg) > 0, msg)
         
     def testGetDBSchemaTablesInfo(self):
         if "DBSCHEMA_TABLES_INFO" in self.conform:
             erg=self.c.getDBSchemaTablesInfo()
-            assert_true(len(erg) > 0, 
+            self.assertTrue(len(erg) > 0, 
                             "There must be at least one tablesinfo")
 
     def testGetMDSchemaActions(self):
         erg=self.c.getMDSchemaActions(
             restrictions={"CUBE_NAME":self.be["restrict_cube"], "COORDINATE":self.be["restrict_cube"], "COORDINATE_TYPE":1})
-        assert_true(len(erg)==0, "no actions expected")
+        self.assertTrue(len(erg)==0, "no actions expected")
 
     def testGetMDSchemaCubes(self):
         # oh my, mondrian doesn't know what do do with Catalog in the Proplist ... 
@@ -176,31 +176,31 @@ class XMLA(object):
         # through just fine (are probably ignored on the server side)
         props = {"Catalog":self.be["catalog"]}
         erg=self.c.getMDSchemaCubes(properties=props)
-        assert_equals(len(erg), self.be["cubes_expected"])
+        self.assertEqual(len(erg), self.be["cubes_expected"])
         self.log.enable()
         erg=self.c.getMDSchemaCubes(
             restrictions={"CUBE_NAME":self.be["restrict_cube"]}, 
             properties=props)
-        assert_equals(len(erg), 1)
+        self.assertEqual(len(erg), 1)
 
     def testGetSchemaRowsets(self):
         erg=self.c.getSchemaRowsets()
-        assert_true(len(erg)>0, "at least one schema is expected")
+        self.assertTrue(len(erg)>0, "at least one schema is expected")
         
     def testGetMDSchemaFunctions(self):
         erg=self.c.getMDSchemaFunctions()
-        assert_true(len(erg)> 1, 
+        self.assertTrue(len(erg)> 1, 
                         "There should be more than one function description.")
         erg=self.c.getMDSchemaFunctions(
             restrictions={"FUNCTION_NAME":self.be["restrict_funcname"]})
-        assert_equals(len(erg), 1)
+        self.assertEqual(len(erg), 1)
         
     def testGetMDSchemaMembers(self):
         erg=self.c.getMDSchemaMembers(
             restrictions={"CUBE_NAME":self.be["restrict_cube"], 
                           "LEVEL_UNIQUE_NAME":self.be["restrict_level_unique_name"]}, 
             properties={"Catalog":self.be["catalog"]})
-        assert_true(len(erg)> 1, 
+        self.assertTrue(len(erg)> 1, 
                         "There should be more than one dimension member.")
 
     def testGetMDSchemaProperties(self):
@@ -208,7 +208,7 @@ class XMLA(object):
             {"CUBE_NAME":self.be["restrict_cube"], 
              'LEVEL_UNIQUE_NAME': self.be["restrict_level_unique_name"]}, 
             properties={"Catalog":self.be["catalog"]})
-        assert_true(len(erg)> 1, 
+        self.assertTrue(len(erg)> 1, 
                         "There should be more than one schema property.")
 
     def testGetMDSchemaSets(self):
@@ -217,25 +217,25 @@ class XMLA(object):
         else:
             erg=self.c.getMDSchemaSets()
         
-        assert_true(len(erg)>= self.be["schema_sets"], 
+        self.assertTrue(len(erg)>= self.be["schema_sets"], 
                         "There should be a schema set.")
 
     def testGetEnumerators(self):
         if "DISCOVER_ENUMERATORS" in self.conform:
             erg = self.c.getEnumerators()
             msg = "There should be at least one enumerator."
-            assert_true(len(erg)> 0, msg)
+            self.assertTrue(len(erg)> 0, msg)
         
     def testGetLiterals(self):
         erg = self.c.getLiterals()
-        assert_true(len(erg)> 0, "There should be at least one literal.")
+        self.assertTrue(len(erg)> 0, "There should be at least one literal.")
         
     def testGetKeywords(self):
         # instead of not listing the KEYWORDS Rowset in a call to 
         # DISCOVER_SCHEMA_ROWSETS, iccube throws an exceptions
         if "DISCOVER_KEYWORDS" in self.conform and self.be != iccube:
             erg = self.c.getKeywords()
-            assert_true(len(erg)> 0, 
+            self.assertTrue(len(erg)> 0, 
                             "There should be at least one keyword.")
         
 
@@ -244,25 +244,25 @@ class XMLA(object):
             restrictions={"CUBE_NAME":self.be["restrict_cube"], 
                           "DIMENSION_NAME":self.be["restrict_dim"]},
             properties={"Catalog":self.be["catalog"]})
-        assert_equals(len(erg), 1)
+        self.assertEqual(len(erg), 1)
         
     def testGetMDSchemaHierarchies(self):
         erg=self.c.getMDSchemaHierarchies(
             restrictions={"CUBE_NAME":self.be["restrict_cube"]}, 
             properties={"Catalog":self.be["catalog"]})
-        assert_true(len(erg)> 1, 
+        self.assertTrue(len(erg)> 1, 
                         "There should be more than one hierarchy.")
         erg=self.c.getMDSchemaHierarchies(
             restrictions={"HIERARCHY_NAME":self.be["restrict_hier"], 
                           "CUBE_NAME":self.be["restrict_cube"]}, 
             properties={"Catalog":self.be["catalog"]})
-        assert_equals(len(erg), 1)
+        self.assertEqual(len(erg), 1)
 
     def testGetMDSchemaMeasures(self):
         erg=self.c.getMDSchemaMeasures(
             restrictions={"CUBE_NAME":self.be["restrict_cube"]}, 
             properties={"Catalog":self.be["catalog"]})
-        assert_equals(len(erg), self.be["cube_measures"])
+        self.assertEqual(len(erg), self.be["cube_measures"])
 
     def testGetSchemaLevels(self):
         #self.log.enable()
@@ -270,7 +270,7 @@ class XMLA(object):
             restrictions={"CUBE_NAME":self.be["restrict_cube"], 
              'HIERARCHY_UNIQUE_NAME': self.be["restrict_hierarchy_unique_name"]},
             properties={"Catalog":self.be["catalog"]})
-        assert_equals(len(erg), self.be["schema_levels"])
+        self.assertEqual(len(erg), self.be["schema_levels"])
     
     def testGetDBSchemaSchemata(self):
         if "DBSCHEMA_SCHEMATA" in self.supported:

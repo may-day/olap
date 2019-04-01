@@ -11,6 +11,7 @@ pygments = "*"
 tox-pipenv = "*"
 tox = "==3.7.0"
 v = {editable = true,version = "*"}
+coverage = "*"
 
 [packages]
 zope-interface = "*"
@@ -20,6 +21,5 @@ requests-kerberos = "*"
 six = "*"
 lxml = "*"
 olap = "*"
-
 #[requires]
 #python_version = "3.7"
