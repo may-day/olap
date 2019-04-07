@@ -14,8 +14,10 @@ n.b.:
 
 import unittest
 import olap.xmla.xmla as xmla
+import olap.xmla.utils as utils
 from nose.tools import *
 from requests.auth import HTTPBasicAuth
+from zeep import Plugin
 
 mondrian={
     "type":"mondrian",
@@ -49,9 +51,35 @@ iccube={
 	"set3":"[Product].[Product].[Category].ALLMEMBERS",
 	}
 
+class LogRequest(Plugin):
+    def __init__(self, enabled):
+        self.enabled = enabled
+        self.hist = {}
+        self.prefix = ""
+        
+    def egress(self, envelope, http_headers, operation, binding_options):
+        self.hist[self.prefix+"_" + "request"] = utils.etree_tostring(envelope)
+        if self.enabled:
+            print(etree_tostring(envelope))
+
+    def ingress(self, envelope, http_headers, operation):
+        self.hist[self.prefix+"_" + "response"] = utils.etree_tostring(envelope)
+        if self.enabled:
+            print(etree_tostring(envelope))
+
+    def enable(self):
+        self.enabled=True
+    def disable(self):
+        self.enabled=False
+
+    def saveConversation(self, fname):
+        with open(fname, "w+") as f:
+            for k in sorted(self.hist.keys()):
+                f.write('{}="""{}"""\n'.format(k, self.hist[k]))
 
 class XMLAExecute(object):
     be = None
+    logreq=None
 
     def setUp(self):
         self.cube = self.be["cube"]
@@ -60,10 +88,13 @@ class XMLAExecute(object):
         self.set3 = self.be["set3"] 
         self.catalog = self.be["catalog"]
         self.p = xmla.XMLAProvider()
-        self.c = self.p.connect(location=self.be["location"], auth=self.be["auth"])
-
+        if self.logreq:
+            self.logreq.prefix=self.id().split(".")[-1]
+        self.c = self.p.connect(location=self.be["location"], auth=self.be["auth"], log=self.logreq)
+        
     def tearDown(self):
-        pass
+        if self.logreq:
+            self.logreq.saveConversation(fname=self.be["type"] +".py")
 
     def test2Axes(self):
         cmd= """select {%(set1)s} * {%(set2)s} on columns, 
@@ -121,6 +152,7 @@ except:
 if "mondrian" in server:
     class TestMondrian(XMLAExecute, unittest.TestCase):
         be = mondrian
+        logreq=LogRequest(False)
 
 if "iccube" in server:
     class TestICCube(XMLAExecute, unittest.TestCase):
@@ -131,4 +163,5 @@ if "ssas" in server:
     ssas["auth"] = HTTPKerberosAuth()
     class TestSSAS(XMLAExecute, unittest.TestCase):
         be = ssas
+        logreq=LogRequest(False)
 

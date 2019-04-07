@@ -1,5 +1,5 @@
 import unittest
-
+import sys
 import olap.xmla.utils as utils
 
 class TestUtils(unittest.TestCase):

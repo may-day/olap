@@ -25,20 +25,20 @@ def aslist(something):
     """If something is not a list already make it one, otherwise simply return something"""
     return something if isinstance(something, list) else [something]
 
-def dictify(r):
+def dictify(r, keep_none_text=False):
 
     if isinstance(r, list):
-        return [dictify(x) for x in r]
+        return [dictify(x, keep_none_text) for x in r]
     if isinstance(r, Data):
         d = {}
         for (k,v) in r.items():
-            if k == "text" and v is None: continue
-            d[k] = dictify(v)
+            if k == "text" and v is None and not keep_none_text: continue
+            d[k] = dictify(v, keep_none_text)
         return d
     if isinstance(r, dict):
         d = {}
         for (k,v) in r.items():
-            d[k] = dictify(v)
+            d[k] = dictify(v, keep_none_text)
         return d
     return r
 

@@ -42,6 +42,7 @@ setup(
         'nose',
         'nose-testconfig',
         'docutils',
+        'requests_mock',
         'Pygments'
     ],
 

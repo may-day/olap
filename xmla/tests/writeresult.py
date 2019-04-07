@@ -5,6 +5,14 @@ import pprint
 import os.path
 from requests_kerberos import HTTPKerberosAuth
 from requests.auth import HTTPBasicAuth
+from zeep import Plugin
+
+class LogRequest(Plugin):
+    def __init__(self):
+        self.res=""
+
+    def ingress(self, envelope, http_headers, operation):
+        self.res=utils.etree_tostring(envelope)
 
 def main(mdxfile, location, catalog, krb, username, password, spn, sslverify):
     p = os.path.dirname(os.path.realpath(__file__))
@@ -25,14 +33,17 @@ def main(mdxfile, location, catalog, krb, username, password, spn, sslverify):
         auth = HTTPKerberosAuth(**kw)
     elif username:
         auth = HTTPBasicAuth(username, password)
-
-    c=p.connect(location=location, sslverify=sslverify, auth=auth)
+    
+    kwargs = {}
+    log = LogRequest()
+    kwargs["log"] = log
+    c=p.connect(location=location, sslverify=sslverify, auth=auth, **kwargs)
     res=c.Execute(cmd, Catalog=catalog)
-    x=utils.dictify(res.root)
+    x=utils.dictify(res.root, keep_none_text=True)
 
     erg=pprint.pformat(x)
     encodinghint="# -*- coding: utf-8"
-    open(pyfile, "w+").write('%s\n"""\n%s\n"""\n\nresult=%s\n' % (encodinghint, cmd, erg))
+    open(pyfile, "w+").write('%s\n"""\n%s\n"""\n\nresult=%s\n\nxml_response="""%s"""' % (encodinghint, cmd, erg, log.res))
 
 if __name__ == "__main__":
     import argparse

@@ -12,6 +12,7 @@ tox-pipenv = "*"
 tox = "==3.7.0"
 v = {editable = true,version = "*"}
 coverage = "*"
+requests-mock = "*"
 
 [packages]
 zope-interface = "*"

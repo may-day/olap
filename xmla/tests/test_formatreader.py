@@ -1,6 +1,8 @@
 import unittest
 from olap.xmla.formatreader import TupleFormatReader
 import olap.xmla.utils as utils
+import olap.xmla.xmla as xmla
+import requests_mock
 from . import mdx1
 from . import mdx_noaxistuple
 from . import mdx_columns_but_no_rows
@@ -10,6 +12,7 @@ from . import mdx_rows_but_no_columns_no_cells
 import olap.xmla.xmla as xmla
 p = xmla.XMLAProvider()
 c=p.connect(location="http://localhost:8080/xmondrian/xmla")
+cmd="...."
 res=c.Execute(cmd, Catalog="FoodMart")
 """
 class TestFormatReader(unittest.TestCase):
@@ -17,20 +20,35 @@ class TestFormatReader(unittest.TestCase):
     longMessage=True
     maxDiff = 2000
     def setUp(self):
+        location = "http://somewhere/over/the/rainbow"
+        p = xmla.XMLAProvider()
+        c = p.connect(location=location)
+        with requests_mock.mock() as m:
+            m.post(location, text=mdx1.xml_response)
+            self.fr = c.Execute(mdx1.__doc__)
         self.res = utils.PropDict(mdx1.result)
-        self.fr=TupleFormatReader(self.res)
+        #self.fr=TupleFormatReader(self.res)
         self.cm = self.fr.cellmap
         self.ordinal1 = list(filter(lambda cell: cell._CellOrdinal == "1", self.res.CellData.Cell))[0]
         self.ax_tupel0 = [tup.Member for tup in self.res.Axes.Axis[0].Tuples.Tuple]
 
-        self.res_noaxistuple = utils.PropDict(mdx_noaxistuple.result)
-        self.fr_noaxistuple=TupleFormatReader(self.res_noaxistuple)
+        with requests_mock.mock() as m:
+            m.post(location, text=mdx_noaxistuple.xml_response)
+            self.fr_noaxistuple = c.Execute(mdx_noaxistuple.__doc__)
+        #self.res_noaxistuple = utils.PropDict(mdx_noaxistuple.result)
+        #self.fr_noaxistuple=TupleFormatReader(self.res_noaxistuple)
 
-        res=utils.PropDict(mdx_columns_but_no_rows.result)
-        self.fr_cbnr=TupleFormatReader(res)
+        with requests_mock.mock() as m:
+            m.post(location, text=mdx_columns_but_no_rows.xml_response)
+            self.fr_cbnr = c.Execute(mdx_columns_but_no_rows.__doc__)
+        #res=utils.PropDict(mdx_columns_but_no_rows.result)
+        #self.fr_cbnr=TupleFormatReader(res)
 
-        res=utils.PropDict(mdx_rows_but_no_columns_no_cells.result)
-        self.fr_rbncnc=TupleFormatReader(res)
+        with requests_mock.mock() as m:
+            m.post(location, text=mdx_rows_but_no_columns_no_cells.xml_response)
+            self.fr_rbncnc = c.Execute(mdx_rows_but_no_columns_no_cells.__doc__)
+        #res=utils.PropDict(mdx_rows_but_no_columns_no_cells.result)
+        #self.fr_rbncnc=TupleFormatReader(res)
 
     def testOrdinalsToCells(self):
         self.assertIsInstance(self.cm, dict)
@@ -43,6 +61,7 @@ class TestFormatReader(unittest.TestCase):
         self.assertEqual({}, self.fr.getCellByOrdinal(-1))
 
     def testGetAxisTuple(self):
+        
         self.assertEqual(self.ax_tupel0, self.fr.getAxisTuple(0))
         self.assertEqual(self.ax_tupel0, self.fr.getAxisTuple("Axis0"))
         self.assertRaises(IndexError, self.fr.getAxisTuple, *[7])
@@ -53,11 +72,10 @@ class TestFormatReader(unittest.TestCase):
 
         # some actually return empty tuples,
         # e.g. "select {} on columns, [Gender].[Gender].ALLMEMBERS on rows from [Sales]"
+        # doesn't seem to work on mondrian anymore (throws NPE), still works on SSAS
         # which would have no tuples on Axis1
-        # we mock that here
 
-        del self.res.Axes.Axis[0].Tuples.Tuple
-        self.assertEqual([], self.fr.getAxisTuple(0))
+        self.assertEqual([], self.fr_rbncnc.getAxisTuple(0))
 
     def testGetSlice_without_SlicerAxis(self):
         c = {}
