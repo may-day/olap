@@ -101,7 +101,13 @@ class XMLAConnection(object):
 
     def __init__(self, url, location, sslverify, **kwargs):
 
-        transport = Transport()
+        if "session" in kwargs:
+            session = kwargs["session"]
+            del kwargs["session"]
+            transport = Transport(session=session)
+        else:
+            transport = Transport()
+            
         if "auth" in kwargs:
             transport.session.auth = kwargs["auth"]
             del kwargs["auth"]
