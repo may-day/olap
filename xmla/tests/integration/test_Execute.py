@@ -18,6 +18,12 @@ import olap.xmla.utils as utils
 from nose.tools import *
 from requests.auth import HTTPBasicAuth
 from zeep import Plugin
+import tests.integration.mondrian as mondrian_conversation
+import tests.integration.ssas as ssas_conversation
+import requests_mock
+import requests
+
+mock_location = "mock://somewhere/over/the/rainbow"
 
 mondrian={
     "type":"mondrian",
@@ -28,6 +34,7 @@ mondrian={
     "set1":"[Measures].ALLMEMBERS",
     "set2":"[Time].[1997].[Q2].children",
     "set3":"[Gender].[Gender].ALLMEMBERS",
+    "conversation":mondrian_conversation,
 }
 ssas={
 	"type":"ssas",
@@ -38,6 +45,7 @@ ssas={
 	"set1":"[Measures].ALLMEMBERS",
 	"set2":"[Date].[Month of Year].ALLMEMBERS",
 	"set3":"[Product].[Product Categories].[Category].ALLMEMBERS",
+    "conversation":ssas_conversation,
 }
 
 iccube={
@@ -77,11 +85,25 @@ class LogRequest(Plugin):
             for k in sorted(self.hist.keys()):
                 f.write('{}="""{}"""\n'.format(k, self.hist[k]))
 
+def conversation_matcher(m, testname):
+    def match(req):
+        respname=testname+"_response"
+        resp = getattr(m, respname, None)
+        print("**** ", respname,">>>>",resp,"<<<<<")
+        return requests_mock.create_response(req, text=resp)
+
+    return match
+
 class XMLAExecute(object):
     be = None
     logreq=None
 
     def setUp(self):
+        session = requests.Session()
+        adapter = requests_mock.Adapter()
+        adapter.add_matcher(conversation_matcher(self.be["conversation"], self.id().split(".")[-1]))
+        session.mount('mock', adapter)
+
         self.cube = self.be["cube"]
         self.set1 = self.be["set1"]
         self.set2 = self.be["set2"]
@@ -90,7 +112,11 @@ class XMLAExecute(object):
         self.p = xmla.XMLAProvider()
         if self.logreq:
             self.logreq.prefix=self.id().split(".")[-1]
-        self.c = self.p.connect(location=self.be["location"], auth=self.be["auth"], log=self.logreq)
+        kw = {
+            "log":self.logreq,
+            "session":session
+        }
+        self.c = self.p.connect(location=self.be["location"], auth=self.be["auth"], **kw)
         
     def tearDown(self):
         if self.logreq:
@@ -149,10 +175,13 @@ except:
     server=[]
     config = {}
 
+mondrian["location"]=mock_location
+ssas["location"]=mock_location
+
 if "mondrian" in server:
     class TestMondrian(XMLAExecute, unittest.TestCase):
         be = mondrian
-        logreq=LogRequest(False)
+        #logreq=LogRequest(False)
 
 if "iccube" in server:
     class TestICCube(XMLAExecute, unittest.TestCase):
