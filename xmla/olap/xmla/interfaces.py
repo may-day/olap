@@ -48,6 +48,12 @@ containing a certicate bundle"""),
         required=False
         )
 
+    session= zope.schema.TextLine(
+        title=u("session"),
+        description=u("""Provide your own session instance to zeep's transport"""),
+        required=False
+        )
+
     def getSchemaElements(schemaElementType, unique_name, 
                           aslist=False, more_restrictions=None, 
                           more_properties=None,
