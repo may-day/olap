@@ -20,7 +20,12 @@ from nose.tools import *
 import olap.xmla.xmla as xmla
 from requests.auth import HTTPBasicAuth
 
-from olap.xmla.connection import xmla1_1_rowsets, LogRequest
+from olap.xmla.connection import xmla1_1_rowsets
+import tests.mockhelper as mockhelper
+import tests.integration.discover_mondrian as discover_mondrian
+import tests.integration.discover_ssas as discover_ssas
+
+mock_location = "mock://somewhere/over/the/rainbow"
 
 mondrian={
     "type":"mondrian",
@@ -42,7 +47,8 @@ mondrian={
     "schema_levels":3,
     "schema_sets":1,
     "schema_sets_needs_cubename":False,
-    "schema_tables":1
+    "schema_tables":1,
+    "conversation":discover_mondrian,
 }
 
 ssas={
@@ -63,7 +69,8 @@ ssas={
     "schema_levels":6,
     "schema_sets":1,
     "schema_sets_needs_cubename":True, # not really, but if you have a few DBs on your server this will bring it to it's knees
-    "schema_tables":1
+    "schema_tables":1,
+    "conversation":discover_ssas
 }
 
 iccube={
@@ -94,12 +101,22 @@ import logging
 
 
 class XMLA(object):
+    be = None
+    logreq = None
+    record = False
 
     def setUp(self):
+        testname = self.id().split(".")[-1]
+        session = mockhelper.mockedsession(self.be["conversation"], testname)
         self.p = xmla.XMLAProvider()
-        self.log = LogRequest(enabled=False)
+        if self.logreq:
+            self.logreq.prefix=testname
+        kw = {
+            "log":self.logreq,
+            "session":session
+        }
         self.c = self.p.connect(location=self.be["location"], 
-                                auth=self.be["auth"], log=self.log)
+                                auth=self.be["auth"], **kw)
         #self.c.BeginSession()
         self.getSchemaRowsetSupport()
          
@@ -112,20 +129,21 @@ class XMLA(object):
     
     def tearDown(self):
         #self.c.EndSession()
-        pass
+        if self.logreq and self.record:
+            self.logreq.saveConversation(fname="try_discover_"+self.be["type"] +".py")
     
     def testGetDatasources(self):
-        self.log.enable()
+        #self.log.enable()
         erg=self.c.getDatasources()
-        e = erg[0]
-        print(type(e))
-        print(e)
+        #e = erg[0]
+        #print(type(e))
+        #print(e)
         self.assertTrue(len(erg) == 1, "One Datasource is expected")
         self.assertEqual(self.be["ds"], erg[0]["DataSourceName"])
         
     def testGetProperties(self):
         erg=self.c.getProperties()
-        # check fpr required xmla properties
+        # check for required xmla properties
         req = """AxisFormat,BeginRange,Catalog,Content,Cube,DataSourceInfo,
                  EndRange,Format,LocaleIdentifier,MDXSupport,Password,
                  ProviderName,ProviderVersion,StateSupport,Timeout,UserName"""
@@ -177,7 +195,7 @@ class XMLA(object):
         props = {"Catalog":self.be["catalog"]}
         erg=self.c.getMDSchemaCubes(properties=props)
         self.assertEqual(len(erg), self.be["cubes_expected"])
-        self.log.enable()
+        #self.log.enable()
         erg=self.c.getMDSchemaCubes(
             restrictions={"CUBE_NAME":self.be["restrict_cube"]}, 
             properties=props)
@@ -284,31 +302,38 @@ try:
     for server_section in server:
         if server_section in globals():
             globals()[server_section].update(config.get(server_section, {}))
+
+    do_record=(config['xmla']['record'] or "no") == "yes"
+    if "ssas" in server:
+        from requests_kerberos import HTTPKerberosAuth
+        ssas["auth"] = HTTPKerberosAuth()
             
 except:
-    print("darn")
-    server=["mondrian"]
+    # we mock responses
+    server=["mondrian", "ssas"]
     config = {}
+    mondrian["location"]=mock_location
+    ssas["location"]=mock_location
+    do_record = False
 
 if "mondrian" in server:
     class TestMondrian(XMLA, unittest.TestCase):
         be = mondrian
         supported = proprietary = conform = unsupported = None
+        logreq = mockhelper.LogRequest(False)
+        record = do_record
 
 if "iccube" in server:
     class TestICCube(XMLA, unittest.TestCase):
         be = iccube
         supported = proprietary = conform = unsupported = None
+        logreq = mockhelper.LogRequest(False)
+        record = do_record
 
 if "ssas" in server:
-    from requests_kerberos import HTTPKerberosAuth
-    ssas["auth"] = HTTPKerberosAuth()
     class TestSSAS(XMLA, unittest.TestCase):
         be = ssas
         supported = proprietary = conform = unsupported = None
-
-#def test_suite():
-#    #import s4u2p
-#    #s4u2p.authGSSKeytab("/home/norman/workspace/olap/host.keytab")
-#    return unittest.makeSuite(TestMondrian)
+        logreq = mockhelper.LogRequest(False)
+        record = do_record
 

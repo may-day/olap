@@ -60,7 +60,8 @@ iccube={
 
 class XMLAExecute(object):
     be = None
-    logreq=None
+    logreq = None
+    record = False
 
     def setUp(self):
         testname = self.id().split(".")[-1]
@@ -81,8 +82,8 @@ class XMLAExecute(object):
         self.c = self.p.connect(location=self.be["location"], auth=self.be["auth"], **kw)
         
     def tearDown(self):
-        if self.logreq:
-            self.logreq.saveConversation(fname="execute_"+self.be["type"] +".py")
+        if self.logreq and self.record:
+            self.logreq.saveConversation(fname="try_execute_"+self.be["type"] +".py")
 
     def test2Axes(self):
         cmd= """select {%(set1)s} * {%(set2)s} on columns, 
@@ -132,27 +133,37 @@ try:
     for server_section in server:
         if server_section in globals():
             globals()[server_section].update(config.get(server_section, {}))
-            
-except:
-    server=[]
-    config = {}
 
-mondrian["location"]=mock_location
-ssas["location"]=mock_location
+    do_record=(config['xmla']['record'] or "no") == "yes"
+
+    if "ssas" in server:
+        from requests_kerberos import HTTPKerberosAuth
+        ssas["auth"] = HTTPKerberosAuth()
+
+except:
+    # we mock responses
+    server=["mondrian", "ssas"]
+    config = {}
+    mondrian["location"]=mock_location
+    ssas["location"]=mock_location
+    do_record = False
 
 if "mondrian" in server:
     class TestMondrian(XMLAExecute, unittest.TestCase):
         be = mondrian
-        #logreq=mockhelper.LogRequest(False)
+        logreq = mockhelper.LogRequest(False)
+        record = do_record
 
 if "iccube" in server:
     class TestICCube(XMLAExecute, unittest.TestCase):
         be = iccube
+        logreq = mockhelper.LogRequest(False)
+        record = do_record
 
 if "ssas" in server:
-    from requests_kerberos import HTTPKerberosAuth
     class TestSSAS(XMLAExecute, unittest.TestCase):
         be = ssas
-        #logreq=mockhelper.LogRequest(False)
-        #ssas["auth"] = HTTPKerberosAuth()
+        logreq = mockhelper.LogRequest(False)
+        record = do_record
+        
 
