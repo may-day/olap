@@ -14,14 +14,11 @@ n.b.:
 
 import unittest
 import olap.xmla.xmla as xmla
-import olap.xmla.utils as utils
 from nose.tools import *
 from requests.auth import HTTPBasicAuth
-from zeep import Plugin
-import tests.integration.mondrian as mondrian_conversation
-import tests.integration.ssas as ssas_conversation
-import requests_mock
-import requests
+import tests.integration.execute_mondrian as execute_mondrian
+import tests.integration.execute_ssas as execute_ssas
+import tests.mockhelper as mockhelper
 
 mock_location = "mock://somewhere/over/the/rainbow"
 
@@ -34,7 +31,7 @@ mondrian={
     "set1":"[Measures].ALLMEMBERS",
     "set2":"[Time].[1997].[Q2].children",
     "set3":"[Gender].[Gender].ALLMEMBERS",
-    "conversation":mondrian_conversation,
+    "conversation":execute_mondrian,
 }
 ssas={
 	"type":"ssas",
@@ -45,7 +42,7 @@ ssas={
 	"set1":"[Measures].ALLMEMBERS",
 	"set2":"[Date].[Month of Year].ALLMEMBERS",
 	"set3":"[Product].[Product Categories].[Category].ALLMEMBERS",
-    "conversation":ssas_conversation,
+    "conversation":execute_ssas,
 }
 
 iccube={
@@ -59,50 +56,15 @@ iccube={
 	"set3":"[Product].[Product].[Category].ALLMEMBERS",
 	}
 
-class LogRequest(Plugin):
-    def __init__(self, enabled):
-        self.enabled = enabled
-        self.hist = {}
-        self.prefix = ""
-        
-    def egress(self, envelope, http_headers, operation, binding_options):
-        self.hist[self.prefix+"_" + "request"] = utils.etree_tostring(envelope)
-        if self.enabled:
-            print(etree_tostring(envelope))
 
-    def ingress(self, envelope, http_headers, operation):
-        self.hist[self.prefix+"_" + "response"] = utils.etree_tostring(envelope)
-        if self.enabled:
-            print(etree_tostring(envelope))
-
-    def enable(self):
-        self.enabled=True
-    def disable(self):
-        self.enabled=False
-
-    def saveConversation(self, fname):
-        with open(fname, "w+") as f:
-            for k in sorted(self.hist.keys()):
-                f.write('{}="""{}"""\n'.format(k, self.hist[k]))
-
-def conversation_matcher(m, testname):
-    def match(req):
-        respname=testname+"_response"
-        resp = getattr(m, respname, None)
-        print("**** ", respname,">>>>",resp,"<<<<<")
-        return requests_mock.create_response(req, text=resp)
-
-    return match
 
 class XMLAExecute(object):
     be = None
     logreq=None
 
     def setUp(self):
-        session = requests.Session()
-        adapter = requests_mock.Adapter()
-        adapter.add_matcher(conversation_matcher(self.be["conversation"], self.id().split(".")[-1]))
-        session.mount('mock', adapter)
+        testname = self.id().split(".")[-1]
+        session = mockhelper.mockedsession(self.be["conversation"], testname)
 
         self.cube = self.be["cube"]
         self.set1 = self.be["set1"]
@@ -111,7 +73,7 @@ class XMLAExecute(object):
         self.catalog = self.be["catalog"]
         self.p = xmla.XMLAProvider()
         if self.logreq:
-            self.logreq.prefix=self.id().split(".")[-1]
+            self.logreq.prefix=testname
         kw = {
             "log":self.logreq,
             "session":session
@@ -120,7 +82,7 @@ class XMLAExecute(object):
         
     def tearDown(self):
         if self.logreq:
-            self.logreq.saveConversation(fname=self.be["type"] +".py")
+            self.logreq.saveConversation(fname="execute_"+self.be["type"] +".py")
 
     def test2Axes(self):
         cmd= """select {%(set1)s} * {%(set2)s} on columns, 
@@ -181,7 +143,7 @@ ssas["location"]=mock_location
 if "mondrian" in server:
     class TestMondrian(XMLAExecute, unittest.TestCase):
         be = mondrian
-        #logreq=LogRequest(False)
+        #logreq=mockhelper.LogRequest(False)
 
 if "iccube" in server:
     class TestICCube(XMLAExecute, unittest.TestCase):
@@ -189,8 +151,8 @@ if "iccube" in server:
 
 if "ssas" in server:
     from requests_kerberos import HTTPKerberosAuth
-    ssas["auth"] = HTTPKerberosAuth()
     class TestSSAS(XMLAExecute, unittest.TestCase):
         be = ssas
-        logreq=LogRequest(False)
+        #logreq=mockhelper.LogRequest(False)
+        #ssas["auth"] = HTTPKerberosAuth()
 
