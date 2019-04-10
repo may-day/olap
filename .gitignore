@@ -18,3 +18,4 @@ MANIFEST
 *.pyc
 *.pem
 index.html
+xmla/Pipfile.lock

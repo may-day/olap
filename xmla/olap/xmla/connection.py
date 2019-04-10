@@ -14,6 +14,7 @@ from .utils import *
 import logging
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 
 schema_xmla="urn:schemas-microsoft-com:xml-analysis"
@@ -53,10 +54,6 @@ class SessionPlugin(Plugin):
         sid=s.attrib.get("SessionId")
         self.xmlaconn.setSessionId(sid)
 
-#import logging
-#logging.basicConfig(level=logging.INFO)
-#logging.getLogger('suds.client').setLevel(logging.DEBUG)
-#logging.getLogger('suds.transport').setLevel(logging.DEBUG)
 
 # lsit of XMLA1.1 rowsets: 
 xmla1_1_rowsets = ["DISCOVER_DATASOURCES",
@@ -160,7 +157,7 @@ class XMLAConnection(object):
                 res = aslist(res)
         except Fault as fault:
             raise XMLAException(fault.message, dictify(fromETree(fault.detail, ns=None)))
-        logger.debug( res )
+        #logger.debug( res )
         return res
 
 

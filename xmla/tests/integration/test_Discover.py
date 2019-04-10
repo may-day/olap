@@ -48,6 +48,12 @@ mondrian={
     "schema_sets":1,
     "schema_sets_needs_cubename":False,
     "schema_tables":1,
+    "flow_catalog":"FoodMart",
+    "flow_cube":"Sales",
+    "flow_hier":"[Product]",
+    "flow_level":"[Product].[Product Category]",
+    "flow_member":"[Product].[Drink].[Alcoholic Beverages].[Beer and Wine]",
+    "flow_member_name":"Beer and Wine",
     "conversation":discover_mondrian,
 }
 
@@ -70,6 +76,12 @@ ssas={
     "schema_sets":1,
     "schema_sets_needs_cubename":True, # not really, but if you have a few DBs on your server this will bring it to it's knees
     "schema_tables":1,
+    "flow_catalog":"Adventure Works DW 2008R2",
+    "flow_cube":"Adventure Works",
+    "flow_hier":"[Product].[Category]",
+    "flow_level":"[Product].[Category].[Category]",
+    "flow_member":"[Product].[Category].&[3]",
+    "flow_member_name":"Clothing",
     "conversation":discover_ssas
 }
 
@@ -294,6 +306,13 @@ class XMLA(object):
         if "DBSCHEMA_SCHEMATA" in self.supported:
             erg = self.c.Discover("DBSCHEMA_SCHEMATA")
 
+    def testFlow(self):
+        cat=self.c.getCatalog(self.be["flow_catalog"])
+        cube=cat.getCube(self.be["flow_cube"])
+        hier=cube.getHierarchy(self.be["flow_hier"])
+        level=hier.getLevel(self.be["flow_level"])
+        member=level.getMember(self.be["flow_member"])
+        self.assertEqual(member.MEMBER_NAME, self.be["flow_member_name"])
 
 try:
     from testconfig import config

@@ -1,3 +1,4 @@
+# -*- coding: utf-8
 conversation={
     "test2Axes":[
         ("request", """<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:schemas-microsoft-com:xml-analysis">

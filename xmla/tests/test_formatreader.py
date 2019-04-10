@@ -27,7 +27,7 @@ class TestFormatReader(unittest.TestCase):
             m.post(location, text=mdx1.xml_response)
             self.fr = c.Execute(mdx1.__doc__)
         self.res = utils.PropDict(mdx1.result)
-        #self.fr=TupleFormatReader(self.res)
+        
         self.cm = self.fr.cellmap
         self.ordinal1 = list(filter(lambda cell: cell._CellOrdinal == "1", self.res.CellData.Cell))[0]
         self.ax_tupel0 = [tup.Member for tup in self.res.Axes.Axis[0].Tuples.Tuple]
@@ -35,20 +35,14 @@ class TestFormatReader(unittest.TestCase):
         with requests_mock.mock() as m:
             m.post(location, text=mdx_noaxistuple.xml_response)
             self.fr_noaxistuple = c.Execute(mdx_noaxistuple.__doc__)
-        #self.res_noaxistuple = utils.PropDict(mdx_noaxistuple.result)
-        #self.fr_noaxistuple=TupleFormatReader(self.res_noaxistuple)
 
         with requests_mock.mock() as m:
             m.post(location, text=mdx_columns_but_no_rows.xml_response)
             self.fr_cbnr = c.Execute(mdx_columns_but_no_rows.__doc__)
-        #res=utils.PropDict(mdx_columns_but_no_rows.result)
-        #self.fr_cbnr=TupleFormatReader(res)
 
         with requests_mock.mock() as m:
             m.post(location, text=mdx_rows_but_no_columns_no_cells.xml_response)
             self.fr_rbncnc = c.Execute(mdx_rows_but_no_columns_no_cells.__doc__)
-        #res=utils.PropDict(mdx_rows_but_no_columns_no_cells.result)
-        #self.fr_rbncnc=TupleFormatReader(res)
 
     def testOrdinalsToCells(self):
         self.assertIsInstance(self.cm, dict)

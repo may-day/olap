@@ -37,18 +37,21 @@ class XMLAClass(object):
 
     def __str__(self):
         return self.__class__.__name__ + ":" + str(self.getElementProperties())
+    def __repr__(self):
+        un = self._properties.get(self.unique_name_property, "???")
+        return self.__class__.__name__ + "<" + un + ">"
 
     def getElementProperties(self):
         return self._properties
 
     def __getattr__(self, name):
-        print("__getattr__", name)
+        #print("__getattr__", name)
         #if name == "_properties":
         #    return object.__getattribute__(self, name)
-        print(self._properties)
+        #print(self._properties)
         if name in self._properties:
             return self._properties[name]
-        print(name, "not in self._properties" )
+        #print(name, "not in self._properties" )
         return object.__getattr__(self, name)
 
     def getUniqueName(self):
@@ -72,18 +75,18 @@ class XMLAClass(object):
             oet=types[otherRestrict]
             rn=oet["RESTRICTION_NAME"]
             try:
-                print("get current value to restrict on {} by using value of attribute {}".format(otherRestrict, rn))
+                #print("get current value to restrict on {} by using value of attribute {}".format(otherRestrict, rn))
                 r[rn] = getattr(self, rn)
-                print("will restrict on {}={}".format(rn, r[rn]))
+                #print("will restrict on {}={}".format(rn, r[rn]))
             except AttributeError:
-                print("failed getting value of attribute {}".format(rn))
+                #print("failed getting value of attribute {}".format(rn))
                 if more_restrictions and rn in more_restrictions:
                     r[rn] = more_restrictions[rn]
                 else:
                     raise
             except:
-                print("failed getting value of attribute {}".format(rn))
-                print(dir(self))
+                #print("failed getting value of attribute {}".format(rn))
+                #print(dir(self))
                 raise
         if unique_name:
             r[et["RESTRICTION_NAME"]] = unique_name
@@ -193,7 +196,7 @@ class XMLACube(XMLAClass):
         return self.getHierarchy(None)
 
     def getHierarchy(self, unique_name):
-        print("getting hier", unique_name)
+        #print("getting hier", unique_name)
         return self.getSchemaElements("HIERARCHY", unique_name, 
                                       aslist=unique_name==None)
 

@@ -1,4 +1,1913 @@
+# -*- coding: utf-8
 conversation={
+    "testFlow":[
+        ("request", """<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:schemas-microsoft-com:xml-analysis">
+  <soap-env:Body>
+    <Discover>
+      <RequestType>DISCOVER_SCHEMA_ROWSETS</RequestType>
+      <Restrictions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+      <Properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+    </Discover>
+  </soap-env:Body>
+</soap-env:Envelope>
+"""),
+        ("response", """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <DiscoverResponse xmlns="urn:schemas-microsoft-com:xml-analysis" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100="http://schemas.microsoft.com/analysisservices/2008/engine/100" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200">
+      <return>
+        <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msxmla="http://schemas.microsoft.com/analysisservices/2003/xmla">
+          <xsd:schema xmlns:sql="urn:schemas-microsoft-com:xml-sql" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" elementFormDefault="qualified">
+            <xsd:element name="root">
+              <xsd:complexType>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                  <xsd:element name="row" type="row"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:simpleType name="uuid">
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:complexType name="xmlDocument">
+              <xsd:sequence>
+                <xsd:any/>
+              </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="row">
+              <xsd:sequence>
+                <xsd:element sql:field="SchemaName" name="SchemaName" type="xsd:string"/>
+                <xsd:element sql:field="SchemaGuid" name="SchemaGuid" type="uuid" minOccurs="0"/>
+                <xsd:element sql:field="Restrictions" name="Restrictions" minOccurs="0" maxOccurs="unbounded">
+                  <xsd:complexType>
+                    <xsd:sequence>
+                      <xsd:element sql:field="Name" name="Name" type="xsd:string" minOccurs="0"/>
+                      <xsd:element sql:field="Type" name="Type" type="xsd:string" minOccurs="0"/>
+                    </xsd:sequence>
+                  </xsd:complexType>
+                </xsd:element>
+                <xsd:element sql:field="Description" name="Description" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="RestrictionsMask" name="RestrictionsMask" type="xsd:unsignedLong" minOccurs="0"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:schema>
+          <row>
+            <SchemaName>DBSCHEMA_CATALOGS</SchemaName>
+            <SchemaGuid>C8B52211-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DBSCHEMA_TABLES</SchemaName>
+            <SchemaGuid>C8B52229-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>TABLE_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TABLE_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TABLE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TABLE_TYPE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TABLE_OLAP_TYPE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>31</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DBSCHEMA_COLUMNS</SchemaName>
+            <SchemaGuid>C8B52214-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>TABLE_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TABLE_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TABLE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>COLUMN_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>COLUMN_OLAP_TYPE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>31</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DBSCHEMA_PROVIDER_TYPES</SchemaName>
+            <SchemaGuid>C8B5222C-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>DATA_TYPE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>BEST_MATCH</Name>
+              <Type>xsd:boolean</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_CUBES</SchemaName>
+            <SchemaGuid>C8B522D8-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>BASE_CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>31</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_DIMENSIONS</SchemaName>
+            <SchemaGuid>C8B522D9-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_VISIBILITY</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <RestrictionsMask>127</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_HIERARCHIES</SchemaName>
+            <SchemaGuid>C8B522DA-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>HIERARCHY_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>HIERARCHY_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>HIERARCHY_ORIGIN</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>HIERARCHY_VISIBILITY</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <RestrictionsMask>511</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_LEVELS</SchemaName>
+            <SchemaGuid>C8B522DB-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>HIERARCHY_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LEVEL_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LEVEL_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LEVEL_ORIGIN</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LEVEL_VISIBILITY</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <RestrictionsMask>1023</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_MEASURES</SchemaName>
+            <SchemaGuid>C8B522DC-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASURE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASURE_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASUREGROUP_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASURE_VISIBILITY</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <RestrictionsMask>255</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_PROPERTIES</SchemaName>
+            <SchemaGuid>C8B522DD-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>HIERARCHY_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LEVEL_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEMBER_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PROPERTY_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PROPERTY_TYPE</Name>
+              <Type>xsd:short</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PROPERTY_CONTENT_TYPE</Name>
+              <Type>xsd:short</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PROPERTY_ORIGIN</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PROPERTY_VISIBILITY</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <RestrictionsMask>8191</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_MEMBERS</SchemaName>
+            <SchemaGuid>C8B522DE-5CF3-11CE-ADE5-00AA0044773D</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>HIERARCHY_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LEVEL_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LEVEL_NUMBER</Name>
+              <Type>xsd:unsignedInt</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEMBER_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEMBER_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEMBER_CAPTION</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEMBER_TYPE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TREE_OP</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCOPE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <RestrictionsMask>16383</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_FUNCTIONS</SchemaName>
+            <SchemaGuid>A07CCD07-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>LIBRARY_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>INTERFACE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>FUNCTION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>ORIGIN</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_ACTIONS</SchemaName>
+            <SchemaGuid>A07CCD08-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>ACTION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>ACTION_TYPE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>COORDINATE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>COORDINATE_TYPE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>INVOCATION</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <RestrictionsMask>511</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_SETS</SchemaName>
+            <SchemaGuid>A07CCD0B-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SET_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCOPE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>HIERARCHY_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SET_EVALUATION_CONTEXT</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <RestrictionsMask>255</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_INSTANCES</SchemaName>
+            <SchemaGuid>20518699-2474-4C15-9885-0E947EC7A7E3</SchemaGuid>
+            <Restrictions>
+              <Name>INSTANCE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_KPIS</SchemaName>
+            <SchemaGuid>2AE44109-ED3D-4842-B16F-B694D1CB0E3F</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>KPI_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_SOURCE</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCOPE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <RestrictionsMask>63</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_MEASUREGROUPS</SchemaName>
+            <SchemaGuid>E1625EBF-FA96-42FD-BEA6-DB90ADAFD96B</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASUREGROUP_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_MEASUREGROUP_DIMENSIONS</SchemaName>
+            <SchemaGuid>A07CCD33-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASUREGROUP_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_VISIBILITY</Name>
+              <Type>xsd:unsignedShort</Type>
+            </Restrictions>
+            <RestrictionsMask>63</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>MDSCHEMA_INPUT_DATASOURCES</SchemaName>
+            <SchemaGuid>A07CCD32-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SCHEMA_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DATASOURCE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DATASOURCE_TYPE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_SERVICES</SchemaName>
+            <SchemaGuid>3ADD8A95-D8B9-11D2-8D2A-00E029154FDE</SchemaGuid>
+            <Restrictions>
+              <Name>SERVICE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SERVICE_TYPE_ID</Name>
+              <Type>xsd:unsignedInt</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_SERVICE_PARAMETERS</SchemaName>
+            <SchemaGuid>3ADD8A75-D8B9-11D2-8D2A-00E029154FDE</SchemaGuid>
+            <Restrictions>
+              <Name>SERVICE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PARAMETER_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_FUNCTIONS</SchemaName>
+            <SchemaGuid>3ADD8A79-D8B9-11D2-8D2A-00E029154FDE</SchemaGuid>
+            <Restrictions>
+              <Name>SERVICE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>FUNCTION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_MODEL_CONTENT</SchemaName>
+            <SchemaGuid>3ADD8A76-D8B9-11D2-8D2A-00E029154FDE</SchemaGuid>
+            <Restrictions>
+              <Name>MODEL_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>ATTRIBUTE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>NODE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>NODE_UNIQUE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>NODE_TYPE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>NODE_GUID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>NODE_CAPTION</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TREE_OPERATION</Name>
+              <Type>xsd:unsignedInt</Type>
+            </Restrictions>
+            <RestrictionsMask>1023</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_MODEL_XML</SchemaName>
+            <SchemaGuid>4290B2D5-0E9C-4AA7-9369-98C95CFD9D13</SchemaGuid>
+            <Restrictions>
+              <Name>MODEL_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_TYPE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_MODEL_CONTENT_PMML</SchemaName>
+            <SchemaGuid>4290B2D5-0E9C-4AA7-9369-98C95CFD9D13</SchemaGuid>
+            <Restrictions>
+              <Name>MODEL_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_TYPE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_MODELS</SchemaName>
+            <SchemaGuid>3ADD8A77-D8B9-11D2-8D2A-00E029154FDE</SchemaGuid>
+            <Restrictions>
+              <Name>MODEL_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_TYPE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SERVICE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SERVICE_TYPE_ID</Name>
+              <Type>xsd:unsignedInt</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MINING_STRUCTURE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>127</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_COLUMNS</SchemaName>
+            <SchemaGuid>3ADD8A78-D8B9-11D2-8D2A-00E029154FDE</SchemaGuid>
+            <Restrictions>
+              <Name>MODEL_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MODEL_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>COLUMN_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_STRUCTURES</SchemaName>
+            <SchemaGuid>883269F3-0CAD-462F-B6F5-E88A72418C4B</SchemaGuid>
+            <Restrictions>
+              <Name>STRUCTURE_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>STRUCTURE_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>STRUCTURE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>7</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DMSCHEMA_MINING_STRUCTURE_COLUMNS</SchemaName>
+            <SchemaGuid>9952E836-BFBF-4D1F-8535-9B67DBD9DDFE</SchemaGuid>
+            <Restrictions>
+              <Name>STRUCTURE_CATALOG</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>STRUCTURE_SCHEMA</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>STRUCTURE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>COLUMN_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_DATASOURCES</SchemaName>
+            <SchemaGuid>06C03D41-F66D-49F3-B1B8-987F7AF4CF18</SchemaGuid>
+            <Restrictions>
+              <Name>DataSourceName</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>URL</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>ProviderName</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>ProviderType</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>AuthenticationMode</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>31</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_PROPERTIES</SchemaName>
+            <SchemaGuid>4B40ADFB-8B09-4758-97BB-636E8AE97BCF</SchemaGuid>
+            <Restrictions>
+              <Name>PropertyName</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_SCHEMA_ROWSETS</SchemaName>
+            <SchemaGuid>EEA0302B-7922-4992-8991-0E605D0E5593</SchemaGuid>
+            <Restrictions>
+              <Name>SchemaName</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_ENUMERATORS</SchemaName>
+            <SchemaGuid>55A9E78B-ACCB-45B4-95A6-94C5065617A7</SchemaGuid>
+            <Restrictions>
+              <Name>EnumName</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_KEYWORDS</SchemaName>
+            <SchemaGuid>1426C443-4CDD-4A40-8F45-572FAB9BBAA1</SchemaGuid>
+            <Restrictions>
+              <Name>Keyword</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_LITERALS</SchemaName>
+            <SchemaGuid>C3EF5ECB-0A07-4665-A140-B075722DBDC2</SchemaGuid>
+            <Restrictions>
+              <Name>LiteralName</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_XML_METADATA</SchemaName>
+            <SchemaGuid>3444B255-171E-4CB9-AD98-19E57888A75F</SchemaGuid>
+            <Restrictions>
+              <Name>DatabaseID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DimensionID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CubeID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MeasureGroupID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PartitionID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PerspectiveID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DimensionPermissionID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>RoleID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DatabasePermissionID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MiningModelID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MiningModelPermissionID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DataSourceID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MiningStructureID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>AggregationDesignID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TraceID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MiningStructurePermissionID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CubePermissionID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>AssemblyID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MdxScriptID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DataSourceViewID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DataSourcePermissionID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CalculatedColumns</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>ObjectExpansion</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>8388607</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_TRACES</SchemaName>
+            <SchemaGuid>A07CCD1A-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>TraceID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_TRACE_DEFINITION_PROVIDERINFO</SchemaName>
+            <SchemaGuid>A07CCD1B-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>Data</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_TRACE_COLUMNS</SchemaName>
+            <SchemaGuid>A07CCD18-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>Data</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_TRACE_EVENT_CATEGORIES</SchemaName>
+            <SchemaGuid>A07CCD19-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>Data</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_MEMORYUSAGE</SchemaName>
+            <SchemaGuid>A07CCD21-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>SPID</Name>
+              <Type>xsd:unsignedInt</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MemoryUsed</Name>
+              <Type>xsd:long</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>BaseObjectType</Name>
+              <Type>xsd:unsignedInt</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>Shrinkable</Name>
+              <Type>xsd:boolean</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_MEMORYGRANT</SchemaName>
+            <SchemaGuid>A07CCD23-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>SPID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_LOCKS</SchemaName>
+            <SchemaGuid>A07CCD24-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>SPID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LOCK_TRANSACTION_ID</Name>
+              <Type>uuid</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LOCK_OBJECT_ID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LOCK_STATUS</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LOCK_TYPE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LOCK_MIN_TOTAL_MS</Name>
+              <Type>xsd:long</Type>
+            </Restrictions>
+            <RestrictionsMask>63</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_CONNECTIONS</SchemaName>
+            <SchemaGuid>A07CCD25-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>CONNECTION_ID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_USER_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_IMPERSONATED_USER_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_HOST_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_ELAPSED_TIME_MS</Name>
+              <Type>xsd:long</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_LAST_COMMAND_ELAPSED_TIME_MS</Name>
+              <Type>xsd:long</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_IDLE_TIME_MS</Name>
+              <Type>xsd:long</Type>
+            </Restrictions>
+            <RestrictionsMask>127</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_SESSIONS</SchemaName>
+            <SchemaGuid>A07CCD26-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>SESSION_ID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_SPID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_CONNECTION_ID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_USER_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_CURRENT_DATABASE</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_ELAPSED_TIME_MS</Name>
+              <Type>xsd:unsignedLong</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_CPU_TIME_MS</Name>
+              <Type>xsd:unsignedLong</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_IDLE_TIME_MS</Name>
+              <Type>xsd:unsignedLong</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_STATUS</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <RestrictionsMask>511</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_JOBS</SchemaName>
+            <SchemaGuid>A07CCD27-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>SPID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>JOB_ID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>JOB_DESCRIPTION</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>JOB_THREADPOOL_ID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>JOB_MIN_TOTAL_TIME_MS</Name>
+              <Type>xsd:long</Type>
+            </Restrictions>
+            <RestrictionsMask>31</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_TRANSACTIONS</SchemaName>
+            <SchemaGuid>A07CCD28-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>TRANSACTION_ID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>TRANSACTION_SESSION_ID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_DB_CONNECTIONS</SchemaName>
+            <SchemaGuid>A07CCD2A-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>CONNECTION_ID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_IN_USE</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_SERVER_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_CATALOG_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CONNECTION_SPID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <RestrictionsMask>31</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_MASTER_KEY</SchemaName>
+            <SchemaGuid>A07CCD29-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>KEY</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_PERFORMANCE_COUNTERS</SchemaName>
+            <SchemaGuid>A07CCD2E-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>PERF_COUNTER_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_LOCATIONS</SchemaName>
+            <SchemaGuid>A07CCD92-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>LOCATION_BACKUP_FILE_PATHNAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>LOCATION_PASSWORD</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_PARTITION_DIMENSION_STAT</SchemaName>
+            <SchemaGuid>A07CCD8E-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>DATABASE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASURE_GROUP_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PARTITION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_PARTITION_STAT</SchemaName>
+            <SchemaGuid>A07CCD8F-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>DATABASE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASURE_GROUP_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PARTITION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_DIMENSION_STAT</SchemaName>
+            <SchemaGuid>A07CCD90-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>DATABASE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>DIMENSION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_COMMANDS</SchemaName>
+            <SchemaGuid>A07CCD34-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>SESSION_SPID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <RestrictionsMask>1</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_COMMAND_OBJECTS</SchemaName>
+            <SchemaGuid>A07CCD35-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>SESSION_SPID</Name>
+              <Type>xsd:int</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>SESSION_ID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>OBJECT_PARENT_PATH</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>OBJECT_ID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_OBJECT_ACTIVITY</SchemaName>
+            <SchemaGuid>A07CCD36-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>OBJECT_PARENT_PATH</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>OBJECT_ID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_OBJECT_MEMORY_USAGE</SchemaName>
+            <SchemaGuid>A07CCD37-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>OBJECT_PARENT_PATH</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>OBJECT_ID</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>3</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_STORAGE_TABLES</SchemaName>
+            <SchemaGuid>A07CCD43-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>DATABASE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASURE_GROUP_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PARTITION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_STORAGE_TABLE_COLUMNS</SchemaName>
+            <SchemaGuid>A07CCD44-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>DATABASE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASURE_GROUP_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PARTITION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+          <row>
+            <SchemaName>DISCOVER_STORAGE_TABLE_COLUMN_SEGMENTS</SchemaName>
+            <SchemaGuid>A07CCD45-8148-11D0-87BB-00C04FC33942</SchemaGuid>
+            <Restrictions>
+              <Name>DATABASE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>CUBE_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>MEASURE_GROUP_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <Restrictions>
+              <Name>PARTITION_NAME</Name>
+              <Type>xsd:string</Type>
+            </Restrictions>
+            <RestrictionsMask>15</RestrictionsMask>
+          </row>
+        </root>
+      </return>
+    </DiscoverResponse>
+  </soap:Body>
+</soap:Envelope>
+"""),
+        ("request", """<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:schemas-microsoft-com:xml-analysis">
+  <soap-env:Body>
+    <Discover>
+      <RequestType>DBSCHEMA_CATALOGS</RequestType>
+      <Restrictions>
+        <RestrictionList>
+          <CATALOG_NAME>Adventure Works DW 2008R2</CATALOG_NAME>
+        </RestrictionList>
+      </Restrictions>
+      <Properties xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>
+    </Discover>
+  </soap-env:Body>
+</soap-env:Envelope>
+"""),
+        ("response", """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <DiscoverResponse xmlns="urn:schemas-microsoft-com:xml-analysis" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100="http://schemas.microsoft.com/analysisservices/2008/engine/100" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200">
+      <return>
+        <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msxmla="http://schemas.microsoft.com/analysisservices/2003/xmla">
+          <xsd:schema xmlns:sql="urn:schemas-microsoft-com:xml-sql" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" elementFormDefault="qualified">
+            <xsd:element name="root">
+              <xsd:complexType>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                  <xsd:element name="row" type="row"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:simpleType name="uuid">
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:complexType name="xmlDocument">
+              <xsd:sequence>
+                <xsd:any/>
+              </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="row">
+              <xsd:sequence>
+                <xsd:element sql:field="CATALOG_NAME" name="CATALOG_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DESCRIPTION" name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="ROLES" name="ROLES" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DATE_MODIFIED" name="DATE_MODIFIED" type="xsd:dateTime" minOccurs="0"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:schema>
+          <row>
+            <CATALOG_NAME>Adventure Works DW 2008R2</CATALOG_NAME>
+            <DESCRIPTION>A Unified Dimensional Model that encompasses the Adventure Works data warehouse.</DESCRIPTION>
+            <ROLES>*,admin</ROLES>
+            <DATE_MODIFIED>2013-07-05T16:05:56.07</DATE_MODIFIED>
+          </row>
+        </root>
+      </return>
+    </DiscoverResponse>
+  </soap:Body>
+</soap:Envelope>
+"""),
+        ("request", """<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:schemas-microsoft-com:xml-analysis">
+  <soap-env:Body>
+    <Discover>
+      <RequestType>MDSCHEMA_CUBES</RequestType>
+      <Restrictions>
+        <RestrictionList>
+          <CUBE_NAME>Adventure Works</CUBE_NAME>
+        </RestrictionList>
+      </Restrictions>
+      <Properties>
+        <PropertyList>
+          <Catalog>Adventure Works DW 2008R2</Catalog>
+        </PropertyList>
+      </Properties>
+    </Discover>
+  </soap-env:Body>
+</soap-env:Envelope>
+"""),
+        ("response", """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <DiscoverResponse xmlns="urn:schemas-microsoft-com:xml-analysis" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100="http://schemas.microsoft.com/analysisservices/2008/engine/100" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200">
+      <return>
+        <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msxmla="http://schemas.microsoft.com/analysisservices/2003/xmla">
+          <xsd:schema xmlns:sql="urn:schemas-microsoft-com:xml-sql" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" elementFormDefault="qualified">
+            <xsd:element name="root">
+              <xsd:complexType>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                  <xsd:element name="row" type="row"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:simpleType name="uuid">
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:complexType name="xmlDocument">
+              <xsd:sequence>
+                <xsd:any/>
+              </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="row">
+              <xsd:sequence>
+                <xsd:element sql:field="CATALOG_NAME" name="CATALOG_NAME" type="xsd:string"/>
+                <xsd:element sql:field="SCHEMA_NAME" name="SCHEMA_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CUBE_NAME" name="CUBE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CUBE_TYPE" name="CUBE_TYPE" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CUBE_GUID" name="CUBE_GUID" type="uuid" minOccurs="0"/>
+                <xsd:element sql:field="CREATED_ON" name="CREATED_ON" type="xsd:dateTime" minOccurs="0"/>
+                <xsd:element sql:field="LAST_SCHEMA_UPDATE" name="LAST_SCHEMA_UPDATE" type="xsd:dateTime" minOccurs="0"/>
+                <xsd:element sql:field="SCHEMA_UPDATED_BY" name="SCHEMA_UPDATED_BY" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LAST_DATA_UPDATE" name="LAST_DATA_UPDATE" type="xsd:dateTime" minOccurs="0"/>
+                <xsd:element sql:field="DATA_UPDATED_BY" name="DATA_UPDATED_BY" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DESCRIPTION" name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="IS_DRILLTHROUGH_ENABLED" name="IS_DRILLTHROUGH_ENABLED" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="IS_LINKABLE" name="IS_LINKABLE" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="IS_WRITE_ENABLED" name="IS_WRITE_ENABLED" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="IS_SQL_ENABLED" name="IS_SQL_ENABLED" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="CUBE_CAPTION" name="CUBE_CAPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="BASE_CUBE_NAME" name="BASE_CUBE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CUBE_SOURCE" name="CUBE_SOURCE" type="xsd:unsignedShort" minOccurs="0"/>
+                <xsd:element sql:field="PREFERRED_QUERY_PATTERNS" name="PREFERRED_QUERY_PATTERNS" type="xsd:unsignedShort" minOccurs="0"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:schema>
+          <row>
+            <CATALOG_NAME>Adventure Works DW 2008R2</CATALOG_NAME>
+            <CUBE_NAME>Adventure Works</CUBE_NAME>
+            <CUBE_TYPE>CUBE</CUBE_TYPE>
+            <LAST_SCHEMA_UPDATE>2011-06-23T23:01:05.196667</LAST_SCHEMA_UPDATE>
+            <LAST_DATA_UPDATE>2011-06-24T11:57:43.523333</LAST_DATA_UPDATE>
+            <DESCRIPTION/>
+            <IS_DRILLTHROUGH_ENABLED>true</IS_DRILLTHROUGH_ENABLED>
+            <IS_LINKABLE>true</IS_LINKABLE>
+            <IS_WRITE_ENABLED>false</IS_WRITE_ENABLED>
+            <IS_SQL_ENABLED>true</IS_SQL_ENABLED>
+            <CUBE_CAPTION>Adventure Works</CUBE_CAPTION>
+            <CUBE_SOURCE>1</CUBE_SOURCE>
+            <PREFERRED_QUERY_PATTERNS>0</PREFERRED_QUERY_PATTERNS>
+          </row>
+        </root>
+      </return>
+    </DiscoverResponse>
+  </soap:Body>
+</soap:Envelope>
+"""),
+        ("request", """<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:schemas-microsoft-com:xml-analysis">
+  <soap-env:Body>
+    <Discover>
+      <RequestType>MDSCHEMA_HIERARCHIES</RequestType>
+      <Restrictions>
+        <RestrictionList>
+          <CUBE_NAME>Adventure Works</CUBE_NAME>
+          <HIERARCHY_UNIQUE_NAME>[Product].[Category]</HIERARCHY_UNIQUE_NAME>
+        </RestrictionList>
+      </Restrictions>
+      <Properties>
+        <PropertyList>
+          <Catalog>Adventure Works DW 2008R2</Catalog>
+        </PropertyList>
+      </Properties>
+    </Discover>
+  </soap-env:Body>
+</soap-env:Envelope>
+"""),
+        ("response", """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <DiscoverResponse xmlns="urn:schemas-microsoft-com:xml-analysis" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100="http://schemas.microsoft.com/analysisservices/2008/engine/100" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200">
+      <return>
+        <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msxmla="http://schemas.microsoft.com/analysisservices/2003/xmla">
+          <xsd:schema xmlns:sql="urn:schemas-microsoft-com:xml-sql" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" elementFormDefault="qualified">
+            <xsd:element name="root">
+              <xsd:complexType>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                  <xsd:element name="row" type="row"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:simpleType name="uuid">
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:complexType name="xmlDocument">
+              <xsd:sequence>
+                <xsd:any/>
+              </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="row">
+              <xsd:sequence>
+                <xsd:element sql:field="CATALOG_NAME" name="CATALOG_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="SCHEMA_NAME" name="SCHEMA_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CUBE_NAME" name="CUBE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DIMENSION_UNIQUE_NAME" name="DIMENSION_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_NAME" name="HIERARCHY_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_UNIQUE_NAME" name="HIERARCHY_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_GUID" name="HIERARCHY_GUID" type="uuid" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_CAPTION" name="HIERARCHY_CAPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DIMENSION_TYPE" name="DIMENSION_TYPE" type="xsd:short" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_CARDINALITY" name="HIERARCHY_CARDINALITY" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="DEFAULT_MEMBER" name="DEFAULT_MEMBER" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="ALL_MEMBER" name="ALL_MEMBER" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DESCRIPTION" name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="STRUCTURE" name="STRUCTURE" type="xsd:short" minOccurs="0"/>
+                <xsd:element sql:field="IS_VIRTUAL" name="IS_VIRTUAL" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="IS_READWRITE" name="IS_READWRITE" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="DIMENSION_UNIQUE_SETTINGS" name="DIMENSION_UNIQUE_SETTINGS" type="xsd:int" minOccurs="0"/>
+                <xsd:element sql:field="DIMENSION_MASTER_UNIQUE_NAME" name="DIMENSION_MASTER_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DIMENSION_IS_VISIBLE" name="DIMENSION_IS_VISIBLE" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_ORDINAL" name="HIERARCHY_ORDINAL" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="DIMENSION_IS_SHARED" name="DIMENSION_IS_SHARED" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_IS_VISIBLE" name="HIERARCHY_IS_VISIBLE" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_ORIGIN" name="HIERARCHY_ORIGIN" type="xsd:unsignedShort" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_DISPLAY_FOLDER" name="HIERARCHY_DISPLAY_FOLDER" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="INSTANCE_SELECTION" name="INSTANCE_SELECTION" type="xsd:unsignedShort" minOccurs="0"/>
+                <xsd:element sql:field="GROUPING_BEHAVIOR" name="GROUPING_BEHAVIOR" type="xsd:unsignedShort" minOccurs="0"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:schema>
+          <row>
+            <CATALOG_NAME>Adventure Works DW 2008R2</CATALOG_NAME>
+            <CUBE_NAME>Adventure Works</CUBE_NAME>
+            <DIMENSION_UNIQUE_NAME>[Product]</DIMENSION_UNIQUE_NAME>
+            <HIERARCHY_NAME>Category</HIERARCHY_NAME>
+            <HIERARCHY_UNIQUE_NAME>[Product].[Category]</HIERARCHY_UNIQUE_NAME>
+            <HIERARCHY_CAPTION>Category</HIERARCHY_CAPTION>
+            <DIMENSION_TYPE>8</DIMENSION_TYPE>
+            <HIERARCHY_CARDINALITY>6</HIERARCHY_CARDINALITY>
+            <DEFAULT_MEMBER>[Product].[Category].[All Products]</DEFAULT_MEMBER>
+            <ALL_MEMBER>[Product].[Category].[All Products]</ALL_MEMBER>
+            <DESCRIPTION/>
+            <STRUCTURE>0</STRUCTURE>
+            <IS_VIRTUAL>false</IS_VIRTUAL>
+            <IS_READWRITE>false</IS_READWRITE>
+            <DIMENSION_UNIQUE_SETTINGS>1</DIMENSION_UNIQUE_SETTINGS>
+            <DIMENSION_IS_VISIBLE>true</DIMENSION_IS_VISIBLE>
+            <HIERARCHY_ORDINAL>6</HIERARCHY_ORDINAL>
+            <DIMENSION_IS_SHARED>true</DIMENSION_IS_SHARED>
+            <HIERARCHY_IS_VISIBLE>true</HIERARCHY_IS_VISIBLE>
+            <HIERARCHY_ORIGIN>2</HIERARCHY_ORIGIN>
+            <HIERARCHY_DISPLAY_FOLDER/>
+            <INSTANCE_SELECTION>1</INSTANCE_SELECTION>
+            <GROUPING_BEHAVIOR>1</GROUPING_BEHAVIOR>
+          </row>
+        </root>
+      </return>
+    </DiscoverResponse>
+  </soap:Body>
+</soap:Envelope>
+"""),
+        ("request", """<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:schemas-microsoft-com:xml-analysis">
+  <soap-env:Body>
+    <Discover>
+      <RequestType>MDSCHEMA_LEVELS</RequestType>
+      <Restrictions>
+        <RestrictionList>
+          <CUBE_NAME>Adventure Works</CUBE_NAME>
+          <HIERARCHY_UNIQUE_NAME>[Product].[Category]</HIERARCHY_UNIQUE_NAME>
+          <LEVEL_UNIQUE_NAME>[Product].[Category].[Category]</LEVEL_UNIQUE_NAME>
+        </RestrictionList>
+      </Restrictions>
+      <Properties>
+        <PropertyList>
+          <Catalog>Adventure Works DW 2008R2</Catalog>
+        </PropertyList>
+      </Properties>
+    </Discover>
+  </soap-env:Body>
+</soap-env:Envelope>
+"""),
+        ("response", """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <DiscoverResponse xmlns="urn:schemas-microsoft-com:xml-analysis" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100="http://schemas.microsoft.com/analysisservices/2008/engine/100" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200">
+      <return>
+        <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msxmla="http://schemas.microsoft.com/analysisservices/2003/xmla">
+          <xsd:schema xmlns:sql="urn:schemas-microsoft-com:xml-sql" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" elementFormDefault="qualified">
+            <xsd:element name="root">
+              <xsd:complexType>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                  <xsd:element name="row" type="row"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:simpleType name="uuid">
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:complexType name="xmlDocument">
+              <xsd:sequence>
+                <xsd:any/>
+              </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="row">
+              <xsd:sequence>
+                <xsd:element sql:field="CATALOG_NAME" name="CATALOG_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="SCHEMA_NAME" name="SCHEMA_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CUBE_NAME" name="CUBE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DIMENSION_UNIQUE_NAME" name="DIMENSION_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_UNIQUE_NAME" name="HIERARCHY_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_NAME" name="LEVEL_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_UNIQUE_NAME" name="LEVEL_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_GUID" name="LEVEL_GUID" type="uuid" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_CAPTION" name="LEVEL_CAPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_NUMBER" name="LEVEL_NUMBER" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_CARDINALITY" name="LEVEL_CARDINALITY" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_TYPE" name="LEVEL_TYPE" type="xsd:int" minOccurs="0"/>
+                <xsd:element sql:field="DESCRIPTION" name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CUSTOM_ROLLUP_SETTINGS" name="CUSTOM_ROLLUP_SETTINGS" type="xsd:int" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_UNIQUE_SETTINGS" name="LEVEL_UNIQUE_SETTINGS" type="xsd:int" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_IS_VISIBLE" name="LEVEL_IS_VISIBLE" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_ORDERING_PROPERTY" name="LEVEL_ORDERING_PROPERTY" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_DBTYPE" name="LEVEL_DBTYPE" type="xsd:int" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_MASTER_UNIQUE_NAME" name="LEVEL_MASTER_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_NAME_SQL_COLUMN_NAME" name="LEVEL_NAME_SQL_COLUMN_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_KEY_SQL_COLUMN_NAME" name="LEVEL_KEY_SQL_COLUMN_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME" name="LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_ATTRIBUTE_HIERARCHY_NAME" name="LEVEL_ATTRIBUTE_HIERARCHY_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_KEY_CARDINALITY" name="LEVEL_KEY_CARDINALITY" type="xsd:unsignedShort" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_ORIGIN" name="LEVEL_ORIGIN" type="xsd:unsignedShort" minOccurs="0"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:schema>
+          <row>
+            <CATALOG_NAME>Adventure Works DW 2008R2</CATALOG_NAME>
+            <CUBE_NAME>Adventure Works</CUBE_NAME>
+            <DIMENSION_UNIQUE_NAME>[Product]</DIMENSION_UNIQUE_NAME>
+            <HIERARCHY_UNIQUE_NAME>[Product].[Category]</HIERARCHY_UNIQUE_NAME>
+            <LEVEL_NAME>Category</LEVEL_NAME>
+            <LEVEL_UNIQUE_NAME>[Product].[Category].[Category]</LEVEL_UNIQUE_NAME>
+            <LEVEL_CAPTION>Category</LEVEL_CAPTION>
+            <LEVEL_NUMBER>1</LEVEL_NUMBER>
+            <LEVEL_CARDINALITY>5</LEVEL_CARDINALITY>
+            <LEVEL_TYPE>0</LEVEL_TYPE>
+            <DESCRIPTION/>
+            <CUSTOM_ROLLUP_SETTINGS>0</CUSTOM_ROLLUP_SETTINGS>
+            <LEVEL_UNIQUE_SETTINGS>0</LEVEL_UNIQUE_SETTINGS>
+            <LEVEL_IS_VISIBLE>true</LEVEL_IS_VISIBLE>
+            <LEVEL_ORDERING_PROPERTY>Category</LEVEL_ORDERING_PROPERTY>
+            <LEVEL_DBTYPE>3</LEVEL_DBTYPE>
+            <LEVEL_NAME_SQL_COLUMN_NAME>NAME( [$Product].[Category] )</LEVEL_NAME_SQL_COLUMN_NAME>
+            <LEVEL_KEY_SQL_COLUMN_NAME>KEY( [$Product].[Category] )</LEVEL_KEY_SQL_COLUMN_NAME>
+            <LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME>UNIQUENAME( [$Product].[Category] )</LEVEL_UNIQUE_NAME_SQL_COLUMN_NAME>
+            <LEVEL_ATTRIBUTE_HIERARCHY_NAME>Category</LEVEL_ATTRIBUTE_HIERARCHY_NAME>
+            <LEVEL_KEY_CARDINALITY>1</LEVEL_KEY_CARDINALITY>
+            <LEVEL_ORIGIN>2</LEVEL_ORIGIN>
+          </row>
+        </root>
+      </return>
+    </DiscoverResponse>
+  </soap:Body>
+</soap:Envelope>
+"""),
+        ("request", """<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:schemas-microsoft-com:xml-analysis">
+  <soap-env:Body>
+    <Discover>
+      <RequestType>MDSCHEMA_MEMBERS</RequestType>
+      <Restrictions>
+        <RestrictionList>
+          <CUBE_NAME>Adventure Works</CUBE_NAME>
+          <HIERARCHY_UNIQUE_NAME>[Product].[Category]</HIERARCHY_UNIQUE_NAME>
+          <LEVEL_UNIQUE_NAME>[Product].[Category].[Category]</LEVEL_UNIQUE_NAME>
+          <MEMBER_UNIQUE_NAME>[Product].[Category].&amp;[3]</MEMBER_UNIQUE_NAME>
+        </RestrictionList>
+      </Restrictions>
+      <Properties>
+        <PropertyList>
+          <Catalog>Adventure Works DW 2008R2</Catalog>
+        </PropertyList>
+      </Properties>
+    </Discover>
+  </soap-env:Body>
+</soap-env:Envelope>
+"""),
+        ("response", """<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <DiscoverResponse xmlns="urn:schemas-microsoft-com:xml-analysis" xmlns:ddl2="http://schemas.microsoft.com/analysisservices/2003/engine/2" xmlns:ddl2_2="http://schemas.microsoft.com/analysisservices/2003/engine/2/2" xmlns:ddl100="http://schemas.microsoft.com/analysisservices/2008/engine/100" xmlns:ddl100_100="http://schemas.microsoft.com/analysisservices/2008/engine/100/100" xmlns:ddl200="http://schemas.microsoft.com/analysisservices/2010/engine/200" xmlns:ddl200_200="http://schemas.microsoft.com/analysisservices/2010/engine/200/200">
+      <return>
+        <root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msxmla="http://schemas.microsoft.com/analysisservices/2003/xmla">
+          <xsd:schema xmlns:sql="urn:schemas-microsoft-com:xml-sql" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" elementFormDefault="qualified">
+            <xsd:element name="root">
+              <xsd:complexType>
+                <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                  <xsd:element name="row" type="row"/>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:simpleType name="uuid">
+              <xsd:restriction base="xsd:string">
+                <xsd:pattern value="[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+            <xsd:complexType name="xmlDocument">
+              <xsd:sequence>
+                <xsd:any/>
+              </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="row">
+              <xsd:sequence>
+                <xsd:element sql:field="CATALOG_NAME" name="CATALOG_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="SCHEMA_NAME" name="SCHEMA_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CUBE_NAME" name="CUBE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="DIMENSION_UNIQUE_NAME" name="DIMENSION_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="HIERARCHY_UNIQUE_NAME" name="HIERARCHY_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_UNIQUE_NAME" name="LEVEL_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="LEVEL_NUMBER" name="LEVEL_NUMBER" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="MEMBER_ORDINAL" name="MEMBER_ORDINAL" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="MEMBER_NAME" name="MEMBER_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="MEMBER_UNIQUE_NAME" name="MEMBER_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="MEMBER_TYPE" name="MEMBER_TYPE" type="xsd:int" minOccurs="0"/>
+                <xsd:element sql:field="MEMBER_GUID" name="MEMBER_GUID" type="uuid" minOccurs="0"/>
+                <xsd:element sql:field="MEMBER_CAPTION" name="MEMBER_CAPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="CHILDREN_CARDINALITY" name="CHILDREN_CARDINALITY" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="PARENT_LEVEL" name="PARENT_LEVEL" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="PARENT_UNIQUE_NAME" name="PARENT_UNIQUE_NAME" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="PARENT_COUNT" name="PARENT_COUNT" type="xsd:unsignedInt" minOccurs="0"/>
+                <xsd:element sql:field="DESCRIPTION" name="DESCRIPTION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="EXPRESSION" name="EXPRESSION" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="MEMBER_KEY" name="MEMBER_KEY" type="xsd:string" minOccurs="0"/>
+                <xsd:element sql:field="IS_PLACEHOLDERMEMBER" name="IS_PLACEHOLDERMEMBER" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="IS_DATAMEMBER" name="IS_DATAMEMBER" type="xsd:boolean" minOccurs="0"/>
+                <xsd:element sql:field="SCOPE" name="SCOPE" type="xsd:int" minOccurs="0"/>
+              </xsd:sequence>
+            </xsd:complexType>
+          </xsd:schema>
+          <row>
+            <CATALOG_NAME>Adventure Works DW 2008R2</CATALOG_NAME>
+            <CUBE_NAME>Adventure Works</CUBE_NAME>
+            <DIMENSION_UNIQUE_NAME>[Product]</DIMENSION_UNIQUE_NAME>
+            <HIERARCHY_UNIQUE_NAME>[Product].[Category]</HIERARCHY_UNIQUE_NAME>
+            <LEVEL_UNIQUE_NAME>[Product].[Category].[Category]</LEVEL_UNIQUE_NAME>
+            <LEVEL_NUMBER>1</LEVEL_NUMBER>
+            <MEMBER_ORDINAL>3</MEMBER_ORDINAL>
+            <MEMBER_NAME>Clothing</MEMBER_NAME>
+            <MEMBER_UNIQUE_NAME>[Product].[Category].&amp;[3]</MEMBER_UNIQUE_NAME>
+            <MEMBER_TYPE>1</MEMBER_TYPE>
+            <MEMBER_CAPTION>Clothing</MEMBER_CAPTION>
+            <CHILDREN_CARDINALITY>0</CHILDREN_CARDINALITY>
+            <PARENT_LEVEL>0</PARENT_LEVEL>
+            <PARENT_UNIQUE_NAME>[Product].[Category].[All Products]</PARENT_UNIQUE_NAME>
+            <PARENT_COUNT>1</PARENT_COUNT>
+            <MEMBER_KEY>3</MEMBER_KEY>
+            <IS_PLACEHOLDERMEMBER>false</IS_PLACEHOLDERMEMBER>
+            <IS_DATAMEMBER>false</IS_DATAMEMBER>
+          </row>
+        </root>
+      </return>
+    </DiscoverResponse>
+  </soap:Body>
+</soap:Envelope>
+"""),
+    ],
     "testGetDBSchemaCatalogs":[
         ("request", """<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/" xmlns="urn:schemas-microsoft-com:xml-analysis">
   <soap-env:Body>
@@ -1513,7 +3422,7 @@ conversation={
           <row>
             <CATALOG_NAME>bi2</CATALOG_NAME>
             <DESCRIPTION/>
-            <DATE_MODIFIED>2019-04-09T05:21:50.106667</DATE_MODIFIED>
+            <DATE_MODIFIED>2019-04-10T05:22:01.156667</DATE_MODIFIED>
           </row>
           <row>
             <CATALOG_NAME>DWH</CATALOG_NAME>
@@ -1523,12 +3432,12 @@ conversation={
           <row>
             <CATALOG_NAME>hr2</CATALOG_NAME>
             <DESCRIPTION/>
-            <DATE_MODIFIED>2019-04-09T06:47:48.223333</DATE_MODIFIED>
+            <DATE_MODIFIED>2019-04-10T06:45:15.883333</DATE_MODIFIED>
           </row>
           <row>
             <CATALOG_NAME>hr4</CATALOG_NAME>
             <DESCRIPTION/>
-            <DATE_MODIFIED>2019-04-09T06:47:05.973333</DATE_MODIFIED>
+            <DATE_MODIFIED>2019-04-10T06:44:36.793333</DATE_MODIFIED>
           </row>
           <row>
             <CATALOG_NAME>MDX Step-by-Step</CATALOG_NAME>
@@ -1538,7 +3447,7 @@ conversation={
           <row>
             <CATALOG_NAME>onstat</CATALOG_NAME>
             <DESCRIPTION/>
-            <DATE_MODIFIED>2019-04-09T05:22:07.993333</DATE_MODIFIED>
+            <DATE_MODIFIED>2019-04-10T05:22:19.623333</DATE_MODIFIED>
           </row>
         </root>
       </return>
@@ -66190,7 +68099,7 @@ conversation={
             <PropertyType>string</PropertyType>
             <PropertyAccessType>Read</PropertyAccessType>
             <IsRequired>false</IsRequired>
-            <Value>KIEBACKPETER\kraemer</Value>
+            <Value>someone</Value>
           </row>
           <row>
             <PropertyName>StateSupport</PropertyName>
