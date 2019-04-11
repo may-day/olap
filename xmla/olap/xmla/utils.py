@@ -146,10 +146,13 @@ def fromETree(e, ns):
     if p.text and p.text.strip() == "":
         p.text=None
     if valtype in e.attrib:
-        if e.attrib[valtype] in ["xsd:int", "xsd:unsignedInt", "xsd:long"]:
+        if e.attrib[valtype] in ["xsd:int", "xsd:unsignedInt"]:
           p.text = int(p.text)  
           delattr(p, "_"+valtype)
-        if e.attrib[valtype] in ["xsd:double", "xsd:float"]:
+        elif e.attrib[valtype] in ["xsd:long"]:
+          p.text = int(p.text)  if six.PY3 else long(p.text)
+          delattr(p, "_"+valtype)
+        elif e.attrib[valtype] in ["xsd:double", "xsd:float"]:
           p.text = float(p.text)  
           delattr(p, "_"+valtype)
     for c in e.findall(nst):
