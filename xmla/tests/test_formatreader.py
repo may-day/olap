@@ -1,15 +1,18 @@
 import unittest
 from olap.xmla.formatreader import TupleFormatReader
 import olap.xmla.utils as utils
-import mdx1
-import mdx_noaxistuple
-import mdx_columns_but_no_rows
-import mdx_rows_but_no_columns_no_cells
+import olap.xmla.xmla as xmla
+import requests_mock
+from . import mdx1
+from . import mdx_noaxistuple
+from . import mdx_columns_but_no_rows
+from . import mdx_rows_but_no_columns_no_cells
 
 """
 import olap.xmla.xmla as xmla
 p = xmla.XMLAProvider()
-c=p.connect(location="http://localhost:8080/mondrian/xmla")
+c=p.connect(location="http://localhost:8080/xmondrian/xmla")
+cmd="...."
 res=c.Execute(cmd, Catalog="FoodMart")
 """
 class TestFormatReader(unittest.TestCase):
@@ -17,20 +20,29 @@ class TestFormatReader(unittest.TestCase):
     longMessage=True
     maxDiff = 2000
     def setUp(self):
+        location = "http://somewhere/over/the/rainbow"
+        p = xmla.XMLAProvider()
+        c = p.connect(location=location)
+        with requests_mock.mock() as m:
+            m.post(location, text=mdx1.xml_response)
+            self.fr = c.Execute(mdx1.__doc__)
         self.res = utils.PropDict(mdx1.result)
-        self.fr=TupleFormatReader(self.res)
+        
         self.cm = self.fr.cellmap
-        self.ordinal1 = filter(lambda cell: cell._CellOrdinal == "1", self.res.CellData.Cell)[0]
+        self.ordinal1 = list(filter(lambda cell: cell._CellOrdinal == "1", self.res.CellData.Cell))[0]
         self.ax_tupel0 = [tup.Member for tup in self.res.Axes.Axis[0].Tuples.Tuple]
 
-        self.res_noaxistuple = utils.PropDict(mdx_noaxistuple.result)
-        self.fr_noaxistuple=TupleFormatReader(self.res_noaxistuple)
+        with requests_mock.mock() as m:
+            m.post(location, text=mdx_noaxistuple.xml_response)
+            self.fr_noaxistuple = c.Execute(mdx_noaxistuple.__doc__)
 
-        res=utils.PropDict(mdx_columns_but_no_rows.result)
-        self.fr_cbnr=TupleFormatReader(res)
+        with requests_mock.mock() as m:
+            m.post(location, text=mdx_columns_but_no_rows.xml_response)
+            self.fr_cbnr = c.Execute(mdx_columns_but_no_rows.__doc__)
 
-        res=utils.PropDict(mdx_rows_but_no_columns_no_cells.result)
-        self.fr_rbncnc=TupleFormatReader(res)
+        with requests_mock.mock() as m:
+            m.post(location, text=mdx_rows_but_no_columns_no_cells.xml_response)
+            self.fr_rbncnc = c.Execute(mdx_rows_but_no_columns_no_cells.__doc__)
 
     def testOrdinalsToCells(self):
         self.assertIsInstance(self.cm, dict)
@@ -43,6 +55,7 @@ class TestFormatReader(unittest.TestCase):
         self.assertEqual({}, self.fr.getCellByOrdinal(-1))
 
     def testGetAxisTuple(self):
+        
         self.assertEqual(self.ax_tupel0, self.fr.getAxisTuple(0))
         self.assertEqual(self.ax_tupel0, self.fr.getAxisTuple("Axis0"))
         self.assertRaises(IndexError, self.fr.getAxisTuple, *[7])
@@ -53,11 +66,10 @@ class TestFormatReader(unittest.TestCase):
 
         # some actually return empty tuples,
         # e.g. "select {} on columns, [Gender].[Gender].ALLMEMBERS on rows from [Sales]"
+        # doesn't seem to work on mondrian anymore (throws NPE), still works on SSAS
         # which would have no tuples on Axis1
-        # we mock that here
 
-        del self.res.Axes.Axis[0].Tuples.Tuple
-        self.assertEqual([], self.fr.getAxisTuple(0))
+        self.assertEqual([], self.fr_rbncnc.getAxisTuple(0))
 
     def testGetSlice_without_SlicerAxis(self):
         c = {}
@@ -70,8 +82,8 @@ class TestFormatReader(unittest.TestCase):
             [c[4], c[5], c[6], c[7]]
             ]
 
-        self.assertEquals(cube, fr.getSlice(properties="Value"), "whole")
-        self.assertEquals(cube, fr.getSlice(properties="Value", SlicerAxis=1),
+        self.assertEqual(cube, fr.getSlice(properties="Value"), "whole")
+        self.assertEqual(cube, fr.getSlice(properties="Value", SlicerAxis=1),
                           "whole, ignore SlicerAxis kw")
 
         cube =[
@@ -79,17 +91,17 @@ class TestFormatReader(unittest.TestCase):
             [c[4], c[6], c[7]]
             ]
 
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis0=[0,2,3]),
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis0=[0,2,3]),
                           "come tuples from axis0, others fully")
 
         cube =[
             [c[0], c[2], c[3]]
             ]
 
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis0=[0,2,3], Axis1=0),
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis0=[0,2,3], Axis1=0),
                           "some tuples from all axes")
 
-        self.assertEquals([], fr.getSlice(properties="Value", Axis0=[]), "dropping axis")
+        self.assertEqual([], fr.getSlice(properties="Value", Axis0=[]), "dropping axis")
 
         # requesting non-existing tuples from an axis
         self.assertRaises(ValueError, fr.getSlice, **{"Axis0":[7]})
@@ -99,7 +111,7 @@ class TestFormatReader(unittest.TestCase):
             [cm[0]] # cm instead of c
             ]
 
-        self.assertEquals(cube, fr.getSlice(Axis0=0, Axis1=0), "whole cell")
+        self.assertEqual(cube, fr.getSlice(Axis0=0, Axis1=0), "whole cell")
 
         # getting more than one property cell
         cube =[[
@@ -107,7 +119,7 @@ class TestFormatReader(unittest.TestCase):
                  "FmtValue":cm[0]["FmtValue"]
                  }
                 ]]
-        self.assertEquals(cube, fr.getSlice(properties=["Value", "FmtValue"], 
+        self.assertEqual(cube, fr.getSlice(properties=["Value", "FmtValue"], 
                                             Axis0=0, Axis1=0), "few properties")
 
         # changing order
@@ -115,7 +127,7 @@ class TestFormatReader(unittest.TestCase):
             [c[3], c[2], c[1]]
             ]
 
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis0=[3,2,1], Axis1=0), 
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis0=[3,2,1], Axis1=0), 
                           "changing order")
 
     def testGetSlice_no_axes_1_cell(self):
@@ -127,11 +139,11 @@ class TestFormatReader(unittest.TestCase):
 
         cube =c[0]
 
-        self.assertEquals(cube, fr.getSlice(properties="Value"), "whole")
-        self.assertEquals(cube, fr.getSlice(properties="Value", SlicerAxis=1), "whole1")
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis0=0), "1st col")
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis1=0), "1st row")
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis0=[]), "no cols")
+        self.assertEqual(cube, fr.getSlice(properties="Value"), "whole")
+        self.assertEqual(cube, fr.getSlice(properties="Value", SlicerAxis=1), "whole1")
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis0=0), "1st col")
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis1=0), "1st row")
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis0=[]), "no cols")
 
     def testGetSlice_columns_but_no_rows(self):
         """ case: select [Measures].AllMembers on columns from [Sales] """
@@ -142,14 +154,14 @@ class TestFormatReader(unittest.TestCase):
 
         cube =[c[0], c[1]]
 
-        self.assertEquals(cube, fr.getSlice(properties="Value"), "whole")
-        self.assertEquals(cube, fr.getSlice(properties="Value", SlicerAxis=1), "whole1")
+        self.assertEqual(cube, fr.getSlice(properties="Value"), "whole")
+        self.assertEqual(cube, fr.getSlice(properties="Value", SlicerAxis=1), "whole1")
         cube =[c[0]]
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis0=0), "1st col")
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis0=0), "1st col")
         cube =[c[0], c[1]]
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis1=0), "1st row")
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis1=0), "1st row")
         cube =[]
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis0=[]), "no cols")
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis0=[]), "no cols")
         self.assertRaises(ValueError, fr.getSlice, **{"Axis0":[7]})
 
     def testGetSlice_columns_but_no_rows_and_no_cells(self):
@@ -164,8 +176,8 @@ class TestFormatReader(unittest.TestCase):
 
         cube =[]
 
-        self.assertEquals(cube, fr.getSlice(properties="Value"), "whole")
-        self.assertEquals(cube, fr.getSlice(properties="Value", SlicerAxis=1), "whole1")
-        self.assertEquals(cube, fr.getSlice(properties="Value", Axis0=[]), "no cols")
+        self.assertEqual(cube, fr.getSlice(properties="Value"), "whole")
+        self.assertEqual(cube, fr.getSlice(properties="Value", SlicerAxis=1), "whole1")
+        self.assertEqual(cube, fr.getSlice(properties="Value", Axis0=[]), "no cols")
 
 

@@ -1,7 +1,8 @@
 import zope.interface
-from connection import XMLAConnection
-import olap.xmla.interfaces as oxi
+from .interfaces import IXMLASource, schemaElementTypes, SchemaElementNotFound
+from .connection import XMLAConnection
 import olap.interfaces as ooi
+from .utils import u
 
 from pkg_resources import ResourceManager
 rm = ResourceManager()
@@ -17,18 +18,16 @@ class TREE_OP(object):
     DESCENDANTS = 0x10
     ANCESTORS = 0x20
     
-
+@zope.interface.implementer(ooi.IProvider)
 class XMLAProvider(object):
     
-    zope.interface.implements(ooi.IProvider)
     
-    def connect(self, url=defaultwsdl, location=None, username=None, 
-                password=None, spn=None, sslverify=True):
-        return XMLASource(url, location, username, password, spn, sslverify)
+    def connect(self, url=defaultwsdl, location=None, sslverify=True, **kwargs):
+        return XMLASource(url, location, sslverify, **kwargs)
 
 
+@zope.interface.implementer(ooi.IOLAPSchemaElement)
 class XMLAClass(object):
-    zope.interface.implements(ooi.IOLAPSchemaElement)
 
     def __init__(self, unique_name_property, properties, schemaElementName, conn):
         self._properties = properties
@@ -38,20 +37,26 @@ class XMLAClass(object):
 
     def __str__(self):
         return self.__class__.__name__ + ":" + str(self.getElementProperties())
+    def __repr__(self):
+        un = self._properties.get(self.unique_name_property, "???")
+        return self.__class__.__name__ + "<" + un + ">"
 
     def getElementProperties(self):
         return self._properties
 
-    def __getattribute__(self, name):
-        if name == "_properties":
-            return object.__getattribute__(self, name)
-        elif name in self._properties:
+    def __getattr__(self, name):
+        #print("__getattr__", name)
+        #if name == "_properties":
+        #    return object.__getattribute__(self, name)
+        #print(self._properties)
+        if name in self._properties:
             return self._properties[name]
-        return object.__getattribute__(self, name)
+        #print(name, "not in self._properties" )
+        return object.__getattr__(self, name)
 
     def getUniqueName(self):
         if hasattr(self, self.unique_name_property):
-            return u""+getattr(self, self.unique_name_property)
+            return u("")+getattr(self, self.unique_name_property)
         return None
 
     def objectfactory(self, clazzname, unp, schemaElementName, props):
@@ -62,7 +67,7 @@ class XMLAClass(object):
                           aslist=False, more_restrictions=None, 
                           more_properties=None,
                           generate_instance=True):
-        types = oxi.schemaElementTypes
+        types = schemaElementTypes
         et = types[schemaElementName]
         
         r=restrictions = {}
@@ -70,13 +75,19 @@ class XMLAClass(object):
             oet=types[otherRestrict]
             rn=oet["RESTRICTION_NAME"]
             try:
+                #print("get current value to restrict on {} by using value of attribute {}".format(otherRestrict, rn))
                 r[rn] = getattr(self, rn)
+                #print("will restrict on {}={}".format(rn, r[rn]))
             except AttributeError:
+                #print("failed getting value of attribute {}".format(rn))
                 if more_restrictions and rn in more_restrictions:
                     r[rn] = more_restrictions[rn]
                 else:
                     raise
-
+            except:
+                #print("failed getting value of attribute {}".format(rn))
+                #print(dir(self))
+                raise
         if unique_name:
             r[et["RESTRICTION_NAME"]] = unique_name
 
@@ -101,7 +112,7 @@ class XMLAClass(object):
         props = func(r, properties)
 
         if props is None or len(props) == 0:
-            raise oxi.SchemaElementNotFound(r, properties)
+            raise SchemaElementNotFound(r, properties)
 
         if generate_instance:
             result = self.objectfactory(et["ELEMENT_CLASS"], 
@@ -118,23 +129,18 @@ class XMLAClass(object):
     def query(self, mdx_stmt):
         return self._conn.Execute(mdx_stmt, Catalog=self.CATALOG_NAME)
 
+@zope.interface.implementer(IXMLASource, ooi.IOLAPSource, ooi.IConnection)
 class XMLASource(XMLAConnection, XMLAClass):
-    zope.interface.implements(oxi.IXMLASource, ooi.IOLAPSource, ooi.IConnection)
-
 
     def __init__(self, urlwsdl=defaultwsdl, 
-                 location=None, username=None, password=None, spn=None,
-                 sslverify=True):
+                 location=None, 
+                 sslverify=True, **kwargs):
         self.urlwsdl=urlwsdl
         self.location=location
-        self.username=username
-        self.password=password
-        self.spn=spn
         self.sslverify=sslverify
             
         XMLAClass.__init__(self, None, {}, None, self)
-        XMLAConnection.__init__(self, urlwsdl, location, username, 
-                                           password, spn, sslverify)
+        XMLAConnection.__init__(self, urlwsdl, location, sslverify, **kwargs)
 
     # IConnection interface
     def getOLAPSource(self):
@@ -149,8 +155,8 @@ class XMLASource(XMLAConnection, XMLAClass):
         return self.getSchemaElements("CATALOG", unique_name,
                                       aslist=unique_name==None)
 
+@zope.interface.implementer(ooi.ICatalog)
 class XMLACatalog(XMLAClass):
-    zope.interface.implements(ooi.ICatalog)
     
     def getCubes(self):
         return self.getCube(None)
@@ -183,13 +189,14 @@ class XMLACatalog(XMLAClass):
     def getMeasure(self, unique_name):
         return self.getSchemaElements("CATALOG_MEASURE", unique_name,
                                       aslist=unique_name==None)
+@zope.interface.implementer(ooi.ICube)
 class XMLACube(XMLAClass):
-    zope.interface.implements(ooi.ICube)
 
     def getHierarchies(self):
         return self.getHierarchy(None)
 
     def getHierarchy(self, unique_name):
+        #print("getting hier", unique_name)
         return self.getSchemaElements("HIERARCHY", unique_name, 
                                       aslist=unique_name==None)
 
@@ -215,8 +222,8 @@ class XMLACube(XMLAClass):
                                       aslist=unique_name==None)
 
 
+@zope.interface.implementer(ooi.IHierarchy)
 class XMLAHierarchy(XMLAClass):
-    zope.interface.implements(ooi.IHierarchy)
 
     def getLevels(self):
         return self.getLevel(None)
@@ -232,8 +239,8 @@ class XMLAHierarchy(XMLAClass):
                                       aslist=unique_name==None)
 
 
+@zope.interface.implementer(ooi.ILevel)
 class XMLALevel(XMLAClass):
-    zope.interface.implements(ooi.ILevel)
 
     def getMembers(self):
         return self.getMember(None)
@@ -249,8 +256,8 @@ class XMLALevel(XMLAClass):
         return self.getSchemaElements("PROPERTY", unique_name,
                                       aslist=unique_name==None)
 
+@zope.interface.implementer(ooi.IMember)
 class XMLAMember(XMLAClass):
-    zope.interface.implements(ooi.IMember)
 
     def getParent(self):
         """Return this members parent member or None if this is the root
@@ -298,17 +305,17 @@ class XMLAMember(XMLAClass):
                                       aslist=True, 
                                       more_restrictions={"TREE_OP":TREE_OP.ANCESTORS})
 
-class XMLAMeasure(XMLAClass):
-    zope.interface.implements(ooi.IMeasure)
+@zope.interface.implementer(ooi.IMeasure)
+class XMLAMeasure(XMLAClass): pass
 
-class XMLAProperty(XMLAClass):
-    zope.interface.implements(ooi.IProperty)
+@zope.interface.implementer(ooi.IProperty)
+class XMLAProperty(XMLAClass): pass
 
-class XMLASet(XMLAClass):
-    zope.interface.implements(ooi.ISet)
+@zope.interface.implementer(ooi.ISet)
+class XMLASet(XMLAClass): pass
 
+@zope.interface.implementer(ooi.IDimension)
 class XMLADimension(XMLAClass):
-    zope.interface.implements(ooi.IDimension)
 
     def getHierarchies(self):
         return self.getHierarchy(None)

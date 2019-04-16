@@ -1,4 +1,6 @@
+# -*- coding: utf-8
 """
+-- newer versions of mondrian now return a sliceraxis, i removed axisinformation in the result by hand here
 select from [Sales]
 
 """
@@ -8,173 +10,210 @@ result={'Axes': '',
                        'FormatString': 'Standard',
                        'Value': 266773.0,
                        '_CellOrdinal': '0'}},
- 'OlapInfo': {'AxesInfo': '',
+ 'OlapInfo': {'AxesInfo': {'AxisInfo': {'_name': 'SlicerAxis'}},
               'CellInfo': {'FmtValue': {'_name': 'FORMATTED_VALUE'},
                            'FormatString': {'_name': 'FORMAT_STRING'},
                            'Value': {'_name': 'VALUE'}},
-              'CubeInfo': {'Cube': {'CubeName': 'Sales'}}},
- 'schema': {'_elementFormDefault': 'qualified',
-            '_targetNamespace': 'urn:schemas-microsoft-com:xml-analysis:mddataset',
-            'complexType': [{'_name': 'MemberType',
-                             'attribute': {'_name': 'Hierarchy',
-                                           '_type': 'xsd:string'},
-                             'sequence': {'element': [{'_name': 'UName',
-                                                       '_type': 'xsd:string'},
-                                                      {'_name': 'Caption',
-                                                       '_type': 'xsd:string'},
-                                                      {'_name': 'LName',
-                                                       '_type': 'xsd:string'},
-                                                      {'_name': 'LNum',
-                                                       '_type': 'xsd:unsignedInt'},
-                                                      {'_name': 'DisplayInfo',
-                                                       '_type': 'xsd:unsignedInt'}],
-                                          'sequence': {'_maxOccurs': 'unbounded',
-                                                       '_minOccurs': '0',
-                                                       'any': {'_maxOccurs': 'unbounded',
-                                                               '_processContents': 'lax'}}}},
-                            {'_name': 'PropType',
-                             'attribute': {'_name': 'name',
-                                           '_type': 'xsd:string'}},
-                            {'_name': 'TupleType',
-                             'sequence': {'_maxOccurs': 'unbounded',
-                                          'element': {'_name': 'Member',
-                                                      '_type': 'MemberType'}}},
-                            {'_name': 'MembersType',
-                             'attribute': {'_name': 'Hierarchy',
-                                           '_type': 'xsd:string'},
-                             'sequence': {'_maxOccurs': 'unbounded',
-                                          'element': {'_name': 'Member',
-                                                      '_type': 'MemberType'}}},
-                            {'_name': 'TuplesType',
-                             'sequence': {'_maxOccurs': 'unbounded',
-                                          'element': {'_name': 'Tuple',
-                                                      '_type': 'TupleType'}}},
-                            {'_name': 'CrossProductType',
-                             'attribute': {'_name': 'Size',
-                                           '_type': 'xsd:unsignedInt'},
-                             'sequence': {'choice': {'_maxOccurs': 'unbounded',
-                                                     '_minOccurs': '0',
-                                                     'element': [{'_name': 'Members',
-                                                                  '_type': 'MembersType'},
-                                                                 {'_name': 'Tuples',
-                                                                  '_type': 'TuplesType'}]}}},
-                            {'_name': 'OlapInfo',
-                             'sequence': {'element': [{'_name': 'CubeInfo',
-                                                       'complexType': {'sequence': {'element': {'_maxOccurs': 'unbounded',
-                                                                                                '_name': 'Cube',
-                                                                                                'complexType': {'sequence': {'element': {'_name': 'CubeName',
-                                                                                                                                         '_type': 'xsd:string'}}}}}}},
-                                                      {'_name': 'AxesInfo',
-                                                       'complexType': {'sequence': {'element': {'_maxOccurs': 'unbounded',
-                                                                                                '_name': 'AxisInfo',
-                                                                                                'complexType': {'attribute': {'_name': 'name',
-                                                                                                                              '_type': 'xsd:string'},
-                                                                                                                'sequence': {'element': {'_maxOccurs': 'unbounded',
-                                                                                                                                         '_minOccurs': '0',
-                                                                                                                                         '_name': 'HierarchyInfo',
-                                                                                                                                         'complexType': {'attribute': {'_name': 'name',
-                                                                                                                                                                       '_type': 'xsd:string',
-                                                                                                                                                                       '_use': 'required'},
-                                                                                                                                                         'sequence': {'sequence': [{'_maxOccurs': 'unbounded',
-                                                                                                                                                                                    'element': [{'_name': 'UName',
-                                                                                                                                                                                                 '_type': 'PropType'},
-                                                                                                                                                                                                {'_name': 'Caption',
-                                                                                                                                                                                                 '_type': 'PropType'},
-                                                                                                                                                                                                {'_name': 'LName',
-                                                                                                                                                                                                 '_type': 'PropType'},
-                                                                                                                                                                                                {'_name': 'LNum',
-                                                                                                                                                                                                 '_type': 'PropType'},
-                                                                                                                                                                                                {'_maxOccurs': 'unbounded',
-                                                                                                                                                                                                 '_minOccurs': '0',
-                                                                                                                                                                                                 '_name': 'DisplayInfo',
-                                                                                                                                                                                                 '_type': 'PropType'}]},
-                                                                                                                                                                                   {'any': {'_maxOccurs': 'unbounded',
-                                                                                                                                                                                            '_minOccurs': '0',
-                                                                                                                                                                                            '_processContents': 'lax'}}]}}}}}}}}},
-                                                      {'_name': 'CellInfo',
-                                                       'complexType': {'sequence': {'sequence': [{'_maxOccurs': 'unbounded',
-                                                                                                  '_minOccurs': '0',
-                                                                                                  'choice': {'element': [{'_name': 'Value',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'FmtValue',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'BackColor',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'ForeColor',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'FontName',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'FontSize',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'FontFlags',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'FormatString',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'NonEmptyBehavior',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'SolveOrder',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'Updateable',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'Visible',
-                                                                                                                          '_type': 'PropType'},
-                                                                                                                         {'_name': 'Expression',
-                                                                                                                          '_type': 'PropType'}]}},
-                                                                                                 {'_maxOccurs': 'unbounded',
-                                                                                                  '_minOccurs': '0',
-                                                                                                  'any': {'_maxOccurs': 'unbounded',
-                                                                                                          '_processContents': 'lax'}}]}}}]}},
-                            {'_name': 'Axes',
-                             'sequence': {'_maxOccurs': 'unbounded',
-                                          'element': {'_name': 'Axis',
-                                                      'complexType': {'attribute': {'_name': 'name',
-                                                                                    '_type': 'xsd:string'},
-                                                                      'choice': {'_maxOccurs': 'unbounded',
-                                                                                 '_minOccurs': '0',
-                                                                                 'element': [{'_name': 'CrossProduct',
-                                                                                              '_type': 'CrossProductType'},
-                                                                                             {'_name': 'Tuples',
-                                                                                              '_type': 'TuplesType'},
-                                                                                             {'_name': 'Members',
-                                                                                              '_type': 'MembersType'}]}}}}},
-                            {'_name': 'CellData',
-                             'sequence': {'element': {'_maxOccurs': 'unbounded',
-                                                      '_minOccurs': '0',
-                                                      '_name': 'Cell',
-                                                      'complexType': {'attribute': {'_name': 'CellOrdinal',
-                                                                                    '_type': 'xsd:unsignedInt',
-                                                                                    '_use': 'required'},
-                                                                      'sequence': {'_maxOccurs': 'unbounded',
-                                                                                   'choice': {'element': [{'_name': 'Value'},
-                                                                                                          {'_name': 'FmtValue',
-                                                                                                           '_type': 'xsd:string'},
-                                                                                                          {'_name': 'BackColor',
-                                                                                                           '_type': 'xsd:unsignedInt'},
-                                                                                                          {'_name': 'ForeColor',
-                                                                                                           '_type': 'xsd:unsignedInt'},
-                                                                                                          {'_name': 'FontName',
-                                                                                                           '_type': 'xsd:string'},
-                                                                                                          {'_name': 'FontSize',
-                                                                                                           '_type': 'xsd:unsignedShort'},
-                                                                                                          {'_name': 'FontFlags',
-                                                                                                           '_type': 'xsd:unsignedInt'},
-                                                                                                          {'_name': 'FormatString',
-                                                                                                           '_type': 'xsd:string'},
-                                                                                                          {'_name': 'NonEmptyBehavior',
-                                                                                                           '_type': 'xsd:unsignedShort'},
-                                                                                                          {'_name': 'SolveOrder',
-                                                                                                           '_type': 'xsd:unsignedInt'},
-                                                                                                          {'_name': 'Updateable',
-                                                                                                           '_type': 'xsd:unsignedInt'},
-                                                                                                          {'_name': 'Visible',
-                                                                                                           '_type': 'xsd:unsignedInt'},
-                                                                                                          {'_name': 'Expression',
-                                                                                                           '_type': 'xsd:string'}]}}}}}}],
-            'element': {'_name': 'root',
-                        'complexType': {'sequence': {'_maxOccurs': 'unbounded',
-                                                     'element': [{'_name': 'OlapInfo',
-                                                                  '_type': 'OlapInfo'},
-                                                                 {'_name': 'Axes',
-                                                                  '_type': 'Axes'},
-                                                                 {'_name': 'CellData',
-                                                                  '_type': 'CellData'}]}}}}}
+              'CubeInfo': {'Cube': {'CubeName': 'Sales'}}}}
+
+xml_response="""<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<SOAP-ENV:Header>
+</SOAP-ENV:Header>
+<SOAP-ENV:Body>
+<cxmla:ExecuteResponse xmlns:cxmla="urn:schemas-microsoft-com:xml-analysis">
+  <cxmla:return>
+    <root xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:EX="urn:schemas-microsoft-com:xml-analysis:exception">
+      <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="urn:schemas-microsoft-com:xml-analysis:mddataset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:sql="urn:schemas-microsoft-com:xml-sql" targetNamespace="urn:schemas-microsoft-com:xml-analysis:mddataset" elementFormDefault="qualified">
+        <xsd:complexType name="MemberType">
+          <xsd:sequence>
+            <xsd:element name="UName" type="xsd:string"/>
+            <xsd:element name="Caption" type="xsd:string"/>
+            <xsd:element name="LName" type="xsd:string"/>
+            <xsd:element name="LNum" type="xsd:unsignedInt"/>
+            <xsd:element name="DisplayInfo" type="xsd:unsignedInt"/>
+            <xsd:sequence maxOccurs="unbounded" minOccurs="0">
+              <xsd:any processContents="lax" maxOccurs="unbounded"/>
+            </xsd:sequence>
+          </xsd:sequence>
+          <xsd:attribute name="Hierarchy" type="xsd:string"/>
+        </xsd:complexType>
+        <xsd:complexType name="PropType">
+          <xsd:attribute name="name" type="xsd:string"/>
+        </xsd:complexType>
+        <xsd:complexType name="TupleType">
+          <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="Member" type="MemberType"/>
+          </xsd:sequence>
+        </xsd:complexType>
+        <xsd:complexType name="MembersType">
+          <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="Member" type="MemberType"/>
+          </xsd:sequence>
+          <xsd:attribute name="Hierarchy" type="xsd:string"/>
+        </xsd:complexType>
+        <xsd:complexType name="TuplesType">
+          <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="Tuple" type="TupleType"/>
+          </xsd:sequence>
+        </xsd:complexType>
+        <xsd:complexType name="CrossProductType">
+          <xsd:sequence>
+            <xsd:choice minOccurs="0" maxOccurs="unbounded">
+              <xsd:element name="Members" type="MembersType"/>
+              <xsd:element name="Tuples" type="TuplesType"/>
+            </xsd:choice>
+          </xsd:sequence>
+          <xsd:attribute name="Size" type="xsd:unsignedInt"/>
+        </xsd:complexType>
+        <xsd:complexType name="OlapInfo">
+          <xsd:sequence>
+            <xsd:element name="CubeInfo">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element name="Cube" maxOccurs="unbounded">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="CubeName" type="xsd:string"/>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="AxesInfo">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element name="AxisInfo" maxOccurs="unbounded">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="HierarchyInfo" minOccurs="0" maxOccurs="unbounded">
+                          <xsd:complexType>
+                            <xsd:sequence>
+                              <xsd:sequence maxOccurs="unbounded">
+                                <xsd:element name="UName" type="PropType"/>
+                                <xsd:element name="Caption" type="PropType"/>
+                                <xsd:element name="LName" type="PropType"/>
+                                <xsd:element name="LNum" type="PropType"/>
+                                <xsd:element name="DisplayInfo" type="PropType" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                              <xsd:sequence>
+                                <xsd:any processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                              </xsd:sequence>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                          </xsd:complexType>
+                        </xsd:element>
+                      </xsd:sequence>
+                      <xsd:attribute name="name" type="xsd:string"/>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="CellInfo">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:sequence minOccurs="0" maxOccurs="unbounded">
+                    <xsd:choice>
+                      <xsd:element name="Value" type="PropType"/>
+                      <xsd:element name="FmtValue" type="PropType"/>
+                      <xsd:element name="BackColor" type="PropType"/>
+                      <xsd:element name="ForeColor" type="PropType"/>
+                      <xsd:element name="FontName" type="PropType"/>
+                      <xsd:element name="FontSize" type="PropType"/>
+                      <xsd:element name="FontFlags" type="PropType"/>
+                      <xsd:element name="FormatString" type="PropType"/>
+                      <xsd:element name="NonEmptyBehavior" type="PropType"/>
+                      <xsd:element name="SolveOrder" type="PropType"/>
+                      <xsd:element name="Updateable" type="PropType"/>
+                      <xsd:element name="Visible" type="PropType"/>
+                      <xsd:element name="Expression" type="PropType"/>
+                    </xsd:choice>
+                  </xsd:sequence>
+                  <xsd:sequence maxOccurs="unbounded" minOccurs="0">
+                    <xsd:any processContents="lax" maxOccurs="unbounded"/>
+                  </xsd:sequence>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+        <xsd:complexType name="Axes">
+          <xsd:sequence maxOccurs="unbounded">
+            <xsd:element name="Axis">
+              <xsd:complexType>
+                <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                  <xsd:element name="CrossProduct" type="CrossProductType"/>
+                  <xsd:element name="Tuples" type="TuplesType"/>
+                  <xsd:element name="Members" type="MembersType"/>
+                </xsd:choice>
+                <xsd:attribute name="name" type="xsd:string"/>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+        <xsd:complexType name="CellData">
+          <xsd:sequence>
+            <xsd:element name="Cell" minOccurs="0" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:sequence maxOccurs="unbounded">
+                  <xsd:choice>
+                    <xsd:element name="Value"/>
+                    <xsd:element name="FmtValue" type="xsd:string"/>
+                    <xsd:element name="BackColor" type="xsd:unsignedInt"/>
+                    <xsd:element name="ForeColor" type="xsd:unsignedInt"/>
+                    <xsd:element name="FontName" type="xsd:string"/>
+                    <xsd:element name="FontSize" type="xsd:unsignedShort"/>
+                    <xsd:element name="FontFlags" type="xsd:unsignedInt"/>
+                    <xsd:element name="FormatString" type="xsd:string"/>
+                    <xsd:element name="NonEmptyBehavior" type="xsd:unsignedShort"/>
+                    <xsd:element name="SolveOrder" type="xsd:unsignedInt"/>
+                    <xsd:element name="Updateable" type="xsd:unsignedInt"/>
+                    <xsd:element name="Visible" type="xsd:unsignedInt"/>
+                    <xsd:element name="Expression" type="xsd:string"/>
+                  </xsd:choice>
+                </xsd:sequence>
+                <xsd:attribute name="CellOrdinal" type="xsd:unsignedInt" use="required"/>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+        <xsd:element name="root">
+          <xsd:complexType>
+            <xsd:sequence maxOccurs="unbounded">
+              <xsd:element name="OlapInfo" type="OlapInfo"/>
+              <xsd:element name="Axes" type="Axes"/>
+              <xsd:element name="CellData" type="CellData"/>
+            </xsd:sequence>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:schema>
+      <OlapInfo>
+        <CubeInfo>
+          <Cube>
+            <CubeName>Sales</CubeName>
+          </Cube>
+        </CubeInfo>
+        <AxesInfo>
+          <AxisInfo name="SlicerAxis"/>
+        </AxesInfo>
+        <CellInfo>
+          <Value name="VALUE"/>
+          <FmtValue name="FORMATTED_VALUE"/>
+          <FormatString name="FORMAT_STRING"/>
+        </CellInfo>
+      </OlapInfo>
+      <Axes></Axes>
+      <CellData>
+        <Cell CellOrdinal="0">
+          <Value xsi:type="xsd:double">266773</Value>
+          <FmtValue>266.773</FmtValue>
+          <FormatString>Standard</FormatString>
+        </Cell>
+      </CellData>
+    </root>
+  </cxmla:return>
+</cxmla:ExecuteResponse>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
+"""

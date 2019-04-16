@@ -1,5 +1,5 @@
 import unittest
-
+import sys
 import olap.xmla.utils as utils
 
 class TestUtils(unittest.TestCase):
@@ -18,6 +18,22 @@ class TestUtils(unittest.TestCase):
         self.assertEqual(mn("DISCOVER_palim"), "getPalim")
         self.assertEqual(mn("I_KNOW_WHAT_YOU_DID_LAST_SPRINGBREAK"), 
                          "getIKnowWhatYouDidLastSpringbreak")
+
+    def testFromETree(self):
+        import lxml.etree as etree
+        root = etree.Element("root")
+        c1 = etree.SubElement(root, "c1")
+        c1.text="iam_c1"
+        c11 = etree.SubElement(c1, "c11")
+        c11.text="iam_c11"
+        c12 = etree.SubElement(c1, "c12", attrib={"a1":"val_a1", "a2":"val_a2"})
+        c12.text="iam_c12"
+        c2 = etree.SubElement(root, "c2")
+        c2.text="iam_c2"
+        d = utils.fromETree(root, ns="")
+        self.assertEqual(d.c1.text, "iam_c1")
+        self.assertEqual(d.c1.c12.text, "iam_c12")
+        self.assertEqual(d.c1.c12._a1, "val_a1")
 
 if __name__ == "__main__":
     unittest.main()

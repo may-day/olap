@@ -1,39 +1,26 @@
 #-*- coding:utf-8 -*-
 
 from setuptools import setup
-from distutils.util import get_platform
 
-long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.md").read() 
+long_description = open("README.md").read()
 
 install_requires=[
-    'olap',
-    'suds',
-    'requests == 1.2.3'
+    'olap >= 0.3',
+    'zeep',
+    'requests',
+    'lxml',
+    'six'
     ]
-
-extras_require = {
-    "kerberos": ["kerberos"],
-    "s4u2p":["s4u2p"]
-}
-
-if get_platform().startswith('win'):
-    extras_require["sspi"] = ["kerberos-sspi"]
-    
-# hack, or test wont run on py2.7
-try:
-    import multiprocessing
-    import logging
-except:
-    pass
 
 setup(
     name='xmla',
-    version='0.7.2',
+    version='0.8.0',
     url="https://github.com/may-day/olap",
     license='Apache Software License 2.0',
     classifiers = [
         "License :: OSI Approved :: Apache Software License",
         "Programming Language :: Python :: 2",
+        "Programming Language :: Python :: 3",
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
@@ -41,6 +28,7 @@ setup(
         ],
     description='Access olap data sources through xmla',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Norman Krämer',
     author_email='kraemer.norman@googlemail.com',
     packages=['olap', 'olap.xmla'],
@@ -48,11 +36,9 @@ setup(
     package_dir={'olap':'olap', 'olap.xmla': 'olap/xmla'},
     package_data={'olap.xmla': ['vs.wsdl']},
     install_requires=install_requires,
-    extras_require = extras_require,
     tests_require = [
         'nose',
-        'nose-testconfig',
-        'docutils'
+        'requests_mock',
     ],
 
     test_suite = 'nose.collector',

@@ -5,6 +5,9 @@ branches:
     - master
 python:
 - "2.7"
+- "3.5"
+- "3.6"
+- "3.7"
 script:
 - cd xmla
 - python setup.py test

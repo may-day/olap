@@ -1,0 +1,22 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+nose = "*"
+nose-testconfig = "*"
+tox-pipenv = "*"
+tox = "==3.7.0"
+v = {editable = true,version = "*"}
+coverage = "*"
+requests-mock = "*"
+
+[packages]
+zope-interface = "*"
+zeep = "*"
+requests = "*"
+requests-kerberos = "*"
+six = "*"
+lxml = "*"
+olap = "*"

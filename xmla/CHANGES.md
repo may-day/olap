@@ -1,6 +1,12 @@
 CHANGES
 =======
 
+0.8.0
+-----
+* now relies on zeep instead of suds
+* optionally pass auth, a requests auth plugin, if needed - or your own requests session object to use
+* now works with python 2.7, 3.5, 3.6, 3.7
+
 0.7.2
 -----
 * now relies on requests 1.2.3

@@ -3,31 +3,57 @@ Created on 18.04.2012
 
 @author: norman
 '''
-from olap.xmla.interfaces import XMLAException
-from suds.client import Client
-from suds import WebFault
-import http
-import types
-from formatreader import TupleFormatReader
-from utils import *
+from .interfaces import XMLAException
+from zeep import Client, Plugin, xsd
+from zeep.exceptions import Fault
+from zeep.transports import Transport
+
+#import types
+from .formatreader import TupleFormatReader
+from .utils import *
 import logging
 
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
-from suds.plugin import MessagePlugin
+
+schema_xmla="urn:schemas-microsoft-com:xml-analysis"
+schema_xmla_rowset="urn:schemas-microsoft-com:xml-analysis:rowset"
+schema_xmla_mddataset="urn:schemas-microsoft-com:xml-analysis:mddataset"
+schema_soap_env="http://schemas.xmlsoap.org/soap/envelope/"
 
 # the following along with changes to the wsdl (elementFormDefault="unqualified") is needed
 # to make it fly with icCube, which expects elements w/o namespace prefix
-class UseDefaultNamespace(MessagePlugin):
-    def marshalled(self, context):
-        for d in context.envelope.getChild('Body').children:
-            d.prefix = None
-            d.set("xmlns", "urn:schemas-microsoft-com:xml-analysis")
+class LogRequest(Plugin):
+    def __init__(self, enabled=True):
+        self.enabled = enabled
 
-#import logging
-#logging.basicConfig(level=logging.INFO)
-#logging.getLogger('suds.client').setLevel(logging.DEBUG)
-#logging.getLogger('suds.transport').setLevel(logging.DEBUG)
+    def egress(self, envelope, http_headers, operation, binding_options):
+        if self.enabled:
+            print(etree_tostring(envelope))
+
+    def ingress(self, envelope, http_headers, operation):
+        if self.enabled:
+            print(etree_tostring(envelope))
+
+    def enable(self):
+        self.enabled=True
+    def disable(self):
+        self.enabled=False
+
+class SessionPlugin(Plugin):
+  def __init__(self, xmlaconn):
+      self.xmlaconn = xmlaconn
+
+  def ingress(self, envelope, http_headers, operation):
+    #print(etree_tostring(envelope))
+    if self.xmlaconn.getListenOnSessionId():
+        nsmap={'se': schema_soap_env,
+               'xmla': schema_xmla}
+        s=envelope.xpath("/se:Envelope/se:Header/xmla:Session", namespaces=nsmap)[0]
+        sid=s.attrib.get("SessionId")
+        self.xmlaconn.setSessionId(sid)
+
 
 # lsit of XMLA1.1 rowsets: 
 xmla1_1_rowsets = ["DISCOVER_DATASOURCES",
@@ -56,7 +82,7 @@ class XMLAConnection(object):
     
     @classmethod
     def addMethod(cls, funcname, func):
-        return setattr(cls, funcname, types.MethodType(func, None, cls))
+        return setattr(cls, funcname, func)
 
         
     @classmethod
@@ -70,82 +96,106 @@ class XMLAConnection(object):
             mname = schemaNameToMethodName(schemaName)
             cls.addMethod( mname, getFunc(schemaName) )
 
-    def __init__(self, url, location, username, password, spn, sslverify):
+    def __init__(self, url, location, sslverify, **kwargs):
 
-        if password is None:
-            transport = http.HttpKerberosAuthenticated(as_user=username, 
-                                                       spn=spn, 
-                                                       sslverify=sslverify)
+        if "session" in kwargs:
+            session = kwargs["session"]
+            del kwargs["session"]
+            transport = Transport(session=session)
         else:
-            transport = http.HttpAuthenticated(username=username, 
-                                               password=password, 
-                                               sslverify=sslverify)
+            transport = Transport()
+            
+        if "auth" in kwargs:
+            transport.session.auth = kwargs["auth"]
+            del kwargs["auth"]
+
+        transport.session.verify = sslverify
+        self.sessionplugin=SessionPlugin(self)
+        plugins=[self.sessionplugin]
+
+        if "log" in kwargs:
+            log = kwargs.get("log")
+            if isinstance(log, Plugin):
+                plugins.append(log)
+            elif log == True:
+                plugins.append(LogRequest())
+            del kwargs["log"]
+            
         self.client = Client(url, 
-                             location=location, 
                              transport=transport, 
-                             cache=None, 
-                             plugins=[UseDefaultNamespace()])
-        
+                             # cache=None, unwrap=False,
+                             plugins=plugins)
+
+        self.service = self.client.create_service(ns_name(schema_xmla,"MsXmlAnalysisSoap"), location)
+        self.client.set_ns_prefix(None, schema_xmla)
         # optional, call might fail
         self.getMDSchemaLevels = lambda *args, **kw: self.Discover("MDSCHEMA_LEVELS", 
                                                                    *args, **kw)
-        self.sessionid = None
+        self.setListenOnSessionId(False)
+        self.setSessionId(None)
+        self._soapheaders=None
              
+
+    def getListenOnSessionId(self):
+        return self.listenOnSessionId
+
+    def setListenOnSessionId(self, trueOrFalse):
+        self.listenOnSessionId = trueOrFalse
+
+    def setSessionId(self, sessionId):
+        self.sessionId = sessionId
         
     def Discover(self, what, restrictions=None, properties=None):
-        rl = None
-        pl = None
-        if restrictions:
-            rl = {"RestrictionList":restrictions}
-        if properties:
-            pl = {"PropertyList":properties}
-            
+        rl = as_etree(restrictions, "RestrictionList")
+        pl = as_etree(properties, "PropertyList")
         try:
-            res = getattr(self.client.service.Discover(what, rl, pl).\
-                              DiscoverResponse["return"].root, "row", [])
+            #import pdb; pdb.set_trace()
+            doc=self.service.Discover(RequestType=what, Restrictions=rl, Properties=pl, _soapheaders=self._soapheaders)
+            root = fromETree(doc.body["return"]["_value_1"], ns=schema_xmla_rowset)
+            res = getattr(root, "row", [])
             if res:
                 res = aslist(res)
-        except WebFault, fault:
-            raise XMLAException(fault.message, dictify(fault.fault))
-        logger.debug( res )
+        except Fault as fault:
+            raise XMLAException(fault.message, dictify(fromETree(fault.detail, ns=None)))
+        #logger.debug( res )
         return res
 
 
     def Execute(self, command, dimformat="Multidimensional", 
                 axisFormat="TupleFormat", **kwargs):
-        if isinstance(command, types.StringTypes):
-            command = {"Statement":command}
+        if isinstance(command, stringtypes):
+            command=as_etree({"Statement": command})
         props = {"Format":dimformat, "AxisFormat":axisFormat}
         props.update(kwargs)
-        pl = {"PropertyList":props}
+
+        plist = as_etree({"PropertyList":props})
         try:
-            root = self.client.service.Execute(command, pl).ExecuteResponse["return"].root
-            return TupleFormatReader(root)
-        except WebFault, fault:
-            raise XMLAException(fault.message, dictify(fault.fault))
+            
+            res = self.service.Execute(Command=command, Properties=plist, _soapheaders=self._soapheaders)
+            root = res.body["return"]["_value_1"]
+            return TupleFormatReader(fromETree(root, ns=schema_xmla_mddataset))
+        except Fault as fault:
+            raise XMLAException(fault.message, dictify(fromETree(fault.detail, ns=None)))
         
         
     def BeginSession(self):
-        bs= self.client.factory.create("BeginSession")
-        bs._mustUnderstand = 1
-        sess= self.client.factory.create("Session")
-        sess._mustUnderstand = 1
-        self.client.set_options(soapheaders={"BeginSession":bs})
-        self.client.service.Execute({"Statement":None})
-        sess._SessionId=self.client.last_received().\
-            childAtPath("/Envelope/Header/Session").getAttribute("SessionId").getValue()
-        self.sessionid = sess._SessionId
-        self.client.set_options(soapheaders=sess)
+        bs= self.client.get_element(ns_name(schema_xmla,"BeginSession"))(mustUnderstand=1)
+        self.setListenOnSessionId(True)
+        cmd = as_etree("Statement")
+
+        self.service.Execute(Command=cmd,_soapheaders={"BeginSession":bs})
+        self.setListenOnSessionId(False)
+
+        sess= self.client.get_element(ns_name(schema_xmla,"Session"))(SessionId=self.sessionId, mustUnderstand = 1)
+        self._soapheaders={"Session":sess}
         
     def EndSession(self):
-        if self.sessionid is not None:
-            es= self.client.factory.create("EndSession")
-            es._mustUnderstand = 1
-            es._SessionId = self.sessionid
-            self.client.set_options(soapheaders={"EndSession":es})
-            self.client.service.Execute({"Statement":None})
-            self.sessionid = None
-            self.client.set_options(soapheaders=None)
+        if self.sessionId is not None:
+            es= self.client.get_element(ns_name(schema_xmla,"EndSession"))(SessionId=self.sessionId, mustUnderstand = 1)
+            cmd = as_etree("Statement")
+            self.service.Execute(Command=cmd, _soapheaders={"EndSession":es})
+            self.setSessionId(None)
+            self._soapheaders=None
 
                 
 XMLAConnection.setupMembers()

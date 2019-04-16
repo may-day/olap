@@ -5,6 +5,7 @@
 /parts
 /develop-eggs
 /bin
+/.venv
 cover
 
 PKG-INFO
@@ -17,3 +18,4 @@ MANIFEST
 *.pyc
 *.pem
 index.html
+xmla/Pipfile.lock

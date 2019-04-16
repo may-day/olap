@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<SOAP-ENV:Body>
+<DiscoverResponse xmlns="urn:schemas-microsoft-com:xml-analysis">
+<return xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">  
+<root xmlns="urn:schemas-microsoft-com:xml-analysis:rowset">
+<xsd:schema xmlns="urn:schemas-microsoft-com:xml-analysis:rowset" targetNamespace="urn:schemas-microsoft-com:xml-analysis:rowset" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:sql="urn:schemas-microsoft-com:xml-sql" elementFormDefault="qualified">
+<xsd:element name="root"><xsd:complexType>
+<xsd:sequence maxOccurs="unbounded" minOccurs="0">
+<xsd:element name="row" type="row"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:element>
+<xsd:complexType name="row">
+<xsd:sequence maxOccurs="unbounded" minOccurs="0">
+<xsd:element name="DataSourceName" type="xsd:string" sql:field="DataSourceName"/>
+<xsd:element name="DataSourceDescription" type="xsd:string" sql:field="DataSourceDescription"/>
+<xsd:element name="URL" type="xsd:string" sql:field="URL"/>
+<xsd:element name="DataSourceInfo" type="xsd:string" sql:field="DataSourceInfo"/>
+<xsd:element name="ProviderName" type="xsd:string" sql:field="ProviderName"/>
+<xsd:element name="ProviderType" type="xsd:string" sql:field="ProviderType"/>
+<xsd:element name="AuthenticationMode" type="xsd:string" sql:field="AuthenticationMode"/>
+</xsd:sequence>
+</xsd:complexType>
+</xsd:schema>
+<row><DataSourceName>SAP_BW</DataSourceName><DataSourceDescription>SAP Business Information Warehouse Release 7.4 Support Package VII</DataSourceDescription>
+<URL>http://yourhost/sap/bw/xml/soap/xmla</URL>
+<DataSourceInfo>default</DataSourceInfo>
+<ProviderName>SAP BW</ProviderName>
+<ProviderType>MDP</ProviderType>
+<AuthenticationMode>Integrated</AuthenticationMode>
+</row>
+</root>
+</return>
+</DiscoverResponse>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
