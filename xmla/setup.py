@@ -7,7 +7,9 @@ long_description = open("README.md").read()
 install_requires=[
     'olap >= 0.3',
     'zeep',
-    'requests'
+    'requests',
+    'lxml',
+    'six'
     ]
 
 setup(
