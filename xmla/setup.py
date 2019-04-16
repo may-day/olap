@@ -36,9 +36,7 @@ setup(
     install_requires=install_requires,
     tests_require = [
         'nose',
-        'docutils',
         'requests_mock',
-        'Pygments'
     ],
 
     test_suite = 'nose.collector',

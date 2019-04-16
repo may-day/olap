@@ -6,8 +6,6 @@ verify_ssl = true
 [dev-packages]
 nose = "*"
 nose-testconfig = "*"
-docutils = "*"
-pygments = "*"
 tox-pipenv = "*"
 tox = "==3.7.0"
 v = {editable = true,version = "*"}
@@ -22,5 +20,3 @@ requests-kerberos = "*"
 six = "*"
 lxml = "*"
 olap = "*"
-#[requires]
-#python_version = "3.7"
