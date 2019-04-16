@@ -23,7 +23,7 @@ In your workdir run:
 Testing
 -
 
-See documentation [HOWTO](xmla/HOWTO.md)
+See [HOWTO](xmla/HOWTO.md)
 
 Example
 -
