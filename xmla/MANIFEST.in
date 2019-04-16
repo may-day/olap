@@ -1,3 +1,6 @@
 include olap/xmla/vs.wsdl
-include CHANGES.rst
-include README.rst
+include CHANGES.md
+include README.md
+include HOWTO.md
+include Pipfile Pipfile.lock
+recursive-include tests *.py
