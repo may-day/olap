@@ -1,19 +1,14 @@
 #-*- coding:utf-8 -*-
 
 from setuptools import setup
-from distutils.util import get_platform
 
-long_description = open("README.rst").read() + "\n\n" +  open("CHANGES.rst").read() 
+long_description = open("README.md").read()
 
 install_requires=[
-    'olap',
+    'olap >= 0.3',
     'zeep',
     'requests'
     ]
-
-extras_require = {
-    "kerberos": ["requests_kerberos"]
-}
 
 setup(
     name='xmla',
@@ -22,6 +17,7 @@ setup(
     license='Apache Software License 2.0',
     classifiers = [
         "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 3",
         "Development Status :: 3 - Alpha",
         "Environment :: Web Environment",
@@ -30,6 +26,7 @@ setup(
         ],
     description='Access olap data sources through xmla',
     long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Norman Krämer',
     author_email='kraemer.norman@googlemail.com',
     packages=['olap', 'olap.xmla'],
@@ -37,10 +34,8 @@ setup(
     package_dir={'olap':'olap', 'olap.xmla': 'olap/xmla'},
     package_data={'olap.xmla': ['vs.wsdl']},
     install_requires=install_requires,
-    extras_require = extras_require,
     tests_require = [
         'nose',
-        'nose-testconfig',
         'docutils',
         'requests_mock',
         'Pygments'

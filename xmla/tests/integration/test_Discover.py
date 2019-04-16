@@ -85,28 +85,6 @@ ssas={
     "conversation":discover_ssas
 }
 
-iccube={
-    "type":"icCube",
-    "location":"http://localhost:80/icCube/xmla",
-    "auth": HTTPBasicAuth("demo", "demo"),
-    "ds":"icCube-datasource",
-    "catalog":"Sales",
-    "restrict_cube":"Sales",
-    "restrict_dim":"Customers",
-    "restrict_unique_dim":"[Customers]",
-    "cubes_expected":1,
-    "restrict_funcname":"TRIM",
-    "restrict_hier":"Geography",
-    "restrict_level_unique_name":"[Customers].[Geography].[Region]",
-    "restrict_hierarchy_unique_name":"[Customers].[Geography]",
-    "cube_measures": 2,
-    "schema_levels":4,
-    "schema_sets":0,
-    "schema_sets_needs_cubename":False,
-    "schema_tables":0
-}
-
-
 import logging
 #logging.basicConfig(level=logging.INFO)
 #logging.getLogger('suds.client').setLevel(logging.DEBUG)
@@ -160,7 +138,7 @@ class XMLA(object):
                  EndRange,Format,LocaleIdentifier,MDXSupport,Password,
                  ProviderName,ProviderVersion,StateSupport,Timeout,UserName"""
         # of those required icCube only returns ProviderVersion and Catalog
-        if self.be == iccube: req = "Catalog,ProviderVersion"
+        # if self.be == iccube: req = "Catalog,ProviderVersion"
         propnames = [x["PropertyName"] for x in erg]
         for p in req.split(","):
             self.assertIn(p.strip(), propnames)
@@ -263,7 +241,7 @@ class XMLA(object):
     def testGetKeywords(self):
         # instead of not listing the KEYWORDS Rowset in a call to 
         # DISCOVER_SCHEMA_ROWSETS, iccube throws an exceptions
-        if "DISCOVER_KEYWORDS" in self.conform and self.be != iccube:
+        if "DISCOVER_KEYWORDS" in self.conform:
             erg = self.c.getKeywords()
             self.assertTrue(len(erg)> 0, 
                             "There should be at least one keyword.")
@@ -338,13 +316,6 @@ except:
 if "mondrian" in server:
     class TestMondrian(XMLA, unittest.TestCase):
         be = mondrian
-        supported = proprietary = conform = unsupported = None
-        logreq = mockhelper.LogRequest(False)
-        record = do_record
-
-if "iccube" in server:
-    class TestICCube(XMLA, unittest.TestCase):
-        be = iccube
         supported = proprietary = conform = unsupported = None
         logreq = mockhelper.LogRequest(False)
         record = do_record

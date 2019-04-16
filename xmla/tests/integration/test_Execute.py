@@ -45,19 +45,6 @@ ssas={
     "conversation":execute_ssas,
 }
 
-iccube={
-	"type":"icCube",
-	"location":"http://localhost:80/icCube/xmla",
-    "auth": HTTPBasicAuth("demo", "demo"),
-	"catalog":"Sales",
-	"cube":"[Sales]",
-	"set1":"[Measures].ALLMEMBERS",
-	"set2":"[Time].[Month].ALLMEMBERS",
-	"set3":"[Product].[Product].[Category].ALLMEMBERS",
-	}
-
-
-
 class XMLAExecute(object):
     be = None
     logreq = None
@@ -151,12 +138,6 @@ except:
 if "mondrian" in server:
     class TestMondrian(XMLAExecute, unittest.TestCase):
         be = mondrian
-        logreq = mockhelper.LogRequest(False)
-        record = do_record
-
-if "iccube" in server:
-    class TestICCube(XMLAExecute, unittest.TestCase):
-        be = iccube
         logreq = mockhelper.LogRequest(False)
         record = do_record
 
