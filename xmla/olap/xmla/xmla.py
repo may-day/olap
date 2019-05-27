@@ -41,6 +41,8 @@ class XMLAClass(object):
         un = self._properties.get(self.unique_name_property, "???")
         return self.__class__.__name__ + "<" + un + ">"
 
+    __repr__ = __str__
+
     def getElementProperties(self):
         return self._properties
 
