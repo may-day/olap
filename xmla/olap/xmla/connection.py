@@ -175,7 +175,7 @@ class XMLAConnection(object):
             if root_raw.tag.startswith("{{{}}}".format(schema_xmla_rowset)):
                 return DAXFormatReader(root_raw, fromETree(root_raw, ns=schema_xmla_rowset))
             else:
-                return TupleFormatReader(root_raw)
+                return TupleFormatReader(fromETree(root_raw, ns=schema_xmla_mddataset))
         except Fault as fault:
             raise XMLAException(fault.message, dictify(fromETree(fault.detail, ns=None)))
         
