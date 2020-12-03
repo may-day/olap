@@ -9,7 +9,7 @@ from zeep.exceptions import Fault
 from zeep.transports import Transport
 
 #import types
-from .formatreader import TupleFormatReader
+from .formatreader import TupleFormatReader, DAXFormatReader
 from .utils import *
 import logging
 
@@ -165,15 +165,17 @@ class XMLAConnection(object):
                 axisFormat="TupleFormat", **kwargs):
         if isinstance(command, stringtypes):
             command=as_etree({"Statement": command})
-        props = {"Format":dimformat, "AxisFormat":axisFormat}
+        props = {"Format":dimformat, "AxisFormat": axisFormat}
         props.update(kwargs)
 
-        plist = as_etree({"PropertyList":props})
+        plist = as_etree({"PropertyList": props})
         try:
-            
             res = self.service.Execute(Command=command, Properties=plist, _soapheaders=self._soapheaders)
-            root = res.body["return"]["_value_1"]
-            return TupleFormatReader(fromETree(root, ns=schema_xmla_mddataset))
+            root_raw = res.body["return"]["_value_1"]
+            if root_raw.tag.startswith("{{{}}}".format(schema_xmla_rowset)):
+                return DAXFormatReader(root_raw, fromETree(root_raw, ns=schema_xmla_rowset))
+            else:
+                return TupleFormatReader(root_raw)
         except Fault as fault:
             raise XMLAException(fault.message, dictify(fromETree(fault.detail, ns=None)))
         
