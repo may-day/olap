@@ -140,33 +140,37 @@ def fromETree(e, ns):
     p = Data()
     nst = ns_name(ns, "*")
     valtype = ns_name(schema_instance, "type")
-    for (k,v) in e.attrib.items():
-        setattr(p, "_"+k, v)
-    p.text = e.text
-    if p.text and p.text.strip() == "":
+    if e is not None:
+        for (k,v) in e.attrib.items():
+            setattr(p, "_"+k, v)
+        p.text = e.text
+        if p.text and p.text.strip() == "":
+            p.text=None
+    else:
         p.text=None
-    if valtype in e.attrib:
-        if e.attrib[valtype] in ["xsd:int", "xsd:unsignedInt"]:
-          p.text = int(p.text)  
-          delattr(p, "_"+valtype)
-        elif e.attrib[valtype] in ["xsd:long"]:
-          p.text = int(p.text)  if six.PY3 else long(p.text)
-          delattr(p, "_"+valtype)
-        elif e.attrib[valtype] in ["xsd:double", "xsd:float"]:
-          p.text = float(p.text)  
-          delattr(p, "_"+valtype)
-    for c in e.findall(nst):
-        t = QName(c)
-        
-        cd = fromETree(c, ns)
-        #if len(cd.__dict__) == 1:
-        if len(cd) == 1:
-            cd = cd.text
-        v = getattr(p, t.localname, None)
-        if v is not None:
-            if not isinstance(v, list):
-                setattr(p, t.localname, [v])
-            getattr(p, t.localname).append(cd)
-        else:
-            setattr(p, t.localname, cd)
+    if e is not None:
+        if valtype in e.attrib:
+            if e.attrib[valtype] in ["xsd:int", "xsd:unsignedInt"]:
+                p.text = int(p.text)  
+                delattr(p, "_"+valtype)
+            elif e.attrib[valtype] in ["xsd:long"]:
+                p.text = int(p.text)  if six.PY3 else long(p.text)
+                delattr(p, "_"+valtype)
+            elif e.attrib[valtype] in ["xsd:double", "xsd:float"]:
+                p.text = float(p.text)  
+                delattr(p, "_"+valtype)
+        for c in e.findall(nst):
+            t = QName(c)
+            
+            cd = fromETree(c, ns)
+            #if len(cd.__dict__) == 1:
+            if len(cd) == 1:
+                cd = cd.text
+            v = getattr(p, t.localname, None)
+            if v is not None:
+                if not isinstance(v, list):
+                    setattr(p, t.localname, [v])
+                getattr(p, t.localname).append(cd)
+            else:
+                setattr(p, t.localname, cd)
     return p
