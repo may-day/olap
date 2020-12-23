@@ -136,9 +136,9 @@ def ns_name(ns, name):
         return name
     return "{{{}}}{}".format(ns,name)
 
-def fromETree(e, ns):
+def fromETree(e, ns=None, name=None):
     p = Data()
-    nst = ns_name(ns, "*")
+    nst = ns_name(ns, name or "*")
     valtype = ns_name(schema_instance, "type")
     for (k,v) in e.attrib.items():
         setattr(p, "_"+k, v)

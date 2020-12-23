@@ -9,7 +9,7 @@ from zeep.exceptions import Fault
 from zeep.transports import Transport
 
 #import types
-from .formatreader import TupleFormatReader
+from .formatreader import TupleFormatReader, TupleFormatReaderTabular
 from .utils import *
 import logging
 
@@ -21,6 +21,7 @@ schema_xmla="urn:schemas-microsoft-com:xml-analysis"
 schema_xmla_rowset="urn:schemas-microsoft-com:xml-analysis:rowset"
 schema_xmla_mddataset="urn:schemas-microsoft-com:xml-analysis:mddataset"
 schema_soap_env="http://schemas.xmlsoap.org/soap/envelope/"
+schema_xml="http://www.w3.org/2001/XMLSchema"
 
 # the following along with changes to the wsdl (elementFormDefault="unqualified") is needed
 # to make it fly with icCube, which expects elements w/o namespace prefix
@@ -169,11 +170,15 @@ class XMLAConnection(object):
         props.update(kwargs)
 
         plist = as_etree({"PropertyList":props})
+        ns = schema_xmla_mddataset if dimformat == "Multidimensional" else schema_xmla_rowset
+        reader = TupleFormatReader if dimformat == "Multidimensional" else TupleFormatReaderTabular
         try:
             
             res = self.service.Execute(Command=command, Properties=plist, _soapheaders=self._soapheaders)
             root = res.body["return"]["_value_1"]
-            return TupleFormatReader(fromETree(root, ns=schema_xmla_mddataset))
+            cols = None if dimformat == "Multidimensional" else fromETree(root, ns=schema_xml, name="schema")
+            rows = fromETree(root, ns=ns)
+            return reader(rows, cols)
         except Fault as fault:
             raise XMLAException(fault.message, dictify(fromETree(fault.detail, ns=None)))
         
