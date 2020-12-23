@@ -6,8 +6,9 @@ import zope.interface
 @zope.interface.implementer(IMDXResult)
 class TupleFormatReader(object):
 
-    def __init__(self, tupleresult):
+    def __init__(self, tupleresult, cols=None):
         self.root = tupleresult
+        self.cols = cols
         self.cellmap = self.mapOrdinalsToCells()
         
     def mapOrdinalsToCells(self):
@@ -169,3 +170,24 @@ class TupleFormatReader(object):
         # so we can safely unpack the first element
         # in that element our resulting multidimensional array has been accumulated
         return axisranges[lastdimchange-1][1][0]
+
+
+class TupleFormatReaderTabular(object):
+
+    def __init__(self, tupleresult, cols=None):
+        self.root = tupleresult
+        self.colmap = {obj['_name']: obj['_{urn:schemas-microsoft-com:xml-sql}field']
+                       for obj in list(filter(lambda x: x['_name'] == 'row',
+                                              cols['schema']['complexType']))[0]['sequence']['element']}
+
+    def items(self):
+        rows = self.root['row']
+        if not isinstance(rows, list):
+            rows = [rows]
+        for row in rows:
+            item = {}
+            for key, value in row.items():
+                if key in self.colmap:
+                    item[self.colmap[key]] = value
+
+            yield item
